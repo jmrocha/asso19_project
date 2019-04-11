@@ -17,3 +17,7 @@
 - Bruno Miguel;
 - João Rocha;
 - Sérgio Salgado.
+
+## Starting Diagram
+
+![Starting Diagram](https://github.com/jmrocha/asso19_project/blob/master/diagram.png?raw=true)
