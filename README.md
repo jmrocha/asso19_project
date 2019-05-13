@@ -16,16 +16,15 @@ npm start
 ```
 
 ## Functionalities
-
-- SimpleDraw is based on the notion of documents;
-- Documents are rendered either in SVG or HTMLCanvas;
-- Multiple views of the same model;
-- Two interaction modes: point-n-click and REPLs;
-- Support persistence in multiple formats (TXT, XML, BIN);
-- Extendible with different objects (triangles, arrows, ...);
-- Extendible with new tools (rotate, translate, grid, ...);
-- Support (un)limited Undo / Redo of all operations;
-- Eventually extra funcionalities to be decided later.
+- Actions are made through REPL;
+- Supports (un)limited Undo / Redo of all operations;
+- Supports persistence in multiple formats (JSON, XML, ...);
+- Documents can be rendered either in SVG or HTMLCanvas;
+- Extensible with new tools (rotate, translate, grid, ...) and objects (triangles, squares, circles, ...) via plugins;
+- Interaction by Point-n-click;
+- Supports multiple users;
+- Supports layering and grouping;
+- Multiple views of the same model.
 
 ## Collaborators
 
