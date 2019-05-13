@@ -16,8 +16,8 @@
     },
     "scripts": {
         "build": "tsc",
-        "browserify": "browserify build/script.js -o dist/bundle.js",
-        "browser": "npm run build; npm run browserify; opn index.html",
-        "start": "npm run build; node build/index.js"
+        "browserify": "browserify build/index.js -o dist/bundle.js",
+        "browser": "npm run build && npm run browserify && opn index.html",
+        "start": "npm run build && node build/index.js"
     }
 }
