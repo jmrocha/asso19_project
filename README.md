@@ -1,5 +1,20 @@
 # Simple Draw
 
+## Getting started
+
+Requirements:
+- nodejs
+
+Install the dependencies:
+```bash
+npm install
+```
+
+Run this project:
+```bash
+npm start
+```
+
 ## Functionalities
 
 - SimpleDraw is based on the notion of documents;
