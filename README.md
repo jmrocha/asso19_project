@@ -10,9 +10,9 @@ Install the dependencies:
 npm install
 ```
 
-Run this project:
+Run the dev server:
 ```bash
-npm start
+npm run dev 
 ```
 
 ## Functionalities
