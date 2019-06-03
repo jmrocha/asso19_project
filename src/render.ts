@@ -31,7 +31,7 @@ export class CanvasRender implements Render {
 
     constructor() {
         const canvas = <HTMLCanvasElement>document.getElementById('canvas')
-        this.ctx = canvas.getContext('2d')
+        this.ctx = <CanvasRenderingContext2D>canvas.getContext('2d')
     }
 
     draw(...objs: Array<Shape>): void {

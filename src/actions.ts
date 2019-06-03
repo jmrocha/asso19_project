@@ -32,10 +32,10 @@ export class CreateRectangleAction extends CreateShapeAction<Rectangle> {
 }
 
 export class TranslateAction implements Action<void> {
-    oldX: number
-    oldY: number
+    oldX: number = 0;
+    oldY: number = 0;
 
-    constructor(private doc: SimpleDrawDocument, public shape: Shape, private xd: number, private yd: number) { }
+    constructor(private doc: SimpleDrawDocument, public shape: Shape, private xd: number, private yd: number) {}
 
     do(): void {
         this.oldX = this.shape.x
