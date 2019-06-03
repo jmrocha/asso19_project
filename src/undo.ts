@@ -1,4 +1,4 @@
-type UndoableAction<S> = { do(): S; undo(): void }
+interface UndoableAction<S> { do(): S; undo(): void; }
 
 export class UndoManager<S, A extends UndoableAction<S>> {
   doStack = new Array<A>();
