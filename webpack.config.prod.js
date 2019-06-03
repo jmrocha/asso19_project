@@ -2,11 +2,10 @@ const path = require('path');
 
 module.exports = {
   entry: './src/index.ts',
-  mode: 'development',
+  mode: 'production',
   devServer: {
     contentBase: './dist'
   },
-  devtool: 'inline-source-map',
   module: {
       rules: [
         {
@@ -21,7 +20,7 @@ module.exports = {
             {
               loader: 'tslint-loader',
               options: {
-                emitErrors: true
+                emitErrors: false
               }
             }
           ]
