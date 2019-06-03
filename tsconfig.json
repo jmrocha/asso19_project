@@ -12,7 +12,6 @@
     "noImplicitAny":true,
     "noImplicitReturns":false,
     "noImplicitUseStrict":false,
-    "outDir":"build/",
     "baseUrl":"src/",
     "lib": [
       "dom"
