@@ -4,10 +4,16 @@ import { Circle } from '../shapes/circle';
 import { Rectangle } from '../shapes/rectangle';
 
 export class CanvasRender implements Render {
-  ctx: CanvasRenderingContext2D;
+  private ctx: CanvasRenderingContext2D;
 
-  constructor() {
-    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+  constructor(private rootElem: HTMLElement) {
+    const canvas = document.createElement('canvas');
+
+    canvas.setAttribute('id', 'canvas-container');
+    canvas.setAttribute('width', '200px');
+    canvas.setAttribute('height', '200px');
+
+    rootElem.appendChild(canvas);
     this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
   }
 
