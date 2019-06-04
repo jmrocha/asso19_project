@@ -1,5 +1,5 @@
 import { SimpleDrawDocument } from '../document';
-import { Render } from '../render';
+import { Render } from '../render/render';
 
 export abstract class AbstractExpr {
   protected constructor(

@@ -1,5 +1,5 @@
 import { AbstractExpr } from './abstract-expr';
-import { Render } from 'render';
+import { Render } from 'render/render';
 import { SimpleDrawDocument } from 'document';
 
 export class ObjAbstractExpr extends AbstractExpr {
@@ -8,7 +8,7 @@ export class ObjAbstractExpr extends AbstractExpr {
   }
 
   evaluate(input: string): string {
-    let res = '';
+    const res = '';
     if (input.indexOf('rect') !== -1) {
       const exprs = input.split('rect')[1].split(' ');
 

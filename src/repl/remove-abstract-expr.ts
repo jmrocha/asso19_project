@@ -1,6 +1,6 @@
 import { AbstractExpr } from './abstract-expr';
 import { SimpleDrawDocument } from '../document';
-import { Render } from '../render';
+import { Render } from '../render/render';
 
 export class RemoveAbstractExpr extends AbstractExpr {
   constructor(simpleDrawDocument: SimpleDrawDocument, render: Render) {

@@ -2,7 +2,7 @@ import { AbstractExpr } from './abstract-expr';
 import { DrawAbstractExpr } from './draw-abstract-expr';
 import { RemoveAbstractExpr } from './remove-abstract-expr';
 import { SimpleDrawDocument } from '../document';
-import { Render } from '../render';
+import { Render } from '../render/render';
 
 export class TermAbstractExpr extends AbstractExpr {
   constructor(simpleDrawDocument: SimpleDrawDocument, render: Render) {

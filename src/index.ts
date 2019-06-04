@@ -1,7 +1,7 @@
 import { SimpleDrawDocument } from './document';
-import { SVGRender } from './render';
 import { Terminal } from './terminal';
 import { ExprAbstractExpr } from './repl/expr-abstract-expr';
+import { SVGRender } from './render/svg-render';
 
 const simpleDrawDocument = new SimpleDrawDocument();
 const e = document.getElementById('terminal') as HTMLInputElement;
