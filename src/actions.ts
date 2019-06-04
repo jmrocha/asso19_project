@@ -56,12 +56,11 @@ export class TranslateAction implements Action<void> {
   do(): void {
     this.oldX = this.shape.x;
     this.oldY = this.shape.y;
-    this.shape.translate(this.xd, this.yd);
+    this.doc.translate(this.shape, this.xd, this.yd);
   }
 
   undo() {
     this.shape.x = this.oldX;
     this.shape.y = this.oldY;
-    // this.shape.translate(-this.xd, -this.yd)
   }
 }

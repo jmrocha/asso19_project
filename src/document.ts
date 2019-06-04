@@ -21,7 +21,6 @@ export class SimpleDrawDocument {
   }
 
   draw(render: Render): void {
-    // this.objects.forEach(o => o.draw(ctx))
     render.draw(...this.objects);
   }
 

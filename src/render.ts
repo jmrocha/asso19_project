@@ -5,10 +5,14 @@ export interface Render {
 }
 
 export class SVGRender implements Render {
-  svg: HTMLElement;
-
-  constructor() {
-    this.svg = document.getElementById('svgcanvas') as HTMLElement;
+  private canvas: SVGElement;
+  constructor(private rootElem: HTMLElement) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('id', 'canvas');
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+    this.rootElem.appendChild(svg);
+    this.canvas = svg;
   }
 
   draw(...objs: Shape[]): void {
@@ -23,7 +27,7 @@ export class SVGRender implements Render {
         e.setAttribute('y', shape.y.toString());
         e.setAttribute('width', shape.width.toString());
         e.setAttribute('height', shape.height.toString());
-        this.svg.appendChild(e);
+        this.canvas.appendChild(e);
       }
     }
   }

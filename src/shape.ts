@@ -1,10 +1,5 @@
 export abstract class Shape {
   constructor(public x: number, public y: number) {}
-
-  translate(xd: number, yd: number): void {
-    this.x += xd;
-    this.y += yd;
-  }
 }
 
 export class Rectangle extends Shape {
