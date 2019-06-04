@@ -63,10 +63,12 @@ import /simple-draw.json  // imports document exported in JSON
 show history              // outputs all the operations done
 show objects              // outputs drawn objects ids
 show documents            // outputs created documents ids
-translate 2 10 15         // Performs a translation (10, 15) in object 2
-rotate 2 90 y             // Performs a rotation of 90 deg in object 2
-create document           // Creates a new document
-use 2                     // Use the document with id 2
+translate 2 10 15         // performs a translation (10, 15) in object 2
+rotate 2 90 y             // performs a rotation of 90 deg in object 2
+create document           // creates a new document
+use 2                     // use the document with id 2
+render SVG                // change render to SVG
+help                      // shows possible commands
 ```
 And to support concatenation of operations such as:
 ```
@@ -102,4 +104,7 @@ radius -> float
 int -> [0-9]+
 float -> [0-9]+\.[0-9]+
 ```
-The **Interpreter pattern** tells us how to solve this kind of problem.
+
+The **Interpreter pattern** tells us how to solve this kind of problem:
+
+![Pattern Diagram](https://www.plantuml.com/plantuml/img/ZP912i8m44NtESM0cuhs1YuKwqvGgXSOwr0YILkIgGhgtQrjfJPDmMp2_7dv-HEoj8o6Iwq4IrO4yMQ_XRL2Qo6Ic1hKGk39ii648QdrLLjkxeM1Xu1gXGUf2qMHmLkK9wMcZC4Ef0QDAJkJ0LDljJJfEVuMmL--S-XvJclJMUKYinJeYgf4fg2jPLQK_4M8cvE1O_0IefdrSurdtWxuY0xGDNUdosWl9frVQRHz9ACzpPwqU8RX8A47SJDw42UfXnZczK1kQY6MrOjMl-iD)
