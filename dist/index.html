@@ -1,26 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>SimpleDraw</title>
+    <title>Simple Draw</title>
     <meta charset="UTF-8">
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
     <style>
-        input#repl {
-            position: absolute;
-            bottom: 10px;
-            width: 25%;
+        body {
+            margin: 0;
+        }
+
+        #terminal {
+            background-color: black;
+            border: 1px solid black;
+            overflow: scroll;
+        }
+        #canvas {
+            background-color: white;
+            border: 1px solid black;
+        }
+
+        .flex-container > div {
+            width: 50%;
+            height: 100vh;
+        }
+
+        .flex-container {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .terminal-text {
+            position: relative;
+            display: inline-block;
+            font-family: Monaco, Arial, Helvetica, sans-serif;
+            line-height: 24px;
+            font-size: 14px;
+            color: white;
+            min-width: 360px;
+        }
+
+        .terminal-output {
+            display: block;
+        }
+
+        .terminal-prompt {
+            background: transparent;
+            border: 0;
+            resize: none;
+            vertical-align: top;
+        }
+
+        .terminal-prompt:focus {
+            outline: none;
+        }
+
+        .output-success {
+            color: green;
+        }
+
+        .output-error {
+            color: red;
         }
     </style>
 </head>
 
 <body>
-    <div>
-        <canvas id="canvas" width="200" height="200" style="border: 1px solid red;"></canvas>
-        <svg id="svgcanvas" width="200" height="200" style="border: 1px solid blue;"></svg>
+    <div id="container" class="flex-container">
+        <div id="terminal"></div>
+        <div id="canvas"></div>
     </div>
-   <div>
-        <input id="repl" type="text">
-   </div>
     <script src="./bundle.js"></script>
 </body>
 </html>

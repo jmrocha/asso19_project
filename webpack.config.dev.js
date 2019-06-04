@@ -4,7 +4,7 @@ module.exports = {
   entry: './src/index.ts',
   mode: 'development',
   devServer: {
-    contentBase: './dist'
+    contentBase: ['./dist', "./node_modules"]
   },
   devtool: 'inline-source-map',
   module: {

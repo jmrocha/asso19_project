@@ -1,12 +1,10 @@
-import { Shape } from './shape';
-import {
-  Action,
-  CreateCircleAction,
-  CreateRectangleAction,
-  TranslateAction,
-} from './actions';
-import { Render } from './render';
-import { UndoManager } from './undo';
+import { Shape } from './shapes/shape';
+import { Action } from './actions/action';
+import { Render } from './render/render';
+import { CreateRectangleAction } from './actions/create-rectangle-action';
+import { CreateCircleAction } from './actions/create-circle-action';
+import { TranslateAction } from './actions/translate-action';
+import { UndoManager } from './actions/undo-manager';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
@@ -21,7 +19,6 @@ export class SimpleDrawDocument {
   }
 
   draw(render: Render): void {
-    // this.objects.forEach(o => o.draw(ctx))
     render.draw(...this.objects);
   }
 

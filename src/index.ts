@@ -1,16 +1,34 @@
-import { SimpleDrawDocument } from './document'
-import { CanvasRender, SVGRender } from './render';
+import { SimpleDrawDocument } from './document';
+import { Terminal } from './terminal';
+import { ExprAbstractExpr } from './repl/expr-abstract-expr';
+import { SVGRender } from './render/svg-render';
 
-const canvasrender = new CanvasRender()
-const svgrender = new SVGRender()
+const simpleDrawDocument = new SimpleDrawDocument();
+const e = document.getElementById('terminal') as HTMLInputElement;
+const t = new Terminal(e);
+const promptTextElem = t.getPromptTextElem();
+const canvas = document.getElementById('canvas') as HTMLElement;
+const defaultRender = new SVGRender(canvas);
 
-const sdd = new SimpleDrawDocument()
-const c1 = sdd.createCircle(50, 50, 30)
-const r1 = sdd.createRectangle(10, 10, 80, 80)
-const r2 = sdd.createRectangle(30, 30, 40, 40)
+e.addEventListener('keydown', event => {
+  if (event.code === 'Enter') {
+    const expr = promptTextElem.value;
+    t.print(expr);
+    try {
+      const res = new ExprAbstractExpr(
+        simpleDrawDocument,
+        defaultRender
+      ).evaluate(expr);
+      t.printSuccess(res);
+    } catch (error) {
+      t.printError(error.message);
+    }
+  }
+});
 
-/* const s1 = sdd.createSelection(c1, r1, r2)
-sdd.translate(s1, 10, 10) */
-
-sdd.draw(canvasrender)
-sdd.draw(svgrender)
+const terminalElem = document.getElementById('terminal');
+if (terminalElem) {
+  terminalElem.onclick = () => {
+    t.focus();
+  };
+}
