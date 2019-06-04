@@ -43,7 +43,7 @@ npm run dev
 
 ## Starting Diagram
 
-![Starting Diagram](https://github.com/jmrocha/asso19_project/blob/master/diagram.png?raw=true)
+![Starting Diagram](https://www.plantuml.com/plantuml/img/VLHRJiCm4FptANA1z0G8jKeH4g8WDQNYT-iknLBYHFQMXyJXCOxjhfFGJy_ClYTPMW93vxOHGcb2ymOIYotg8neX6x2sgFVtsRi2_G4sG56Zshx1jO7FTIVFBMeAn0vDgpHasUjtw96zLv9KfsEgoY0GLih81WF3YIrA0drA71mi6P1KS96la0Nl36ZRE2f3N_Insu26avlaqiyV2eTHzLNVCybUMKKT3xhxwZj3jUk5yFGTWbutZxFuG_tyD2A4xxaeozkKF5SKDp-BnLLkMcrEDLVR3UShpvmnKkcG4GW6YC_9ED4rGs9_SkuS1ejfMS_ow_mZYTQPdDtDMfPpNhgg79ihATpUfixYxDXVhFSq2_DKChjlRLZ3WAGMmcv4M9UlSlaKEPfza8ED1fmbP_2aWbYwKFS7-0K0)
 
 ## Decision Points
 
