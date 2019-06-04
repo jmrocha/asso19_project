@@ -48,7 +48,7 @@ npm run dev
 ## Decision Points
 
 ### REPL
-We want to be able to execute commands like:
+We want to be able to execute commands such as:
 ```
 draw rect 10 10 10 10   // draws a rectangle at point (10, 10) with width 10 and height 10
 draw circle 10 10 10    // draws a square at point (10, 10) with radius 10
