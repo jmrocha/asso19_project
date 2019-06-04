@@ -6,6 +6,7 @@
   "license": "ISC",
   "@std/esm": "cjs",
   "main": "script.js",
+  "repository": "github:jmrocha/asso19_project",
   "dependencies": {},
   "devDependencies": {
     "gts": "^1.0.0",
