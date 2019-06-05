@@ -35,7 +35,7 @@ npm run dev
 - Support (un)limited Undo / Redo of all operations;
 - Eventually extra funcionalities to be decided later.
 
-## Collaborators
+## Contributors
 
 - Bruno Miguel;
 - João Rocha;
