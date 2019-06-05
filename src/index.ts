@@ -25,10 +25,3 @@ e.addEventListener('keydown', event => {
     }
   }
 });
-
-const terminalElem = document.getElementById('terminal');
-if (terminalElem) {
-  terminalElem.onclick = () => {
-    t.focus();
-  };
-}
