@@ -48,7 +48,7 @@ simpleDrawDocument.add(tri);
 simpleDrawDocument.add(p);
 simpleDrawDocument.add(r);
 simpleDrawDocument.translate(p, 300, 300);
-simpleDrawDocument.rotate(r, 45);
+simpleDrawDocument.scale(r, 1.5, 1.5);
 simpleDrawDocument.undo();
 simpleDrawDocument.redo();
 simpleDrawDocument.draw(defaultRender);

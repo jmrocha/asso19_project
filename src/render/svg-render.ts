@@ -32,9 +32,13 @@ export class SVGRender implements Render {
         //transformation (REPEATED CODE)
         let transformations = '';
         if (shape.rotation !== 0) {
-          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ')';
+          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ') ';
+        }
+        if (shape.scaleX !== 0 || shape.scaleY !== 0) {
+          transformations += 'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
         }
         e.setAttribute('transform', transformations);
+        //end transformations
 
         this.canvas.appendChild(e);
       }
@@ -52,9 +56,13 @@ export class SVGRender implements Render {
         //transformation (REPEATED CODE)
         let transformations = '';
         if (shape.rotation !== 0) {
-          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ')';
+          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ') ';
+        }
+        if (shape.scaleX !== 0 || shape.scaleY !== 0) {
+          transformations += 'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
         }
         e.setAttribute('transform', transformations);
+        //end transformations
 
         this.canvas.appendChild(e);
       }
@@ -75,9 +83,13 @@ export class SVGRender implements Render {
         //transformation (REPEATED CODE)
         let transformations = '';
         if (shape.rotation !== 0) {
-          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ')';
+          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ') ';
+        }
+        if (shape.scaleX !== 0 || shape.scaleY !== 0) {
+          transformations += 'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
         }
         e.setAttribute('transform', transformations);
+        //end transformations
 
         this.canvas.appendChild(e);
       }
@@ -98,9 +110,13 @@ export class SVGRender implements Render {
         //transformation (REPEATED CODE)
         let transformations = '';
         if (shape.rotation !== 0) {
-          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ')';
+          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ') ';
+        }
+        if (shape.scaleX !== 0 || shape.scaleY !== 0) {
+          transformations += 'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
         }
         e.setAttribute('transform', transformations);
+        //end transformations
 
         this.canvas.appendChild(e);
       }

@@ -8,6 +8,7 @@ import { TranslateAction } from './actions/translate-action';
 import { RotateAction } from './actions/rotate-action';
 import { UndoManager } from './actions/undo-manager';
 import { Coordinate } from 'utilities/coordinate';
+import { ScaleAction } from 'actions/scale-action';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
@@ -52,5 +53,9 @@ export class SimpleDrawDocument {
 
   rotate(s: Shape, angleDegrees: number): void {
     return this.do(new RotateAction(this, s, angleDegrees));
+  }
+
+  scale(s: Shape, scaleX: number, scaleY: number): void {
+    return this.do(new ScaleAction(this, s, scaleX, scaleY));
   }
 }
