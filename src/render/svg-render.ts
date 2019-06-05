@@ -1,6 +1,7 @@
 import { Shape } from '../shapes/shape';
 import { Render } from './render';
 import { Rectangle } from '../shapes/rectangle';
+import { Circle } from '../shapes/circle';
 
 export class SVGRender implements Render {
   private canvas: SVGElement;
@@ -25,6 +26,18 @@ export class SVGRender implements Render {
         e.setAttribute('y', shape.y.toString());
         e.setAttribute('width', shape.width.toString());
         e.setAttribute('height', shape.height.toString());
+        this.canvas.appendChild(e);
+      }
+      else if (shape instanceof Circle) {
+        const e = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'circle'
+        );
+        e.setAttribute('cx', shape.x.toString());
+        e.setAttribute('cy', shape.y.toString());
+        e.setAttribute('r', shape.radius.toString());
+        e.setAttribute('stroke', 'black');
+        e.setAttribute('fill', 'white');
         this.canvas.appendChild(e);
       }
     }
