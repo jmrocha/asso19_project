@@ -14,14 +14,13 @@ export class TranslateAction implements Action<void> {
   ) {}
 
   do(): void {
-    this.oldCoordinates = this.shape.coordinates;
-    console.log(this.oldCoordinates);
+    this.shape.coordinates.forEach(element => {
+      this.oldCoordinates.push(new Coordinate(element.x, element.y));
+    });
     this.shape.translate(this.xd, this.yd);
   }
 
   undo() {
-    console.log(this.shape);
-    this.shape.coordinates = this.oldCoordinates;
-    console.log(this.shape);
+    this.shape.coordinates = [...this.oldCoordinates];
   }
 }

@@ -36,11 +36,12 @@ if (terminalElem) {
   };
 }
 
-//simpleDrawDocument.createTriangle(new Coordinate(100, 100), new Coordinate(200, 200), new Coordinate(200, 200));
 const c = new Circle(100, 100, 40);
 const tri = new Triangle(new Coordinate(100, 100), new Coordinate(100, 200), new Coordinate(300, 300));
 simpleDrawDocument.add(c);
 simpleDrawDocument.add(tri);
 simpleDrawDocument.translate(tri, 400, 400);
+simpleDrawDocument.translate(c, 400, 400);
 simpleDrawDocument.undo();
+simpleDrawDocument.redo();
 simpleDrawDocument.draw(defaultRender);
