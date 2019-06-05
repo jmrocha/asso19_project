@@ -23,7 +23,7 @@ export class SVGRender implements Render {
           'http://www.w3.org/2000/svg',
           'rect'
         );
-        e.setAttribute('style', 'stroke: black; fill: white');
+        e.setAttribute('style', 'stroke: black; fill: ' + shape.fillColor);
         e.setAttribute('x', shape.coordinates[0].x.toString());
         e.setAttribute('y', shape.coordinates[0].y.toString());
         e.setAttribute('width', shape.width.toString());
@@ -51,7 +51,7 @@ export class SVGRender implements Render {
         e.setAttribute('cy', shape.coordinates[0].y.toString());
         e.setAttribute('r', shape.radius.toString());
         e.setAttribute('stroke', 'black');
-        e.setAttribute('fill', 'white');
+        e.setAttribute('fill', shape.fillColor);
 
         //transformation (REPEATED CODE)
         let transformations = '';
@@ -66,7 +66,7 @@ export class SVGRender implements Render {
 
         this.canvas.appendChild(e);
       }
-      else if (shape instanceof Triangle) {
+      else if (shape instanceof Triangle || shape instanceof Polygon) {
         const e = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'polygon'
@@ -78,34 +78,7 @@ export class SVGRender implements Render {
         });
 
         e.setAttribute('points', s);
-        e.setAttribute('style', 'stroke: black; fill: white');
-
-        //transformation (REPEATED CODE)
-        let transformations = '';
-        if (shape.rotation !== 0) {
-          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ') ';
-        }
-        if (shape.scaleX !== 0 || shape.scaleY !== 0) {
-          transformations += 'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
-        }
-        e.setAttribute('transform', transformations);
-        //end transformations
-
-        this.canvas.appendChild(e);
-      }
-      else if (shape instanceof Polygon) {
-        const e = document.createElementNS(
-          'http://www.w3.org/2000/svg',
-          'polygon'
-        );
-
-        let s = '';
-        shape.coordinates.forEach((element) => {
-          s += element.x + ',' + element.y + ' ';
-        });
-
-        e.setAttribute('points', s);
-        e.setAttribute('style', 'stroke: black; fill: white');
+        e.setAttribute('style', 'stroke: black; fill: ' + shape.fillColor);
 
         //transformation (REPEATED CODE)
         let transformations = '';

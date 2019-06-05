@@ -5,6 +5,7 @@ export abstract class Shape {
   rotation = 0;
   scaleX = 1;
   scaleY = 1;
+  fillColor = 'white';
 
   protected constructor(...coordinates: Coordinate[]) {
     this.coordinates = coordinates;
