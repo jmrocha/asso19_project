@@ -17,7 +17,11 @@ export class TranslateAction implements Action<void> {
     this.shape.coordinates.forEach(element => {
       this.oldCoordinates.push(new Coordinate(element.x, element.y));
     });
-    this.shape.translate(this.xd, this.yd);
+
+    this.shape.coordinates.forEach(element => {
+      element.x += this.xd;
+      element.y += this.yd;
+    })
   }
 
   undo() {

@@ -113,3 +113,17 @@ float -> [0-9]+\.[0-9]+
 The **Interpreter pattern** tells us how to solve this kind of problem:
 
 ![Pattern Diagram](https://www.plantuml.com/plantuml/png/ZP912i8m44NtESM0cuhs1YuKwqvGgXSOwr0YILkIgGhgtQrjfJPDmMp2_7dv-HEoj8o6Iwq4IrO4yMQ_XRL2Qo6Ic1hKGk39ii648QdrLLjkxeM1Xu1gXGUf2qMHmLkK9wMcZC4Ef0QDAJkJ0LDljJJfEVuMmL--S-XvJclJMUKYinJeYgf4fg2jPLQK_4M8cvE1O_0IefdrSurdtWxuY0xGDNUdosWl9frVQRHz9ACzpPwqU8RX8A47SJDw42UfXnZczK1kQY6MrOjMl-iD)
+
+### Undo/Redo Actions
+
+We want to be able to perform actions such as:
+
+	* Create multiple different shapes, such as rectangles, circles, triangles, etc.
+	* Translate objects around the canvas
+	* Add color to objects
+	* Scale objects given a multiplier
+	* Rotate objects given an angle
+
+The problem we are faced with is to create an interface that is capable of performing a multitude of actions without passing the responsibility and the need of knowledge on how to execute them to the objects on which the action is interacting with. These actions need to be stored in a data structure which allows us to execute and undo the actions in their respective performing order.
+
+The **Command pattern** helps us solving this problem, as we can encapsulate every action the user can take onto an object that stores the context the action needs in order to be executed or undone.

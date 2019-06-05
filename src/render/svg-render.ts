@@ -34,7 +34,7 @@ export class SVGRender implements Render {
         if (shape.rotation !== 0) {
           transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ') ';
         }
-        if (shape.scaleX !== 0 || shape.scaleY !== 0) {
+        if (shape.scaleX !== 1 || shape.scaleY !== 1) {
           transformations += 'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
         }
         e.setAttribute('transform', transformations);
@@ -58,7 +58,7 @@ export class SVGRender implements Render {
         if (shape.rotation !== 0) {
           transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ') ';
         }
-        if (shape.scaleX !== 0 || shape.scaleY !== 0) {
+        if (shape.scaleX !== 1 || shape.scaleY !== 1) {
           transformations += 'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
         }
         e.setAttribute('transform', transformations);
@@ -85,7 +85,7 @@ export class SVGRender implements Render {
         if (shape.rotation !== 0) {
           transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ') ';
         }
-        if (shape.scaleX !== 0 || shape.scaleY !== 0) {
+        if (shape.scaleX !== 1 || shape.scaleY !== 1) {
           transformations += 'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
         }
         e.setAttribute('transform', transformations);

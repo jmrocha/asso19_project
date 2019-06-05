@@ -21,23 +21,51 @@ export class CanvasRender implements Render {
 
   draw(...objs: Shape[]): void {
     for (const shape of objs) {
-      console.log(shape);
+      this.ctx.save();
       if (shape instanceof Circle) {
-        this.ctx.ellipse(
-          shape.coordinates[0].x,
-          shape.coordinates[0].y,
-          shape.radius,
-          shape.radius,
-          0,
-          0,
-          2 * Math.PI
-        );
+        //transformation (REPEATED CODE)
+        if (shape.rotation !== 0) {
+          this.ctx.rotate(shape.rotation * Math.PI / 180); //convert degrees to radians
+        }
+        if (shape.scaleX !== 1 || shape.scaleY !== 1) {
+          this.ctx.scale(shape.scaleX, shape.scaleY);
+        }
+        //end transformations
+        
+        this.ctx.beginPath();
+        this.ctx.arc(shape.coordinates[0].x, shape.coordinates[0].y, shape.radius, 0, 2 * Math.PI);
+        this.ctx.closePath();
+
+        this.ctx.fillStyle = shape.fillColor;
+        this.ctx.fill();
         this.ctx.stroke();
       } 
       else if (shape instanceof Rectangle) {
-        this.ctx.strokeRect(shape.coordinates[0].x, shape.coordinates[0].y, shape.width, shape.height);
+        //transformation (REPEATED CODE)
+        if (shape.rotation !== 0) {
+          this.ctx.rotate(shape.rotation * Math.PI / 180); //convert degrees to radians
+        }
+        if (shape.scaleX !== 1 || shape.scaleY !== 1) {
+          this.ctx.scale(shape.scaleX, shape.scaleY);
+        }
+        //end transformations
+
+        this.ctx.rect(shape.coordinates[0].x, shape.coordinates[0].y, shape.width, shape.height);
+
+        this.ctx.fillStyle = shape.fillColor;
+        this.ctx.fill();
+        this.ctx.stroke();
       } 
-      else if (shape instanceof Triangle) {
+      else if (shape instanceof Triangle || shape instanceof Polygon) {
+        //transformation (REPEATED CODE)
+        if (shape.rotation !== 0) {
+          this.ctx.rotate(shape.rotation * Math.PI / 180); //convert degrees to radians
+        }
+        if (shape.scaleX !== 1 || shape.scaleY !== 1) {
+          this.ctx.scale(shape.scaleX, shape.scaleY);
+        }
+        //end transformations
+
         this.ctx.beginPath();
         this.ctx.moveTo(shape.coordinates[0].x, shape.coordinates[0].y);
         shape.coordinates.forEach((element, index) => {
@@ -46,19 +74,12 @@ export class CanvasRender implements Render {
           }
         });
         this.ctx.closePath();
+
+        this.ctx.fillStyle = shape.fillColor;
+        this.ctx.fill();
         this.ctx.stroke();
       }
-      else if (shape instanceof Polygon) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(shape.coordinates[0].x, shape.coordinates[0].y);
-        shape.coordinates.forEach((element, index) => {
-          if(index > 0) {
-            this.ctx.lineTo(element.x, element.y);
-          }
-        });
-        this.ctx.closePath();
-        this.ctx.stroke();
-      }
+      this.ctx.restore();
     }
   }
 }
