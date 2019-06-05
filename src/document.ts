@@ -42,4 +42,8 @@ export class SimpleDrawDocument {
   translate(s: Shape, xd: number, yd: number): void {
     return this.do(new TranslateAction(this, s, xd, yd));
   }
+
+  /*rotate(s: Shape, angleDegrees: number): void {
+    return this.do(new RotateAction(this, s, angleDegrees));
+  }*/
 }

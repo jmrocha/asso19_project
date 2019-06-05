@@ -2,6 +2,7 @@ import { SimpleDrawDocument } from './document';
 import { Terminal } from './terminal';
 import { ExprAbstractExpr } from './repl/expr-abstract-expr';
 import { SVGRender } from './render/svg-render';
+import { Circle } from 'shapes/circle';
 
 const simpleDrawDocument = new SimpleDrawDocument();
 const e = document.getElementById('terminal') as HTMLInputElement;
@@ -32,3 +33,11 @@ if (terminalElem) {
     t.focus();
   };
 }
+
+
+const circle = new Circle(100, 100, 15);
+const circle2 = new Circle(100, 100, 15);
+simpleDrawDocument.add(circle);
+simpleDrawDocument.add(circle2);
+simpleDrawDocument.translate(circle2, 500, 500);
+simpleDrawDocument.draw(defaultRender);

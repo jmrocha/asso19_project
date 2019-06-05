@@ -1,4 +1,5 @@
 import { Shape } from './shape';
+import { Coordinate } from '../utilities/coordinate';
 
 export class Rectangle extends Shape {
   constructor(
@@ -7,6 +8,6 @@ export class Rectangle extends Shape {
     public width: number,
     public height: number
   ) {
-    super(x, y);
+    super(new Coordinate([x, y]));
   }
 }
