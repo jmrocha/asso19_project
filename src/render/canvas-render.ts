@@ -21,8 +21,8 @@ export class CanvasRender implements Render {
     for (const shape of objs) {
       if (shape instanceof Circle) {
         this.ctx.ellipse(
-          shape.x,
-          shape.y,
+          shape.coordinates[0].x,
+          shape.coordinates[0].y,
           shape.radius,
           shape.radius,
           0,
@@ -31,7 +31,7 @@ export class CanvasRender implements Render {
         );
         this.ctx.stroke();
       } else if (shape instanceof Rectangle) {
-        this.ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+        this.ctx.strokeRect(shape.coordinates[0].x, shape.coordinates[0].y, shape.width, shape.height);
       }
     }
   }

@@ -22,8 +22,8 @@ export class SVGRender implements Render {
           'rect'
         );
         e.setAttribute('style', 'stroke: black; fill: white');
-        e.setAttribute('x', shape.x.toString());
-        e.setAttribute('y', shape.y.toString());
+        e.setAttribute('x', shape.coordinates[0].x.toString());
+        e.setAttribute('y', shape.coordinates[0].y.toString());
         e.setAttribute('width', shape.width.toString());
         e.setAttribute('height', shape.height.toString());
         this.canvas.appendChild(e);
@@ -33,8 +33,8 @@ export class SVGRender implements Render {
           'http://www.w3.org/2000/svg',
           'circle'
         );
-        e.setAttribute('cx', shape.x.toString());
-        e.setAttribute('cy', shape.y.toString());
+        e.setAttribute('cx', shape.coordinates[0].x.toString());
+        e.setAttribute('cy', shape.coordinates[0].y.toString());
         e.setAttribute('r', shape.radius.toString());
         e.setAttribute('stroke', 'black');
         e.setAttribute('fill', 'white');
