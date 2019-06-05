@@ -5,6 +5,7 @@ import { CreateRectangleAction } from './actions/create-rectangle-action';
 import { CreateTriangleAction } from './actions/create-triangle-action';
 import { CreateCircleAction } from './actions/create-circle-action';
 import { TranslateAction } from './actions/translate-action';
+import { RotateAction } from './actions/rotate-action';
 import { UndoManager } from './actions/undo-manager';
 import { Coordinate } from 'utilities/coordinate';
 
@@ -49,7 +50,7 @@ export class SimpleDrawDocument {
     return this.do(new TranslateAction(this, s, xd, yd));
   }
 
-  /*rotate(s: Shape, angleDegrees: number): void {
+  rotate(s: Shape, angleDegrees: number): void {
     return this.do(new RotateAction(this, s, angleDegrees));
-  }*/
+  }
 }

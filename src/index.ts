@@ -6,6 +6,8 @@ import { Coordinate } from 'utilities/coordinate';
 import { Circle } from 'shapes/circle';
 import { Triangle } from 'shapes/triangle';
 import { Polygon } from 'shapes/polygon';
+import { CanvasRender } from 'render/canvas-render';
+import { Rectangle } from 'shapes/rectangle';
 
 const simpleDrawDocument = new SimpleDrawDocument();
 const e = document.getElementById('terminal') as HTMLInputElement;
@@ -38,12 +40,15 @@ if (terminalElem) {
 }
 
 const c = new Circle(100, 100, 40);
+const r = new Rectangle(400, 400, 50, 50);
 const tri = new Triangle(new Coordinate(100, 100), new Coordinate(100, 200), new Coordinate(300, 300));
 const p = new Polygon(new Coordinate(100, 100), new Coordinate(354, 213), new Coordinate(289, 275), new Coordinate(157, 198));
 simpleDrawDocument.add(c);
 simpleDrawDocument.add(tri);
 simpleDrawDocument.add(p);
+simpleDrawDocument.add(r);
 simpleDrawDocument.translate(p, 300, 300);
+simpleDrawDocument.rotate(r, 45);
 simpleDrawDocument.undo();
 simpleDrawDocument.redo();
 simpleDrawDocument.draw(defaultRender);

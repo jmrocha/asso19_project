@@ -28,6 +28,14 @@ export class SVGRender implements Render {
         e.setAttribute('y', shape.coordinates[0].y.toString());
         e.setAttribute('width', shape.width.toString());
         e.setAttribute('height', shape.height.toString());
+
+        //transformation (REPEATED CODE)
+        let transformations = '';
+        if (shape.rotation !== 0) {
+          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ')';
+        }
+        e.setAttribute('transform', transformations);
+
         this.canvas.appendChild(e);
       }
       else if (shape instanceof Circle) {
@@ -40,6 +48,14 @@ export class SVGRender implements Render {
         e.setAttribute('r', shape.radius.toString());
         e.setAttribute('stroke', 'black');
         e.setAttribute('fill', 'white');
+
+        //transformation (REPEATED CODE)
+        let transformations = '';
+        if (shape.rotation !== 0) {
+          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ')';
+        }
+        e.setAttribute('transform', transformations);
+
         this.canvas.appendChild(e);
       }
       else if (shape instanceof Triangle) {
@@ -55,6 +71,14 @@ export class SVGRender implements Render {
 
         e.setAttribute('points', s);
         e.setAttribute('style', 'stroke: black; fill: white');
+
+        //transformation (REPEATED CODE)
+        let transformations = '';
+        if (shape.rotation !== 0) {
+          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ')';
+        }
+        e.setAttribute('transform', transformations);
+
         this.canvas.appendChild(e);
       }
       else if (shape instanceof Polygon) {
@@ -70,6 +94,14 @@ export class SVGRender implements Render {
 
         e.setAttribute('points', s);
         e.setAttribute('style', 'stroke: black; fill: white');
+
+        //transformation (REPEATED CODE)
+        let transformations = '';
+        if (shape.rotation !== 0) {
+          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ')';
+        }
+        e.setAttribute('transform', transformations);
+
         this.canvas.appendChild(e);
       }
     }
