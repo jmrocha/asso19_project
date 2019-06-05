@@ -15,7 +15,10 @@ export class TranslateAction implements Action<void> {
 
   do(): void {
     this.oldCoordinates = this.shape.coordinates;
-    this.doc.translate(this.shape, this.xd, this.yd);
+    console.log('before: ' + this.shape);
+    this.shape.translate(this.xd, this.yd);
+    console.log('after: ' + this.shape);
+    //this.doc.translate(this.shape, this.xd, this.yd);
   }
 
   undo() {
