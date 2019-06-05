@@ -5,6 +5,7 @@ import { SVGRender } from './render/svg-render';
 import { Coordinate } from 'utilities/coordinate';
 import { Circle } from 'shapes/circle';
 import { Triangle } from 'shapes/triangle';
+import { Polygon } from 'shapes/polygon';
 
 const simpleDrawDocument = new SimpleDrawDocument();
 const e = document.getElementById('terminal') as HTMLInputElement;
@@ -38,10 +39,11 @@ if (terminalElem) {
 
 const c = new Circle(100, 100, 40);
 const tri = new Triangle(new Coordinate(100, 100), new Coordinate(100, 200), new Coordinate(300, 300));
+const p = new Polygon(new Coordinate(100, 100), new Coordinate(354, 213), new Coordinate(289, 275), new Coordinate(157, 198));
 simpleDrawDocument.add(c);
 simpleDrawDocument.add(tri);
-simpleDrawDocument.translate(tri, 400, 400);
-simpleDrawDocument.translate(c, 400, 400);
+simpleDrawDocument.add(p);
+simpleDrawDocument.translate(p, 300, 300);
 simpleDrawDocument.undo();
 simpleDrawDocument.redo();
 simpleDrawDocument.draw(defaultRender);

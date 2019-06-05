@@ -3,6 +3,7 @@ import { Render } from './render';
 import { Rectangle } from '../shapes/rectangle';
 import { Circle } from '../shapes/circle';
 import { Triangle } from 'shapes/triangle';
+import { Polygon } from 'shapes/polygon';
 
 export class SVGRender implements Render {
   private canvas: SVGElement;
@@ -42,6 +43,21 @@ export class SVGRender implements Render {
         this.canvas.appendChild(e);
       }
       else if (shape instanceof Triangle) {
+        const e = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'polygon'
+        );
+
+        let s = '';
+        shape.coordinates.forEach((element) => {
+          s += element.x + ',' + element.y + ' ';
+        });
+
+        e.setAttribute('points', s);
+        e.setAttribute('style', 'stroke: black; fill: white');
+        this.canvas.appendChild(e);
+      }
+      else if (shape instanceof Polygon) {
         const e = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'polygon'
