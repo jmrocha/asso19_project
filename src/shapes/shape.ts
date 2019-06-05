@@ -9,7 +9,8 @@ export abstract class Shape {
 
   translate(deltaX: number, deltaY: number): void {
     this.coordinates.forEach(element => {
-      element.setCoordinates(element.x + deltaX, element.y + deltaY);
+      element.x += deltaX;
+      element.y += deltaY;
     });
   }
 

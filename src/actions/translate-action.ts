@@ -15,6 +15,7 @@ export class TranslateAction implements Action<void> {
 
   do(): void {
     this.oldCoordinates = this.shape.coordinates;
+    console.log(this.oldCoordinates);
     this.shape.translate(this.xd, this.yd);
   }
 
