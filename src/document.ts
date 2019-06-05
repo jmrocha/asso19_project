@@ -2,9 +2,11 @@ import { Shape } from './shapes/shape';
 import { Action } from './actions/action';
 import { Render } from './render/render';
 import { CreateRectangleAction } from './actions/create-rectangle-action';
+import { CreateTriangleAction } from './actions/create-triangle-action';
 import { CreateCircleAction } from './actions/create-circle-action';
 import { TranslateAction } from './actions/translate-action';
 import { UndoManager } from './actions/undo-manager';
+import { Coordinate } from 'utilities/coordinate';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
@@ -37,6 +39,10 @@ export class SimpleDrawDocument {
 
   createCircle(x: number, y: number, radius: number): Shape {
     return this.do(new CreateCircleAction(this, x, y, radius));
+  }
+
+  createTriangle(p1: Coordinate, p2: Coordinate, p3: Coordinate): Shape {
+    return this.do(new CreateTriangleAction(this, p1, p2, p3));
   }
 
   translate(s: Shape, xd: number, yd: number): void {

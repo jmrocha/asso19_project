@@ -1,10 +1,7 @@
 export class Coordinate {
-    x: number;
-    y: number;
-
-    constructor(coordinate: number[]) {
-      this.x = coordinate[0];
-      this.y = coordinate[1];
+    constructor(public x: number, public y: number) {
+      this.x = x;
+      this.y = y;
     }
 
     setCoordinates(x: number, y: number) {

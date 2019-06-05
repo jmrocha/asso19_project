@@ -2,7 +2,9 @@ import { SimpleDrawDocument } from './document';
 import { Terminal } from './terminal';
 import { ExprAbstractExpr } from './repl/expr-abstract-expr';
 import { SVGRender } from './render/svg-render';
+import { Coordinate } from 'utilities/coordinate';
 import { Circle } from 'shapes/circle';
+import { Triangle } from 'shapes/triangle';
 
 const simpleDrawDocument = new SimpleDrawDocument();
 const e = document.getElementById('terminal') as HTMLInputElement;
@@ -34,12 +36,11 @@ if (terminalElem) {
   };
 }
 
-
-const circle = new Circle(100, 100, 15);
-const circle2 = new Circle(150, 100, 15);
-simpleDrawDocument.add(circle);
-simpleDrawDocument.add(circle2);
-console.log(circle2);
-simpleDrawDocument.translate(circle2, 500, 500);
-console.log(circle2);
+//simpleDrawDocument.createTriangle(new Coordinate(100, 100), new Coordinate(200, 200), new Coordinate(200, 200));
+const c = new Circle(100, 100, 40);
+const tri = new Triangle(new Coordinate(100, 100), new Coordinate(100, 200), new Coordinate(300, 300));
+simpleDrawDocument.add(c);
+simpleDrawDocument.add(tri);
+simpleDrawDocument.translate(tri, 400, 400);
+simpleDrawDocument.undo();
 simpleDrawDocument.draw(defaultRender);

@@ -8,6 +8,6 @@ export class Rectangle extends Shape {
     public width: number,
     public height: number
   ) {
-    super(new Coordinate([x, y]));
+    super(new Coordinate(x, y));
   }
 }
