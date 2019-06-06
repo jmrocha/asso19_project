@@ -6,6 +6,7 @@ export abstract class Shape {
   scaleX = 1;
   scaleY = 1;
   fillColor = 'white';
+  protected id = -1;
 
   protected constructor(...coordinates: Coordinate[]) {
     this.coordinates = coordinates;
