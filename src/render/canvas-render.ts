@@ -25,41 +25,50 @@ export class CanvasRender implements Render {
       if (shape instanceof Circle) {
         //transformation (REPEATED CODE)
         if (shape.rotation !== 0) {
-          this.ctx.rotate(shape.rotation * Math.PI / 180); //convert degrees to radians
+          this.ctx.rotate((shape.rotation * Math.PI) / 180); //convert degrees to radians
         }
         if (shape.scaleX !== 1 || shape.scaleY !== 1) {
           this.ctx.scale(shape.scaleX, shape.scaleY);
         }
         //end transformations
-        
+
         this.ctx.beginPath();
-        this.ctx.arc(shape.coordinates[0].x, shape.coordinates[0].y, shape.radius, 0, 2 * Math.PI);
+        this.ctx.arc(
+          shape.coordinates[0].x,
+          shape.coordinates[0].y,
+          shape.radius,
+          0,
+          2 * Math.PI
+        );
         this.ctx.closePath();
 
         this.ctx.fillStyle = shape.fillColor;
         this.ctx.fill();
         this.ctx.stroke();
-      } 
-      else if (shape instanceof Rectangle) {
+      } else if (shape instanceof Rectangle) {
         //transformation (REPEATED CODE)
         if (shape.rotation !== 0) {
-          this.ctx.rotate(shape.rotation * Math.PI / 180); //convert degrees to radians
+          this.ctx.rotate((shape.rotation * Math.PI) / 180); //convert degrees to radians
         }
         if (shape.scaleX !== 1 || shape.scaleY !== 1) {
           this.ctx.scale(shape.scaleX, shape.scaleY);
         }
         //end transformations
 
-        this.ctx.rect(shape.coordinates[0].x, shape.coordinates[0].y, shape.width, shape.height);
+        this.ctx.rect(
+          shape.coordinates[0].x,
+          shape.coordinates[0].y,
+          shape.width,
+          shape.height
+        );
 
         this.ctx.fillStyle = shape.fillColor;
         this.ctx.fill();
         this.ctx.stroke();
-      } 
-      else if (shape instanceof Triangle || shape instanceof Polygon) {
+      } else if (shape instanceof Triangle || shape instanceof Polygon) {
         //transformation (REPEATED CODE)
         if (shape.rotation !== 0) {
-          this.ctx.rotate(shape.rotation * Math.PI / 180); //convert degrees to radians
+          this.ctx.rotate((shape.rotation * Math.PI) / 180); //convert degrees to radians
         }
         if (shape.scaleX !== 1 || shape.scaleY !== 1) {
           this.ctx.scale(shape.scaleX, shape.scaleY);
@@ -69,7 +78,7 @@ export class CanvasRender implements Render {
         this.ctx.beginPath();
         this.ctx.moveTo(shape.coordinates[0].x, shape.coordinates[0].y);
         shape.coordinates.forEach((element, index) => {
-          if(index > 0) {
+          if (index > 0) {
             this.ctx.lineTo(element.x, element.y);
           }
         });
