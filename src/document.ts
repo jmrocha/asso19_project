@@ -33,7 +33,7 @@ export class SimpleDrawDocument {
   }
 
   do<T>(a: Action<T>): T {
-    if((a as UndoableAction<T>).undo !== undefined) {
+    if ((a as UndoableAction<T>).undo !== undefined) {
       this.undoManager.onActionDone(a as UndoableAction<T>);
     }
     return a.do();
