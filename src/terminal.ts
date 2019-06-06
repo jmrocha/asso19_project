@@ -28,6 +28,8 @@ export class Terminal {
     this.promptTextElem = textArea;
     this.elem.appendChild(label);
     textArea.focus();
+
+    this.elem.onclick = () => this.focus();
   }
 
   private write(value: string, type?: string): void {
