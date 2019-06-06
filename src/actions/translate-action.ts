@@ -1,9 +1,9 @@
 import { SimpleDrawDocument } from '../document';
 import { Shape } from '../shapes/shape';
-import { Action } from './action';
+import { UndoableAction } from './undoable-action';
 import { Coordinate } from '../utilities/coordinate';
 
-export class TranslateAction implements Action<void> {
+export class TranslateAction implements UndoableAction<void> {
   oldCoordinates: Coordinate[] = [];
 
   constructor(

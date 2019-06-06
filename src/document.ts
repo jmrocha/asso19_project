@@ -1,5 +1,6 @@
 import { Shape } from './shapes/shape';
 import { Action } from './actions/action';
+import { UndoableAction } from './actions/undoable-action';
 import { Render } from './render/render';
 import { CreateRectangleAction } from './actions/create-rectangle-action';
 import { CreateTriangleAction } from './actions/create-triangle-action';
@@ -32,7 +33,9 @@ export class SimpleDrawDocument {
   }
 
   do<T>(a: Action<T>): T {
-    this.undoManager.onActionDone(a);
+    if((a as UndoableAction<T>).undo !== undefined) {
+      this.undoManager.onActionDone(a as UndoableAction<T>);
+    }
     return a.do();
   }
 

@@ -1,3 +1,4 @@
+import { Action } from './action';
 import { UndoableAction } from './undoable-action';
 
 export class UndoManager<S, A extends UndoableAction<S>> {

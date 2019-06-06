@@ -1,8 +1,8 @@
 import { SimpleDrawDocument } from '../document';
 import { Shape } from '../shapes/shape';
-import { Action } from './action';
+import { UndoableAction } from './undoable-action';
 
-export class ScaleAction implements Action<void> {
+export class ScaleAction implements UndoableAction<void> {
   oldScaleX = 0;
   oldScaleY = 0;
 

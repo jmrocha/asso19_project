@@ -32,7 +32,7 @@ e.addEventListener('keydown', event => {
   }
 });
 
-/*const c = new Circle(200, 200, 50);
+const c = new Circle(200, 200, 50);
 const c1 = new Circle(200, 200, 50);
 const r = new Rectangle(400, 400, 50, 50);
 simpleDrawDocument.add(r);
@@ -41,4 +41,4 @@ simpleDrawDocument.add(c1);
 simpleDrawDocument.translate(c1, 300, 0);
 simpleDrawDocument.scale(r, 1.5, 1.5);
 simpleDrawDocument.paint(r, 'red');
-simpleDrawDocument.draw(defaultRender);*/
+simpleDrawDocument.draw(defaultRender);

@@ -1,8 +1,8 @@
 import { SimpleDrawDocument } from '../document';
 import { Shape } from '../shapes/shape';
-import { Action } from './action';
+import { UndoableAction } from './undoable-action';
 
-export class PaintAction implements Action<void> {
+export class PaintAction implements UndoableAction<void> {
   oldFillColor = '';
 
   constructor(

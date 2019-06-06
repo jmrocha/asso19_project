@@ -1,8 +1,8 @@
 import { SimpleDrawDocument } from '../document';
 import { Shape } from '../shapes/shape';
-import { Action } from './action';
+import { UndoableAction } from './undoable-action';
 
-export class RotateAction implements Action<void> {
+export class RotateAction implements UndoableAction<void> {
   oldRotation = 0;
 
   constructor(
