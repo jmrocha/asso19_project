@@ -1,3 +1,13 @@
+import { Coordinate } from '../utilities/coordinate';
+
 export abstract class Shape {
-  protected constructor(public x: number, public y: number) {}
+  coordinates: Coordinate[];
+  rotation = 0;
+  scaleX = 1;
+  scaleY = 1;
+  fillColor = 'white';
+
+  protected constructor(...coordinates: Coordinate[]) {
+    this.coordinates = coordinates;
+  }
 }

@@ -1,10 +1,10 @@
 import { SimpleDrawDocument } from '../document';
 import { Shape } from '../shapes/shape';
 import { Action } from './action';
+import { Coordinate } from '../utilities/coordinate';
 
 export class TranslateAction implements Action<void> {
-  oldX = 0;
-  oldY = 0;
+  oldCoordinates: Coordinate[] = [];
 
   constructor(
     private doc: SimpleDrawDocument,
@@ -14,13 +14,17 @@ export class TranslateAction implements Action<void> {
   ) {}
 
   do(): void {
-    this.oldX = this.shape.x;
-    this.oldY = this.shape.y;
-    this.doc.translate(this.shape, this.xd, this.yd);
+    this.shape.coordinates.forEach(element => {
+      this.oldCoordinates.push(new Coordinate(element.x, element.y));
+    });
+
+    this.shape.coordinates.forEach(element => {
+      element.x += this.xd;
+      element.y += this.yd;
+    })
   }
 
   undo() {
-    this.shape.x = this.oldX;
-    this.shape.y = this.oldY;
+    this.shape.coordinates = [...this.oldCoordinates];
   }
 }

@@ -2,9 +2,14 @@ import { Shape } from './shapes/shape';
 import { Action } from './actions/action';
 import { Render } from './render/render';
 import { CreateRectangleAction } from './actions/create-rectangle-action';
+import { CreateTriangleAction } from './actions/create-triangle-action';
 import { CreateCircleAction } from './actions/create-circle-action';
 import { TranslateAction } from './actions/translate-action';
+import { RotateAction } from './actions/rotate-action';
 import { UndoManager } from './actions/undo-manager';
+import { Coordinate } from 'utilities/coordinate';
+import { ScaleAction } from 'actions/scale-action';
+import { PaintAction } from 'actions/paint-action';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
@@ -39,7 +44,23 @@ export class SimpleDrawDocument {
     return this.do(new CreateCircleAction(this, x, y, radius));
   }
 
+  createTriangle(p1: Coordinate, p2: Coordinate, p3: Coordinate): Shape {
+    return this.do(new CreateTriangleAction(this, p1, p2, p3));
+  }
+
   translate(s: Shape, xd: number, yd: number): void {
     return this.do(new TranslateAction(this, s, xd, yd));
+  }
+
+  rotate(s: Shape, angleDegrees: number): void {
+    return this.do(new RotateAction(this, s, angleDegrees));
+  }
+
+  scale(s: Shape, scaleX: number, scaleY: number): void {
+    return this.do(new ScaleAction(this, s, scaleX, scaleY));
+  }
+
+  paint(s: Shape, fillColor: string): void {
+    return this.do(new PaintAction(this, s, fillColor));
   }
 }
