@@ -32,17 +32,24 @@ export class SVGRender implements Render {
         //transformation (REPEATED CODE)
         let transformations = '';
         if (shape.rotation !== 0) {
-          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ') ';
+          transformations +=
+            'rotate(' +
+            shape.rotation +
+            ',' +
+            shape.coordinates[0].x +
+            ',' +
+            shape.coordinates[0].y +
+            ') ';
         }
         if (shape.scaleX !== 1 || shape.scaleY !== 1) {
-          transformations += 'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
+          transformations +=
+            'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
         }
         e.setAttribute('transform', transformations);
         //end transformations
 
         this.canvas.appendChild(e);
-      }
-      else if (shape instanceof Circle) {
+      } else if (shape instanceof Circle) {
         const e = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'circle'
@@ -56,24 +63,31 @@ export class SVGRender implements Render {
         //transformation (REPEATED CODE)
         let transformations = '';
         if (shape.rotation !== 0) {
-          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ') ';
+          transformations +=
+            'rotate(' +
+            shape.rotation +
+            ',' +
+            shape.coordinates[0].x +
+            ',' +
+            shape.coordinates[0].y +
+            ') ';
         }
         if (shape.scaleX !== 1 || shape.scaleY !== 1) {
-          transformations += 'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
+          transformations +=
+            'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
         }
         e.setAttribute('transform', transformations);
         //end transformations
 
         this.canvas.appendChild(e);
-      }
-      else if (shape instanceof Triangle || shape instanceof Polygon) {
+      } else if (shape instanceof Triangle || shape instanceof Polygon) {
         const e = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'polygon'
         );
 
         let s = '';
-        shape.coordinates.forEach((element) => {
+        shape.coordinates.forEach(element => {
           s += element.x + ',' + element.y + ' ';
         });
 
@@ -83,10 +97,18 @@ export class SVGRender implements Render {
         //transformation (REPEATED CODE)
         let transformations = '';
         if (shape.rotation !== 0) {
-          transformations += 'rotate(' + shape.rotation + ',' + shape.coordinates[0].x + ',' + shape.coordinates[0].y + ') ';
+          transformations +=
+            'rotate(' +
+            shape.rotation +
+            ',' +
+            shape.coordinates[0].x +
+            ',' +
+            shape.coordinates[0].y +
+            ') ';
         }
         if (shape.scaleX !== 1 || shape.scaleY !== 1) {
-          transformations += 'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
+          transformations +=
+            'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
         }
         e.setAttribute('transform', transformations);
         //end transformations

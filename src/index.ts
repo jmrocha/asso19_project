@@ -32,13 +32,6 @@ e.addEventListener('keydown', event => {
   }
 });
 
-const terminalElem = document.getElementById('terminal');
-if (terminalElem) {
-  terminalElem.onclick = () => {
-    t.focus();
-  };
-}
-
 /*const c = new Circle(200, 200, 50);
 const c1 = new Circle(200, 200, 50);
 const r = new Rectangle(400, 400, 50, 50);

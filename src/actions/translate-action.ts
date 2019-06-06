@@ -21,7 +21,7 @@ export class TranslateAction implements Action<void> {
     this.shape.coordinates.forEach(element => {
       element.x += this.xd;
       element.y += this.yd;
-    })
+    });
   }
 
   undo() {
