@@ -8,6 +8,9 @@ import { Triangle } from 'shapes/triangle';
 import { Polygon } from 'shapes/polygon';
 import { CanvasRender } from 'render/canvas-render';
 import { Rectangle } from 'shapes/rectangle';
+import { connect } from 'mqtt';
+
+const client = connect('https://test.mosquitto.org:8080');
 
 const simpleDrawDocument = new SimpleDrawDocument();
 const e = document.getElementById('terminal') as HTMLInputElement;
@@ -30,6 +33,19 @@ e.addEventListener('keydown', event => {
       t.printError(error.message);
     }
   }
+});
+
+client.on('connect', () => {
+  client.subscribe('presence', err => {
+    if(!err) {
+      client.publish('presence', 'Hello mqtt');
+    }
+  });
+});
+
+client.on('message', (topic, message) => {
+  console.log(message.toString());
+  client.end();
 });
 
 const c = new Circle(200, 200, 50);
