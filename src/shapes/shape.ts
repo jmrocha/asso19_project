@@ -8,7 +8,12 @@ export abstract class Shape {
   fillColor = 'white';
   protected id = -1;
 
-  protected constructor(...coordinates: Coordinate[]) {
+  protected constructor(id: number, ...coordinates: Coordinate[]) {
+    this.id = id;
     this.coordinates = coordinates;
+  }
+
+  getId(): number {
+    return this.id;
   }
 }

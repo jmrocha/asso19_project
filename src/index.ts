@@ -9,12 +9,12 @@ import { Polygon } from 'shapes/polygon';
 import { CanvasRender } from 'render/canvas-render';
 import { Rectangle } from 'shapes/rectangle';
 
-const simpleDrawDocument = new SimpleDrawDocument();
+const canvas = document.getElementById('canvas') as HTMLElement;
+const defaultRender = new SVGRender(canvas);
+const simpleDrawDocument = new SimpleDrawDocument(defaultRender);
 const e = document.getElementById('terminal') as HTMLInputElement;
 const t = new Terminal(e);
 const promptTextElem = t.getPromptTextElem();
-const canvas = document.getElementById('canvas') as HTMLElement;
-const defaultRender = new SVGRender(canvas);
 
 e.addEventListener('keydown', event => {
   if (event.code === 'Enter') {
@@ -32,13 +32,12 @@ e.addEventListener('keydown', event => {
   }
 });
 
-const c = new Circle(200, 200, 50);
-const c1 = new Circle(200, 200, 50);
-const r = new Rectangle(400, 400, 50, 50);
-simpleDrawDocument.add(r);
-simpleDrawDocument.add(c);
-simpleDrawDocument.add(c1);
-simpleDrawDocument.translate(c1, 300, 0);
-simpleDrawDocument.scale(r, 1.5, 1.5);
-simpleDrawDocument.paint(r, 'red');
-simpleDrawDocument.draw(defaultRender);
+simpleDrawDocument.createRectangle(10, 10, 10, 10);
+simpleDrawDocument.draw();
+simpleDrawDocument.createRectangle(20, 20, 10, 10);
+simpleDrawDocument.draw();
+simpleDrawDocument.createRectangle(30, 30, 10, 10);
+simpleDrawDocument.draw();
+//simpleDrawDocument.translate(c1, 300, 0);
+//simpleDrawDocument.scale(r, 1.5, 1.5);
+//simpleDrawDocument.paint(r, 'red');

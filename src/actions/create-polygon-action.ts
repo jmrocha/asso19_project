@@ -4,7 +4,7 @@ import { Polygon } from '../shapes/polygon';
 import { Coordinate } from 'utilities/coordinate';
 
 export class CreatePolygonAction extends CreateShapeAction<Polygon> {
-  constructor(doc: SimpleDrawDocument, private points: Coordinate) {
-    super(doc, new Polygon(points));
+  constructor(doc: SimpleDrawDocument, id: number, private points: Coordinate) {
+    super(doc, new Polygon(id, points));
   }
 }

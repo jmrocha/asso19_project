@@ -5,11 +5,12 @@ import { Rectangle } from '../shapes/rectangle';
 export class CreateRectangleAction extends CreateShapeAction<Rectangle> {
   constructor(
     doc: SimpleDrawDocument,
+    id: number,
     private x: number,
     private y: number,
     private width: number,
     private height: number
   ) {
-    super(doc, new Rectangle(x, y, width, height));
+    super(doc, new Rectangle(id, x, y, width, height));
   }
 }
