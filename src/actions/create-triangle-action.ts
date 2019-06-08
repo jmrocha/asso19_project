@@ -18,6 +18,7 @@ export class CreateTriangleAction extends CreateShapeAction<Triangle> {
     return JSON.stringify({
       docID,
       type: 'CreateTriangleAction',
+      objectID: this.shape.getId,
       p1: JSON.stringify(this.p1),
       p2: JSON.stringify(this.p2),
       p3: JSON.stringify(this.p3),

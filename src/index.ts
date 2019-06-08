@@ -61,13 +61,38 @@ client.on('message', (topic, message) => {
       switch (parsedMessage.type) {
         case 'CreateRectangleAction':
           const rect = new Rectangle(
-            simpleDrawDocument.objId,
+            parsedMessage.objectID,
             parsedMessage.x,
             parsedMessage.y,
             parsedMessage.width,
             parsedMessage.height
           );
           simpleDrawDocument.add(rect);
+          break;
+        case 'CreateCircleAction':
+          const circle = new Circle(
+            parsedMessage.objectID,
+            parsedMessage.x,
+            parsedMessage.y,
+            parsedMessage.radius
+          );
+          simpleDrawDocument.add(circle);
+          break;
+        case 'CreateTriangleAction':
+          //console.log(parsedMessage.p1);
+          //const triangle = new Triangle(parsedMessage.objectID, new Coordinate)
+          //simpleDrawDocument.add(triangle);
+          break;
+        case 'CreatePolygonAction':
+          //simpleDrawDocument.add(triangle);
+          break;
+        case 'TranslateAction':
+          break;
+        case 'RotateAction':
+          break;
+        case 'ScaleAction':
+          break;
+        case 'PaintAction':
           break;
         default:
           break;

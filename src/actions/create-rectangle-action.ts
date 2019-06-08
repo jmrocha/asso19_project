@@ -18,6 +18,7 @@ export class CreateRectangleAction extends CreateShapeAction<Rectangle> {
     return JSON.stringify({
       docID,
       type: 'CreateRectangleAction',
+      objectID: this.shape.getId,
       x: this.x,
       y: this.y,
       width: this.width,

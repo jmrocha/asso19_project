@@ -45,10 +45,6 @@ export class SimpleDrawDocument {
     this.renders.push(render);
   }
 
-  getObjectId(): number {
-    return this.objId;
-  }
-
   undo() {
     this.undoManager.undo();
   }
