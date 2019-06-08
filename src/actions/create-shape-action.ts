@@ -12,6 +12,6 @@ export abstract class CreateShapeAction<S extends Shape>
   }
 
   undo() {
-    this.doc.objects = this.doc.objects.filter(o => o !== this.shape);
+    this.doc.remove(this.shape);
   }
 }

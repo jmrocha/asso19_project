@@ -23,6 +23,10 @@ export class TermAbstractExpr extends AbstractExpr {
       new RemoveAbstractExpr(this.simpleDrawDocument, this.render).evaluate(
         expr
       );
+    } else if (input.indexOf('undo') !== -1) {
+      this.simpleDrawDocument.undo();
+    } else if (input.indexOf('redo') !== -1) {
+      this.simpleDrawDocument.redo();
     } else {
       const command = input.split(' ')[0];
       throw new Error(`${command}: command not found`);
