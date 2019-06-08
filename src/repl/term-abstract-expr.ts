@@ -4,6 +4,7 @@ import { RemoveAbstractExpr } from './remove-abstract-expr';
 import { SimpleDrawDocument } from '../document';
 import { Render } from '../render/render';
 import { TranslateAbstractExpr } from './translate-abstract-expr';
+import { RotateAbstractExpr } from './rotate-abstract-expr';
 
 export class TermAbstractExpr extends AbstractExpr {
   constructor(simpleDrawDocument: SimpleDrawDocument, render: Render) {
@@ -34,6 +35,11 @@ export class TermAbstractExpr extends AbstractExpr {
       this.simpleDrawDocument.redo();
     } else if (command.match('translate')) {
       return new TranslateAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(input);
+    } else if (command.match('rotate')) {
+      return new RotateAbstractExpr(
         this.simpleDrawDocument,
         this.render
       ).evaluate(input);
