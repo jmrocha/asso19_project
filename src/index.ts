@@ -12,10 +12,13 @@ import { connect } from 'mqtt';
 import { CreateRectangleAction } from 'actions/create-rectangle-action';
 
 const docID = Date.now() + Math.random();
-const client = connect('ws://iot.eclipse.org:80/ws', {
-  clientId: docID.toString(),
-  clean: false,
-});
+const client = connect(
+  'ws://iot.eclipse.org:80/ws',
+  {
+    clientId: docID.toString(),
+    clean: false,
+  }
+);
 
 const canvas = document.getElementById('canvas') as HTMLElement;
 const defaultRender = new SVGRender(canvas);

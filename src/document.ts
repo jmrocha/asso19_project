@@ -23,7 +23,7 @@ export class SimpleDrawDocument {
 
   constructor(public docID: number, public client: MqttClient, render: Render) {
     client.on('connect', () => {
-      client.subscribe({'ASSOSimpleDraw': {qos: 1}}, err => {
+      client.subscribe({ ASSOSimpleDraw: { qos: 1 } }, err => {
         if (!err) {
           client.publish(
             'ASSOSimpleDraw',
