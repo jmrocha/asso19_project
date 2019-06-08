@@ -11,6 +11,7 @@ import { UndoManager } from './actions/undo-manager';
 import { Coordinate } from 'utilities/coordinate';
 import { ScaleAction } from 'actions/scale-action';
 import { PaintAction } from 'actions/paint-action';
+import { CreatePolygonAction } from './actions/create-polygon-action';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
@@ -73,6 +74,10 @@ export class SimpleDrawDocument {
 
   createTriangle(p1: Coordinate, p2: Coordinate, p3: Coordinate): Shape {
     return this.do(new CreateTriangleAction(this, this.objId++, p1, p2, p3));
+  }
+
+  createPolygon(points: Coordinate[]) {
+    return this.do(new CreatePolygonAction(this, this.objId++, points));
   }
 
   translate(s: Shape, xd: number, yd: number): void {

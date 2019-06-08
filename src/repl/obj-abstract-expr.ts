@@ -3,6 +3,7 @@ import { Render } from 'render/render';
 import { SimpleDrawDocument } from 'document';
 import { RectObjAbstractExpr } from './rect-obj-abstract-expr';
 import { CircleObjAbstractExpr } from './circle-obj-abstract-expr';
+import { PolygonObjAbstractExpr } from './polygon-obj-abstract-expr';
 
 export class ObjAbstractExpr extends AbstractExpr {
   constructor(simpleDrawDocument: SimpleDrawDocument, render: Render) {
@@ -17,6 +18,11 @@ export class ObjAbstractExpr extends AbstractExpr {
       ).evaluate(input);
     } else if (input.indexOf('circle') !== -1) {
       return new CircleObjAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(input);
+    } else if (input.indexOf('polygon') !== -1) {
+      return new PolygonObjAbstractExpr(
         this.simpleDrawDocument,
         this.render
       ).evaluate(input);
