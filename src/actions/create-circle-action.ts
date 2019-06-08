@@ -5,11 +5,12 @@ import { Circle } from '../shapes/circle';
 export class CreateCircleAction extends CreateShapeAction<Circle> {
   constructor(
     doc: SimpleDrawDocument,
+    id: number,
     private x: number,
     private y: number,
     private radius: number
   ) {
-    super(doc, new Circle(x, y, radius));
+    super(doc, new Circle(id, x, y, radius));
   }
 
   toJSON(docID: number): string {

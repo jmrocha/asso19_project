@@ -14,12 +14,12 @@ import { CreateRectangleAction } from 'actions/create-rectangle-action';
 const client = connect('ws://iot.eclipse.org:80/ws');
 const docID = Date.now() + Math.random();
 
-const simpleDrawDocument = new SimpleDrawDocument(docID, client);
+const canvas = document.getElementById('canvas') as HTMLElement;
+const defaultRender = new SVGRender(canvas);
+const simpleDrawDocument = new SimpleDrawDocument(docID, client, defaultRender);
 const e = document.getElementById('terminal') as HTMLInputElement;
 const t = new Terminal(e);
 const promptTextElem = t.getPromptTextElem();
-const canvas = document.getElementById('canvas') as HTMLElement;
-const defaultRender = new SVGRender(canvas);
 
 e.addEventListener('keydown', event => {
   if (event.code === 'Enter') {
@@ -61,6 +61,7 @@ client.on('message', (topic, message) => {
       switch (parsedMessage.type) {
         case 'CreateRectangleAction':
           const rect = new Rectangle(
+            simpleDrawDocument.objId,
             parsedMessage.x,
             parsedMessage.y,
             parsedMessage.width,
@@ -71,11 +72,11 @@ client.on('message', (topic, message) => {
         default:
           break;
       }
-      simpleDrawDocument.draw(defaultRender);
+      simpleDrawDocument.draw();
     }
   } else {
     console.log(message.toString());
   }
 });
 
-simpleDrawDocument.draw(defaultRender);
+simpleDrawDocument.draw();

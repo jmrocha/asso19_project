@@ -13,7 +13,7 @@ export class DrawAbstractExpr extends AbstractExpr {
       this.simpleDrawDocument,
       this.render
     ).evaluate(input);
-    this.simpleDrawDocument.draw(this.render);
+    this.simpleDrawDocument.draw();
     return res;
   }
 }
