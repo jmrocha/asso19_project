@@ -7,8 +7,12 @@ export class CreatePolygonAction extends CreateShapeAction<Polygon> {
   constructor(doc: SimpleDrawDocument, private points: Coordinate) {
     super(doc, new Polygon(points));
   }
-  
-  toJSON(): string {
-    return JSON.stringify({ type: 'CreatePolygonAction', points: JSON.stringify(this.points) });
+
+  toJSON(docID: number): string {
+    return JSON.stringify({
+      docID,
+      type: 'CreatePolygonAction',
+      points: JSON.stringify(this.points),
+    });
   }
 }

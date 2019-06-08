@@ -11,8 +11,14 @@ export class CreateCircleAction extends CreateShapeAction<Circle> {
   ) {
     super(doc, new Circle(x, y, radius));
   }
-  
-  toJSON(): string {
-    return JSON.stringify({ type: 'CreateCircleAction', x: this.x, y: this.y, radius: this.radius });
+
+  toJSON(docID: number): string {
+    return JSON.stringify({
+      docID,
+      type: 'CreateCircleAction',
+      x: this.x,
+      y: this.y,
+      radius: this.radius,
+    });
   }
 }

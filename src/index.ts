@@ -12,8 +12,9 @@ import { connect } from 'mqtt';
 import { CreateRectangleAction } from 'actions/create-rectangle-action';
 
 const client = connect('ws://iot.eclipse.org:80/ws');
+const docID = Date.now() + Math.random();
 
-const simpleDrawDocument = new SimpleDrawDocument(client);
+const simpleDrawDocument = new SimpleDrawDocument(docID, client);
 const e = document.getElementById('terminal') as HTMLInputElement;
 const t = new Terminal(e);
 const promptTextElem = t.getPromptTextElem();
@@ -37,36 +38,41 @@ e.addEventListener('keydown', event => {
 });
 
 function isJson(item: string) {
-  item = typeof item !== "string"
-      ? JSON.stringify(item)
-      : item;
+  item = typeof item !== 'string' ? JSON.stringify(item) : item;
 
   try {
-      item = JSON.parse(item);
+    item = JSON.parse(item);
   } catch (e) {
-      return false;
+    return false;
   }
 
-  if (typeof item === "object" && item !== null) {
-      return true;
+  if (typeof item === 'object' && item !== null) {
+    return true;
   }
 
   return false;
 }
 
 client.on('message', (topic, message) => {
-  if(isJson(message.toString())) {
+  if (isJson(message.toString())) {
     const parsedMessage = JSON.parse(message.toString());
 
-    switch(parsedMessage.type) {
-      case 'CreateRectangleAction':
-        const rect = new Rectangle(parsedMessage.x, parsedMessage.y, parsedMessage.width, parsedMessage.height);
-        simpleDrawDocument.add(rect);
-        break;
-      default:
-        break;
+    if (docID !== parsedMessage.docID) {
+      switch (parsedMessage.type) {
+        case 'CreateRectangleAction':
+          const rect = new Rectangle(
+            parsedMessage.x,
+            parsedMessage.y,
+            parsedMessage.width,
+            parsedMessage.height
+          );
+          simpleDrawDocument.add(rect);
+          break;
+        default:
+          break;
+      }
+      simpleDrawDocument.draw(defaultRender);
     }
-    simpleDrawDocument.draw(defaultRender);
   } else {
     console.log(message.toString());
   }

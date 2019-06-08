@@ -15,7 +15,7 @@ export abstract class CreateShapeAction<S extends Shape>
     this.doc.objects = this.doc.objects.filter(o => o !== this.shape);
   }
 
-  toJSON() {
+  toJSON(docID: number) {
     return '';
   }
 }
