@@ -5,6 +5,7 @@ import { SimpleDrawDocument } from '../document';
 import { Render } from '../render/render';
 import { TranslateAbstractExpr } from './translate-abstract-expr';
 import { RotateAbstractExpr } from './rotate-abstract-expr';
+import { ScaleAbstractExpr } from './scale-abstract-expr';
 
 export class TermAbstractExpr extends AbstractExpr {
   constructor(simpleDrawDocument: SimpleDrawDocument, render: Render) {
@@ -39,6 +40,11 @@ export class TermAbstractExpr extends AbstractExpr {
       ).evaluate(input);
     } else if (command.match('rotate')) {
       return new RotateAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(input);
+    } else if (command.match('scale')) {
+      return new ScaleAbstractExpr(
         this.simpleDrawDocument,
         this.render
       ).evaluate(input);
