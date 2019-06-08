@@ -55,6 +55,7 @@ function isJson(item: string) {
 
 client.on('message', (topic, message) => {
   if (isJson(message.toString())) {
+    console.log(message.toString());
     const parsedMessage = JSON.parse(message.toString());
 
     if (docID !== parsedMessage.docID) {

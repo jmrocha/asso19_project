@@ -12,7 +12,7 @@ export class CreatePolygonAction extends CreateShapeAction<Polygon> {
     return JSON.stringify({
       docID,
       type: 'CreatePolygonAction',
-      objectID: this.shape.getId,
+      objectID: this.shape.getId(),
       points: JSON.stringify(this.points),
     });
   }

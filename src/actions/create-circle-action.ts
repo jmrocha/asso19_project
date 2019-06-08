@@ -17,7 +17,7 @@ export class CreateCircleAction extends CreateShapeAction<Circle> {
     return JSON.stringify({
       docID,
       type: 'CreateCircleAction',
-      objectID: this.shape.getId,
+      objectID: this.shape.getId(),
       x: this.x,
       y: this.y,
       radius: this.radius,
