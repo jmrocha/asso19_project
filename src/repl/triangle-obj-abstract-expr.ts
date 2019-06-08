@@ -23,8 +23,12 @@ export class TriangleObjAbstractExpr extends AbstractExpr {
       return new Coordinate(Number(x), Number(y));
     });
 
-    this.simpleDrawDocument.createTriangle(points[0], points[1], points[2]);
+    const action = this.simpleDrawDocument.createTriangle(
+      points[0],
+      points[1],
+      points[2]
+    );
 
-    return '';
+    return `Created triangle with id ${action.getId()}`;
   }
 }

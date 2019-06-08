@@ -23,8 +23,8 @@ export class PolygonObjAbstractExpr extends AbstractExpr {
       return new Coordinate(Number(x), Number(y));
     });
 
-    this.simpleDrawDocument.createPolygon(points);
+    const action = this.simpleDrawDocument.createPolygon(points);
 
-    return '';
+    return `Created polygon with id ${action.getId()}`;
   }
 }

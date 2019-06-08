@@ -17,8 +17,8 @@ export class RectObjAbstractExpr extends AbstractExpr {
     width = Number(exprs[3]);
     height = Number(exprs[4]);
 
-    this.simpleDrawDocument.createRectangle(x, y, width, height);
+    const action = this.simpleDrawDocument.createRectangle(x, y, width, height);
 
-    return '';
+    return `Created rectangle with id ${action.getId()}`;
   }
 }

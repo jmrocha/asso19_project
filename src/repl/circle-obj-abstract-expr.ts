@@ -16,8 +16,8 @@ export class CircleObjAbstractExpr extends AbstractExpr {
     y = Number(exprs[2]);
     radius = Number(exprs[3]);
 
-    this.simpleDrawDocument.createCircle(x, y, radius);
+    const action = this.simpleDrawDocument.createCircle(x, y, radius);
 
-    return '';
+    return `Created circle with id ${action.getId()}`;
   }
 }

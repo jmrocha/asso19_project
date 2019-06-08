@@ -17,14 +17,16 @@ export class TermAbstractExpr extends AbstractExpr {
       const exprs = input.split('draw');
       const drawExpr = exprs[1];
 
-      new DrawAbstractExpr(this.simpleDrawDocument, this.render).evaluate(
-        drawExpr
-      );
+      return new DrawAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(drawExpr);
     } else if (command.match('remove')) {
       const expr = input.split('remove')[1];
-      new RemoveAbstractExpr(this.simpleDrawDocument, this.render).evaluate(
-        expr
-      );
+      return new RemoveAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(expr);
     } else if (command.match('undo')) {
       this.simpleDrawDocument.undo();
     } else if (command.match('redo')) {
