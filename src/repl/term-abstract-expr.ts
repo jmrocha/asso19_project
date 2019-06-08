@@ -24,11 +24,10 @@ export class TermAbstractExpr extends AbstractExpr {
         this.render
       ).evaluate(drawExpr);
     } else if (command.match('remove')) {
-      const expr = input.split('remove')[1];
       return new RemoveAbstractExpr(
         this.simpleDrawDocument,
         this.render
-      ).evaluate(expr);
+      ).evaluate(input);
     } else if (command.match('undo')) {
       this.simpleDrawDocument.undo();
     } else if (command.match('redo')) {

@@ -8,6 +8,14 @@ export class RemoveAbstractExpr extends AbstractExpr {
   }
 
   evaluate(input: string): string {
-    throw new Error('remove: command not implemented');
+    const shapeId = Number(input.split('remove').splice(1)[0]);
+    try {
+      const shape = this.simpleDrawDocument.getShapeById(shapeId);
+      this.simpleDrawDocument.remove(shape);
+    } catch (error) {
+      throw new Error("Shape doesn't exist");
+    }
+
+    return '';
   }
 }
