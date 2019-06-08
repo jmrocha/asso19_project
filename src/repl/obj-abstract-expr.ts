@@ -1,6 +1,8 @@
 import { AbstractExpr } from './abstract-expr';
 import { Render } from 'render/render';
 import { SimpleDrawDocument } from 'document';
+import { RectObjAbstractExpr } from './rect-obj-abstract-expr';
+import { CircleObjAbstractExpr } from './circle-obj-abstract-expr';
 
 export class ObjAbstractExpr extends AbstractExpr {
   constructor(simpleDrawDocument: SimpleDrawDocument, render: Render) {
@@ -8,20 +10,18 @@ export class ObjAbstractExpr extends AbstractExpr {
   }
 
   evaluate(input: string): string {
-    const res = '';
     if (input.indexOf('rect') !== -1) {
-      const exprs = input.split('rect')[1].split(' ');
-
-      let x, y, width, height;
-
-      x = Number(exprs[1]);
-      y = Number(exprs[2]);
-      width = Number(exprs[3]);
-      height = Number(exprs[4]);
-
-      this.simpleDrawDocument.createRectangle(x, y, width, height);
+      return new RectObjAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(input);
+    } else if (input.indexOf('circle') !== -1) {
+      return new CircleObjAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(input);
     }
 
-    return res;
+    return '';
   }
 }
