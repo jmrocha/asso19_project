@@ -48,6 +48,11 @@ export class TermAbstractExpr extends AbstractExpr {
         this.simpleDrawDocument,
         this.render
       ).evaluate(input);
+    } else if (command.match('render')) {
+      return new RemoveAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(input);
     } else {
       const command = input.split(' ')[0];
       throw new Error(`${command}: command not found`);
