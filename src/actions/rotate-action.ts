@@ -19,4 +19,8 @@ export class RotateAction implements UndoableAction<void> {
   undo() {
     this.shape.rotation = this.oldRotation;
   }
+
+  toJSON(): string {
+    return JSON.stringify({ type: 'RotateAction', shape: JSON.stringify(this.shape), rotation: this.rotation });
+  }
 }

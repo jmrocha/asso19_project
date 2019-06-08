@@ -9,10 +9,11 @@ import { Polygon } from 'shapes/polygon';
 import { CanvasRender } from 'render/canvas-render';
 import { Rectangle } from 'shapes/rectangle';
 import { connect } from 'mqtt';
+import { CreateRectangleAction } from 'actions/create-rectangle-action';
 
-const client = connect('https://test.mosquitto.org:8080');
+const client = connect('ws://iot.eclipse.org:80/ws');
 
-const simpleDrawDocument = new SimpleDrawDocument();
+const simpleDrawDocument = new SimpleDrawDocument(client);
 const e = document.getElementById('terminal') as HTMLInputElement;
 const t = new Terminal(e);
 const promptTextElem = t.getPromptTextElem();
@@ -35,26 +36,40 @@ e.addEventListener('keydown', event => {
   }
 });
 
-client.on('connect', () => {
-  client.subscribe('presence', err => {
-    if(!err) {
-      client.publish('presence', 'Hello mqtt');
-    }
-  });
-});
+function isJson(item: string) {
+  item = typeof item !== "string"
+      ? JSON.stringify(item)
+      : item;
+
+  try {
+      item = JSON.parse(item);
+  } catch (e) {
+      return false;
+  }
+
+  if (typeof item === "object" && item !== null) {
+      return true;
+  }
+
+  return false;
+}
 
 client.on('message', (topic, message) => {
-  console.log(message.toString());
-  client.end();
+  if(isJson(message.toString())) {
+    const parsedMessage = JSON.parse(message.toString());
+
+    switch(parsedMessage.type) {
+      case 'CreateRectangleAction':
+        const rect = new Rectangle(parsedMessage.x, parsedMessage.y, parsedMessage.width, parsedMessage.height);
+        simpleDrawDocument.add(rect);
+        break;
+      default:
+        break;
+    }
+    simpleDrawDocument.draw(defaultRender);
+  } else {
+    console.log(message.toString());
+  }
 });
 
-const c = new Circle(200, 200, 50);
-const c1 = new Circle(200, 200, 50);
-const r = new Rectangle(400, 400, 50, 50);
-simpleDrawDocument.add(r);
-simpleDrawDocument.add(c);
-simpleDrawDocument.add(c1);
-simpleDrawDocument.translate(c1, 300, 0);
-simpleDrawDocument.scale(r, 1.5, 1.5);
-simpleDrawDocument.paint(r, 'red');
 simpleDrawDocument.draw(defaultRender);

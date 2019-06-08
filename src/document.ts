@@ -11,10 +11,22 @@ import { UndoManager } from './actions/undo-manager';
 import { Coordinate } from 'utilities/coordinate';
 import { ScaleAction } from 'actions/scale-action';
 import { PaintAction } from 'actions/paint-action';
+import { MqttClient } from 'mqtt';
+import { inspect } from 'util';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
   undoManager = new UndoManager();
+
+  constructor(public client: MqttClient) {
+    client.on('connect', () => {
+      client.subscribe('ASSOSimpleDraw', err => {
+        if(!err) {
+          client.publish('ASSOSimpleDraw', 'Hello ASSO');
+        }
+      });
+    });
+  }
 
   undo() {
     this.undoManager.undo();
@@ -35,6 +47,7 @@ export class SimpleDrawDocument {
   do<T>(a: Action<T>): T {
     if ((a as UndoableAction<T>).undo !== undefined) {
       this.undoManager.onActionDone(a as UndoableAction<T>);
+      this.client.publish('ASSOSimpleDraw', (a as UndoableAction<T>).toJSON());
     }
     return a.do();
   }

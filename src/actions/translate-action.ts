@@ -27,4 +27,8 @@ export class TranslateAction implements UndoableAction<void> {
   undo() {
     this.shape.coordinates = [...this.oldCoordinates];
   }
+
+  toJSON(): string {
+    return JSON.stringify({ type: 'TranslateAction', shape: JSON.stringify(this.shape), xd: this.xd, yd: this.yd });
+  }
 }

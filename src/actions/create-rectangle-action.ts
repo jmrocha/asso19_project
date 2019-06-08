@@ -12,4 +12,8 @@ export class CreateRectangleAction extends CreateShapeAction<Rectangle> {
   ) {
     super(doc, new Rectangle(x, y, width, height));
   }
+
+  toJSON(): string {
+    return JSON.stringify({ type: 'CreateRectangleAction', x: this.x, y: this.y, width: this.width, height: this.height });
+  }
 }
