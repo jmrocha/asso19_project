@@ -38,6 +38,7 @@ export class SimpleDrawDocument {
 
   redo() {
     this.undoManager.redo();
+    this.currentRender.draw(...this.objects);
   }
 
   draw(): void {
