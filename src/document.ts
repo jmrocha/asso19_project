@@ -11,6 +11,12 @@ import { UndoManager } from './actions/undo-manager';
 import { Coordinate } from 'utilities/coordinate';
 import { ScaleAction } from 'actions/scale-action';
 import { PaintAction } from 'actions/paint-action';
+import {
+  XMLExporterVisitor,
+  Context,
+  ConcreteStrategyXML,
+  ConcreteStrategyJSON,
+} from 'persistence/exporter';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
@@ -65,5 +71,18 @@ export class SimpleDrawDocument {
 
   paint(s: Shape, fillColor: string): void {
     return this.do(new PaintAction(this, s, fillColor));
+  }
+
+  export(action: string) {
+    const context = new Context();
+
+    if (action === 'XML') {
+      context.setStrategy(new ConcreteStrategyXML());
+    }
+    if (action === 'JSON') {
+      context.setStrategy(new ConcreteStrategyJSON());
+    }
+
+    const result = context.executeStrategy(this.objects);
   }
 }

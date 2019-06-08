@@ -1,5 +1,6 @@
 import { Shape } from './shape';
 import { Coordinate } from '../utilities/coordinate';
+import { Visitor } from 'persistence/exporter';
 
 export class Rectangle extends Shape {
   constructor(
@@ -9,5 +10,9 @@ export class Rectangle extends Shape {
     public height: number
   ) {
     super(new Coordinate(x, y));
+  }
+
+  accept(visitor: Visitor): string {
+    return visitor.visitRectangle(this);
   }
 }

@@ -42,3 +42,7 @@ simpleDrawDocument.translate(c1, 300, 0);
 simpleDrawDocument.scale(r, 1.5, 1.5);
 simpleDrawDocument.paint(r, 'red');
 simpleDrawDocument.draw(defaultRender);
+
+simpleDrawDocument.export('XML');
+console.log('\n');
+simpleDrawDocument.export('JSON');

@@ -1,4 +1,5 @@
 import { Coordinate } from '../utilities/coordinate';
+import { Visitor } from 'persistence/exporter';
 
 export abstract class Shape {
   coordinates: Coordinate[];
@@ -10,4 +11,6 @@ export abstract class Shape {
   protected constructor(...coordinates: Coordinate[]) {
     this.coordinates = coordinates;
   }
+
+  abstract accept(visitor: Visitor): string;
 }
