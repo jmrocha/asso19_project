@@ -12,7 +12,7 @@ export class Rectangle extends Shape {
     super(new Coordinate(x, y));
   }
 
-  accept(visitor: Visitor): string {
+  accept(visitor: Visitor): Element {
     return visitor.visitRectangle(this);
   }
 }

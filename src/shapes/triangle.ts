@@ -7,7 +7,7 @@ export class Triangle extends Shape {
     super(p1, p2, p3);
   }
 
-  accept(visitor: Visitor): string {
+  accept(visitor: Visitor): Element {
     return visitor.visitTriangle(this);
   }
 }

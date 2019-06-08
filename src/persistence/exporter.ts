@@ -12,20 +12,42 @@ export interface Strategy {
 
 export class ConcreteStrategyXML implements Strategy {
   execute(objects: Shape[]): void {
-    //console.log("XMLConcreteStrategy");
-    const visitor = new XMLExporterVisitor();
+    const xmlDoc: XMLDocument = document.implementation.createDocument(
+      '',
+      '',
+      null
+    );
+    const storedShapes = xmlDoc.createElement('shapes');
+
+    const visitor = new XMLExporterVisitor(xmlDoc);
+
     for (const shape of objects) {
-      console.log(shape.accept(visitor));
+      storedShapes.appendChild(shape.accept(visitor));
     }
+
+    xmlDoc.appendChild(storedShapes);
+    console.log(xmlDoc);
   }
 }
 
+//At the moment, this class is outputting the same thing as the XML one.
 export class ConcreteStrategyJSON implements Strategy {
   execute(objects: Shape[]): void {
-    const visitor = new JSONExporterVisitor();
+    const jsonDoc: XMLDocument = document.implementation.createDocument(
+      '',
+      '',
+      null
+    );
+    const storedShapes = jsonDoc.createElement('shapes');
+
+    const visitor = new JSONExporterVisitor(jsonDoc);
+
     for (const shape of objects) {
-      console.log(shape.accept(visitor));
+      storedShapes.appendChild(shape.accept(visitor));
     }
+
+    jsonDoc.appendChild(storedShapes);
+    console.log(jsonDoc);
   }
 }
 
@@ -44,44 +66,58 @@ export class Context {
 // Visitor Pattern
 
 export interface Visitor {
-  visitRectangle(rect: Rectangle): string;
-  visitCircle(circle: Circle): string;
-  visitPolygon(polyg: Polygon): string;
-  visitTriangle(triangle: Triangle): string;
+  visitRectangle(rect: Rectangle): Element;
+  visitCircle(circle: Circle): Element;
+  visitPolygon(polyg: Polygon): Element;
+  visitTriangle(triangle: Triangle): Element;
 }
 
 export class XMLExporterVisitor implements Visitor {
-  visitRectangle(rect: Rectangle): string {
-    return 'rectangle1';
+  constructor(private xmlDoc: XMLDocument) {}
+
+  visitRectangle(rect: Rectangle): Element {
+    const rectElement: Element = this.xmlDoc.createElement('rect');
+    return rectElement;
   }
 
-  visitCircle(circle: Circle): string {
-    return 'circle1';
+  visitCircle(circle: Circle): Element {
+    const circleElement: Element = this.xmlDoc.createElement('circle');
+    return circleElement;
   }
 
-  visitPolygon(polyg: Polygon): string {
-    return 'polygon1';
+  visitPolygon(polyg: Polygon): Element {
+    const polygElement: Element = this.xmlDoc.createElement('polyg');
+    return polygElement;
   }
 
-  visitTriangle(triangle: Triangle): string {
-    return 'triangle1';
+  visitTriangle(triangle: Triangle): Element {
+    const trianglegElement: Element = this.xmlDoc.createElement('triangle');
+    return trianglegElement;
   }
 }
 
+//At the moment, this class is outputting the same thing as the XML one.
+
 export class JSONExporterVisitor implements Visitor {
-  visitRectangle(rect: Rectangle): string {
-    return 'rectangle2';
+  constructor(private xmlDoc: XMLDocument) {}
+
+  visitRectangle(rect: Rectangle): Element {
+    const rectElement: Element = this.xmlDoc.createElement('rect');
+    return rectElement;
   }
 
-  visitCircle(circle: Circle): string {
-    return 'circle2';
+  visitCircle(circle: Circle): Element {
+    const circleElement: Element = this.xmlDoc.createElement('circle');
+    return circleElement;
   }
 
-  visitPolygon(polyg: Polygon): string {
-    return 'polygon2';
+  visitPolygon(polyg: Polygon): Element {
+    const polygElement: Element = this.xmlDoc.createElement('polyg');
+    return polygElement;
   }
 
-  visitTriangle(triangle: Triangle): string {
-    return 'triangle2';
+  visitTriangle(triangle: Triangle): Element {
+    const triangleElement: Element = this.xmlDoc.createElement('triangle');
+    return triangleElement;
   }
 }

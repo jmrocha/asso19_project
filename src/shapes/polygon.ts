@@ -7,7 +7,7 @@ export class Polygon extends Shape {
     super(...coordinates);
   }
 
-  accept(visitor: Visitor): string {
+  accept(visitor: Visitor): Element {
     return visitor.visitPolygon(this);
   }
 }

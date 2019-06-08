@@ -12,5 +12,5 @@ export abstract class Shape {
     this.coordinates = coordinates;
   }
 
-  abstract accept(visitor: Visitor): string;
+  abstract accept(visitor: Visitor): Element;
 }
