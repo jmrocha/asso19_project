@@ -95,4 +95,8 @@ export class SimpleDrawDocument {
   paint(s: Shape, fillColor: string): void {
     return this.do(new PaintAction(this, s, fillColor));
   }
+
+  getShapeById(id: number): Shape {
+    return this.objects.find(shape => shape.getId() === id) as Shape;
+  }
 }

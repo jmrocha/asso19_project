@@ -27,12 +27,8 @@ export class SVGRender implements Render {
   }
 
   draw(...objs: Shape[]): void {
+    this.canvas.innerHTML = '';
     for (const shape of objs) {
-      if (this.shapes.has(shape.getId())) {
-        continue;
-      } else {
-        this.shapes = this.shapes.set(shape.getId(), shape);
-      }
       if (shape instanceof Rectangle) {
         const e = document.createElementNS(
           'http://www.w3.org/2000/svg',

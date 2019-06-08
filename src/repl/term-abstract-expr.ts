@@ -3,6 +3,7 @@ import { DrawAbstractExpr } from './draw-abstract-expr';
 import { RemoveAbstractExpr } from './remove-abstract-expr';
 import { SimpleDrawDocument } from '../document';
 import { Render } from '../render/render';
+import { TranslateAbstractExpr } from './translate-abstract-expr';
 
 export class TermAbstractExpr extends AbstractExpr {
   constructor(simpleDrawDocument: SimpleDrawDocument, render: Render) {
@@ -31,6 +32,11 @@ export class TermAbstractExpr extends AbstractExpr {
       this.simpleDrawDocument.undo();
     } else if (command.match('redo')) {
       this.simpleDrawDocument.redo();
+    } else if (command.match('translate')) {
+      return new TranslateAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(input);
     } else {
       const command = input.split(' ')[0];
       throw new Error(`${command}: command not found`);
