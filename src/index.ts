@@ -11,6 +11,7 @@ import { Rectangle } from 'shapes/rectangle';
 
 const simpleDrawDocument = new SimpleDrawDocument();
 const e = document.getElementById('terminal') as HTMLInputElement;
+const d = document.getElementById('exportForm') as HTMLElement;
 const t = new Terminal(e);
 const promptTextElem = t.getPromptTextElem();
 const canvas = document.getElementById('canvas') as HTMLElement;
@@ -30,6 +31,12 @@ e.addEventListener('keydown', event => {
       t.printError(error.message);
     }
   }
+});
+
+d.addEventListener('submit', (event: Event) => {
+  event.preventDefault();
+  console.log('Exported');
+  simpleDrawDocument.export('XML');
 });
 
 const c = new Circle(200, 200, 50);
