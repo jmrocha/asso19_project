@@ -19,6 +19,8 @@ export class CanvasRender implements Render {
     this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
   }
 
+  remove(obj: Shape): void {}
+
   draw(...objs: Shape[]): void {
     for (const shape of objs) {
       this.ctx.save();

@@ -7,6 +7,8 @@ import { Polygon } from 'shapes/polygon';
 
 export class SVGRender implements Render {
   private canvas: SVGElement;
+  private shapes: Map<number, Shape> = new Map<number, Shape>();
+
   constructor(private rootElem: HTMLElement) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('id', 'canvas');
@@ -16,13 +18,27 @@ export class SVGRender implements Render {
     this.canvas = svg;
   }
 
+  remove(obj: Shape): void {
+    const e = document.getElementById(`${obj.getId()}`);
+    if (e) {
+      e.remove();
+      this.shapes.delete(obj.getId());
+    }
+  }
+
   draw(...objs: Shape[]): void {
     for (const shape of objs) {
+      if (this.shapes.has(shape.getId())) {
+        continue;
+      } else {
+        this.shapes = this.shapes.set(shape.getId(), shape);
+      }
       if (shape instanceof Rectangle) {
         const e = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'rect'
         );
+        e.setAttribute('id', `${shape.getId()}`);
         e.setAttribute('style', 'stroke: black; fill: ' + shape.fillColor);
         e.setAttribute('x', shape.coordinates[0].x.toString());
         e.setAttribute('y', shape.coordinates[0].y.toString());

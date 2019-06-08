@@ -15,6 +15,22 @@ import { PaintAction } from 'actions/paint-action';
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
   undoManager = new UndoManager();
+  objId = 0;
+  renders: Render[] = [];
+  currentRender: Render;
+
+  constructor(render: Render) {
+    this.currentRender = render;
+    this.renders.push(render);
+  }
+
+  setCurrentRender(render: Render) {
+    this.currentRender = render;
+  }
+
+  registerRender(render: Render) {
+    this.renders.push(render);
+  }
 
   undo() {
     this.undoManager.undo();
@@ -22,10 +38,16 @@ export class SimpleDrawDocument {
 
   redo() {
     this.undoManager.redo();
+    this.currentRender.draw(...this.objects);
   }
 
-  draw(render: Render): void {
-    render.draw(...this.objects);
+  draw(): void {
+    this.currentRender.draw(...this.objects);
+  }
+
+  remove(s: Shape): void {
+    this.objects = this.objects.filter(o => o !== s);
+    this.renders.forEach(render => render.remove(s));
   }
 
   add(r: Shape): void {
@@ -40,15 +62,17 @@ export class SimpleDrawDocument {
   }
 
   createRectangle(x: number, y: number, width: number, height: number): Shape {
-    return this.do(new CreateRectangleAction(this, x, y, width, height));
+    return this.do(
+      new CreateRectangleAction(this, this.objId++, x, y, width, height)
+    );
   }
 
   createCircle(x: number, y: number, radius: number): Shape {
-    return this.do(new CreateCircleAction(this, x, y, radius));
+    return this.do(new CreateCircleAction(this, this.objId++, x, y, radius));
   }
 
   createTriangle(p1: Coordinate, p2: Coordinate, p3: Coordinate): Shape {
-    return this.do(new CreateTriangleAction(this, p1, p2, p3));
+    return this.do(new CreateTriangleAction(this, this.objId++, p1, p2, p3));
   }
 
   translate(s: Shape, xd: number, yd: number): void {
