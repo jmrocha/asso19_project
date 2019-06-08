@@ -11,21 +11,23 @@ export class TermAbstractExpr extends AbstractExpr {
 
   evaluate(input: string): string {
     const res = '';
-    if (input.indexOf('draw') !== -1) {
+    const command = input.split(' ')[0];
+
+    if (command.match('draw')) {
       const exprs = input.split('draw');
       const drawExpr = exprs[1];
 
       new DrawAbstractExpr(this.simpleDrawDocument, this.render).evaluate(
         drawExpr
       );
-    } else if (input.indexOf('remove') !== -1) {
+    } else if (command.match('remove')) {
       const expr = input.split('remove')[1];
       new RemoveAbstractExpr(this.simpleDrawDocument, this.render).evaluate(
         expr
       );
-    } else if (input.indexOf('undo') !== -1) {
+    } else if (command.match('undo')) {
       this.simpleDrawDocument.undo();
-    } else if (input.indexOf('redo') !== -1) {
+    } else if (command.match('redo')) {
       this.simpleDrawDocument.redo();
     } else {
       const command = input.split(' ')[0];

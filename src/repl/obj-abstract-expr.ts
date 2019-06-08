@@ -4,6 +4,7 @@ import { SimpleDrawDocument } from 'document';
 import { RectObjAbstractExpr } from './rect-obj-abstract-expr';
 import { CircleObjAbstractExpr } from './circle-obj-abstract-expr';
 import { PolygonObjAbstractExpr } from './polygon-obj-abstract-expr';
+import { TriangleObjAbstractExpr } from './triangle-obj-abstract-expr';
 
 export class ObjAbstractExpr extends AbstractExpr {
   constructor(simpleDrawDocument: SimpleDrawDocument, render: Render) {
@@ -11,23 +12,31 @@ export class ObjAbstractExpr extends AbstractExpr {
   }
 
   evaluate(input: string): string {
-    if (input.indexOf('rect') !== -1) {
-      return new RectObjAbstractExpr(
-        this.simpleDrawDocument,
-        this.render
-      ).evaluate(input);
-    } else if (input.indexOf('circle') !== -1) {
-      return new CircleObjAbstractExpr(
-        this.simpleDrawDocument,
-        this.render
-      ).evaluate(input);
-    } else if (input.indexOf('polygon') !== -1) {
-      return new PolygonObjAbstractExpr(
-        this.simpleDrawDocument,
-        this.render
-      ).evaluate(input);
-    }
+    const shape = input.split(' ')[1];
 
-    return '';
+    switch (shape) {
+      case 'rect':
+        return new RectObjAbstractExpr(
+          this.simpleDrawDocument,
+          this.render
+        ).evaluate(input);
+      case 'circle':
+        return new CircleObjAbstractExpr(
+          this.simpleDrawDocument,
+          this.render
+        ).evaluate(input);
+      case 'polygon':
+        return new PolygonObjAbstractExpr(
+          this.simpleDrawDocument,
+          this.render
+        ).evaluate(input);
+      case 'triangle':
+        return new TriangleObjAbstractExpr(
+          this.simpleDrawDocument,
+          this.render
+        ).evaluate(input);
+      default:
+        throw new Error(`draw: ${input} not recognized`);
+    }
   }
 }
