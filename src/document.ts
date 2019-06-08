@@ -23,11 +23,14 @@ export class SimpleDrawDocument {
 
   constructor(public docID: number, public client: MqttClient, render: Render) {
     client.on('connect', () => {
-      client.subscribe('ASSOSimpleDraw', err => {
+      client.subscribe({'ASSOSimpleDraw': {qos: 1}}, err => {
         if (!err) {
           client.publish(
             'ASSOSimpleDraw',
-            'Document with ID ' + this.docID + ' has connected!'
+            'Document with ID ' + this.docID + ' has connected!',
+            {
+              qos: 1,
+            }
           );
         }
       });
@@ -65,6 +68,7 @@ export class SimpleDrawDocument {
 
   add(r: Shape): void {
     this.objects.push(r);
+    this.objId++;
   }
 
   do<T>(a: Action<T>): T {
@@ -72,7 +76,10 @@ export class SimpleDrawDocument {
       this.undoManager.onActionDone(a as UndoableAction<T>);
       this.client.publish(
         'ASSOSimpleDraw',
-        (a as UndoableAction<T>).toJSON(this.docID)
+        (a as UndoableAction<T>).toJSON(this.docID),
+        {
+          qos: 1,
+        }
       );
     }
     return a.do();
@@ -80,16 +87,16 @@ export class SimpleDrawDocument {
 
   createRectangle(x: number, y: number, width: number, height: number): Shape {
     return this.do(
-      new CreateRectangleAction(this, this.objId++, x, y, width, height)
+      new CreateRectangleAction(this, this.objId, x, y, width, height)
     );
   }
 
   createCircle(x: number, y: number, radius: number): Shape {
-    return this.do(new CreateCircleAction(this, this.objId++, x, y, radius));
+    return this.do(new CreateCircleAction(this, this.objId, x, y, radius));
   }
 
   createTriangle(p1: Coordinate, p2: Coordinate, p3: Coordinate): Shape {
-    return this.do(new CreateTriangleAction(this, this.objId++, p1, p2, p3));
+    return this.do(new CreateTriangleAction(this, this.objId, p1, p2, p3));
   }
 
   translate(s: Shape, xd: number, yd: number): void {
