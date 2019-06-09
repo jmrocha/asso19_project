@@ -12,10 +12,11 @@ import { Coordinate } from 'utilities/coordinate';
 import { ScaleAction } from 'actions/scale-action';
 import { PaintAction } from 'actions/paint-action';
 import {
-  XMLExporterVisitor,
   Context,
-  ConcreteStrategyXML,
-  ConcreteStrategyJSON,
+  ConcreteStrategyXMLExp,
+  ConcreteStrategyJSONExp,
+  //ConcreteStrategyXMLImp,
+  //ConcreteStrategyJSONImp,
 } from 'persistence/exporter';
 
 export class SimpleDrawDocument {
@@ -77,12 +78,27 @@ export class SimpleDrawDocument {
     const context = new Context();
 
     if (action === 'XML') {
-      context.setStrategy(new ConcreteStrategyXML());
+      context.setStrategy(new ConcreteStrategyXMLExp());
     }
     if (action === 'JSON') {
-      context.setStrategy(new ConcreteStrategyJSON());
+      context.setStrategy(new ConcreteStrategyJSONExp());
     }
 
     const result = context.executeStrategy(this.objects);
   }
+
+  /*
+  import(action : string) {
+    const context = new Context();
+
+    if (action === 'XML') {
+      context.setStrategy(new ConcreteStrategyXMLImp());
+    }
+    if (action === 'JSON') {
+      context.setStrategy(new ConcreteStrategyJSONImp());
+    }
+
+    const result = context.executeStrategy(this.objects);
+  }
+  */
 }

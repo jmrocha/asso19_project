@@ -11,7 +11,8 @@ import { Rectangle } from 'shapes/rectangle';
 
 const simpleDrawDocument = new SimpleDrawDocument();
 const e = document.getElementById('terminal') as HTMLInputElement;
-const d = document.getElementById('exportForm') as HTMLElement;
+const d = document.getElementById('exportFormXML') as HTMLElement;
+const j = document.getElementById('exportFormJSON') as HTMLElement;
 const t = new Terminal(e);
 const promptTextElem = t.getPromptTextElem();
 const canvas = document.getElementById('canvas') as HTMLElement;
@@ -35,8 +36,14 @@ e.addEventListener('keydown', event => {
 
 d.addEventListener('submit', (event: Event) => {
   event.preventDefault();
-  console.log('Exported');
+  console.log('Exported XML');
   simpleDrawDocument.export('XML');
+});
+
+j.addEventListener('submit', (event: Event) => {
+  event.preventDefault();
+  console.log('Exported JSON');
+  simpleDrawDocument.export('JSON');
 });
 
 const c = new Circle(200, 200, 50);
@@ -50,6 +57,6 @@ simpleDrawDocument.scale(r, 1.5, 1.5);
 simpleDrawDocument.paint(r, 'red');
 simpleDrawDocument.draw(defaultRender);
 
-simpleDrawDocument.export('XML');
-console.log('\n');
-simpleDrawDocument.export('JSON');
+//simpleDrawDocument.export('XML');
+//console.log('\n');
+//simpleDrawDocument.export('JSON');

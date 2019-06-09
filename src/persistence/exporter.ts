@@ -11,7 +11,7 @@ export interface Strategy {
   execute(objects: Shape[]): void;
 }
 
-export class ConcreteStrategyXML implements Strategy {
+export class ConcreteStrategyXMLExp implements Strategy {
   execute(objects: Shape[]): void {
     const xmlDoc: XMLDocument = document.implementation.createDocument(
       '',
@@ -29,20 +29,69 @@ export class ConcreteStrategyXML implements Strategy {
     xmlDoc.appendChild(storedShapes);
     console.log(xmlDoc);
 
+    //Download File
+
+    const xmlDocString = new XMLSerializer().serializeToString(
+      xmlDoc.documentElement
+    );
+    const fileSaver = require('file-saver');
+    const blob = new Blob([xmlDocString], {
+      type: 'data:text/plain;charset=utf-8',
+    });
+    fileSaver.saveAs(blob, 'newXmlDoc.xml');
+
+    /*
     Tools.download(
       'newXmlDoc.xml',
       new XMLSerializer().serializeToString(xmlDoc.documentElement)
     );
+    */
   }
 }
 
-//At the moment, this class is outputting the same thing as the XML one.
-export class ConcreteStrategyJSON implements Strategy {
+export class ConcreteStrategyJSONExp implements Strategy {
+  execute(objects: Shape[]): void {
+    const xmlDoc: XMLDocument = document.implementation.createDocument(
+      '',
+      '',
+      null
+    );
+    const storedShapes = xmlDoc.createElement('shapes');
+
+    const visitor = new XMLExporterVisitor(xmlDoc);
+
+    for (const shape of objects) {
+      storedShapes.appendChild(shape.accept(visitor));
+    }
+
+    xmlDoc.appendChild(storedShapes);
+    console.log(xmlDoc);
+
+    //Convert Xml to Json
+    const convert = require('xml-js');
+    const xml = new XMLSerializer().serializeToString(xmlDoc.documentElement);
+    //var xml = require('fs').readFileSync('newXmlDoc.xml', 'utf8');
+    const options = { ignoreComment: true, compact: false };
+    const result = convert.xml2json(xml, options);
+    console.log('Json : \n ' + result);
+
+    //Download File
+
+    const fileSaver = require('file-saver');
+    const blob = new Blob([result], { type: 'data:text/plain;charset=utf-8' });
+    fileSaver.saveAs(blob, 'newJsonDoc.xml');
+
+    //Tools.download("newXmlDoc.xml", jsonDoc);
+  }
+}
+
+/*
+export class ConcreteStrategyJSONImp implements Strategy {
   execute(objects: Shape[]): void {
     const jsonDoc: XMLDocument = document.implementation.createDocument(
       '',
       '',
-      null
+      null 
     );
     const storedShapes = jsonDoc.createElement('shapes');
 
@@ -58,6 +107,29 @@ export class ConcreteStrategyJSON implements Strategy {
     //Tools.download("newXmlDoc.xml", jsonDoc);
   }
 }
+
+export class ConcreteStrategyXMLImp implements Strategy {
+  execute(objects: Shape[]): void {
+    const xmlDoc: XMLDocument = document.implementation.createDocument(
+      '',
+      '',
+      null 
+    );
+    const storedShapes = xmlDoc.createElement('shapes');
+
+    const visitor = new JSONExporterVisitor(xmlDoc);
+
+    for (const shape of objects) {
+      storedShapes.appendChild(shape.accept(visitor));
+    }
+
+    xmlDoc.appendChild(storedShapes);
+    console.log(xmlDoc);
+
+    //Tools.download("newXmlDoc.xml", xmlDocs);
+  }
+}
+*/
 
 export class Context {
   private strategy!: Strategy;
@@ -140,7 +212,7 @@ export class XMLExporterVisitor implements Visitor {
   }
 }
 
-//At the moment, this class is outputting the same thing as the XML one.
+//At the moment, this class is worthless. Delete if is isn't being used
 
 export class JSONExporterVisitor implements Visitor {
   constructor(private xmlDoc: XMLDocument) {}

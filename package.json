@@ -7,7 +7,10 @@
   "@std/esm": "cjs",
   "main": "script.js",
   "repository": "github:jmrocha/asso19_project",
-  "dependencies": {},
+  "dependencies": {
+    "file-saver": "^2.0.2",
+    "xml-js": "^1.6.11"
+  },
   "devDependencies": {
     "gts": "^1.0.0",
     "ts-loader": "^6.0.0",
