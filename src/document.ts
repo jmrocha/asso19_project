@@ -24,24 +24,31 @@ export class SimpleDrawDocument {
 
   constructor(public docID: number, public client: MqttClient, render: Render) {
     client.on('connect', () => {
-      client.subscribe({ ASSOSimpleDraw: { qos: 1 }, ASSOSimpleDrawSync: {qos: 1} }, err => {
-        if (!err) {
-          client.publish(
-            'ASSOSimpleDraw',
-            'Document with ID ' + this.docID + ' has connected!',
-            {
-              qos: 1,
-            }
-          );
-          client.publish(
-            'ASSOSimpleDrawSync',
-            JSON.stringify(JSON.parse('{ "docID": ' + this.docID + ', "type": "SYNC_REQUEST" }')),
-            {
-              qos: 1,
-            }
-          );
+      client.subscribe(
+        { ASSOSimpleDraw: { qos: 1 }, ASSOSimpleDrawSync: { qos: 1 } },
+        err => {
+          if (!err) {
+            client.publish(
+              'ASSOSimpleDraw',
+              'Document with ID ' + this.docID + ' has connected!',
+              {
+                qos: 1,
+              }
+            );
+            client.publish(
+              'ASSOSimpleDrawSync',
+              JSON.stringify(
+                JSON.parse(
+                  '{ "docID": ' + this.docID + ', "type": "SYNC_REQUEST" }'
+                )
+              ),
+              {
+                qos: 1,
+              }
+            );
+          }
         }
-      });
+      );
     });
 
     this.currentRender = render;

@@ -62,7 +62,7 @@ function isJson(item: string) {
 
 function messageHandler(message: string) {
   const parsedMessage = JSON.parse(message.toString());
-  
+
   if (docID !== parsedMessage.docID) {
     switch (parsedMessage.type) {
       case 'CreateRectangleAction':
@@ -74,7 +74,16 @@ function messageHandler(message: string) {
           parsedMessage.height
         );
         simpleDrawDocument.add(rect);
-        simpleDrawDocument.syncManager.actions.push(new CreateRectangleAction(simpleDrawDocument, parsedMessage.objectID, parsedMessage.x, parsedMessage.y, parsedMessage.width, parsedMessage.height));
+        simpleDrawDocument.syncManager.actions.push(
+          new CreateRectangleAction(
+            simpleDrawDocument,
+            parsedMessage.objectID,
+            parsedMessage.x,
+            parsedMessage.y,
+            parsedMessage.width,
+            parsedMessage.height
+          )
+        );
         break;
       case 'CreateCircleAction':
         const circle = new Circle(
@@ -108,29 +117,32 @@ function messageHandler(message: string) {
 }
 
 client.on('message', (topic, message) => {
-  if(topic === 'ASSOSimpleDraw') {
+  if (topic === 'ASSOSimpleDraw') {
     if (isJson(message.toString())) {
-
     } else {
       console.log(message.toString());
     }
-  } else if(topic === 'ASSOSimpleDrawSync') {
-    if(JSON.parse(message.toString()).docID !== docID) {
-      if(JSON.parse(message.toString()).type === "SYNC_REQUEST") {
-        simpleDrawDocument.syncManager.publish(simpleDrawDocument.syncManager.syncNewClient(JSON.parse(message.toString()).docID));
-      }
-      else if(JSON.parse(message.toString()).type === "SYNC_NEW_CLIENT") {
-        if(JSON.parse(message.toString()).newClientID === docID.toString()) { //wtf
-          if(simpleDrawDocument.syncManager.actions.length === 0) {
+  } else if (topic === 'ASSOSimpleDrawSync') {
+    if (JSON.parse(message.toString()).docID !== docID) {
+      if (JSON.parse(message.toString()).type === 'SYNC_REQUEST') {
+        simpleDrawDocument.syncManager.publish(
+          simpleDrawDocument.syncManager.syncNewClient(
+            JSON.parse(message.toString()).docID
+          )
+        );
+      } else if (JSON.parse(message.toString()).type === 'SYNC_NEW_CLIENT') {
+        if (JSON.parse(message.toString()).newClientID === docID.toString()) {
+          //wtf
+          if (simpleDrawDocument.syncManager.actions.length === 0) {
             const actions = JSON.parse(message.toString()).actions;
-            actions.forEach( (element: any) => { // tslint:disable-line
+            actions.forEach((element: any) => {
+              // tslint:disable-line
               messageHandler(JSON.stringify(element));
             });
             simpleDrawDocument.draw();
           }
         }
-      }
-      else if(JSON.parse(message.toString()).type === "SYNC_MESSAGE") {
+      } else if (JSON.parse(message.toString()).type === 'SYNC_MESSAGE') {
         const actions = JSON.parse(message.toString()).actions;
         messageHandler(JSON.stringify(actions[actions.length - 1]));
         simpleDrawDocument.draw();
