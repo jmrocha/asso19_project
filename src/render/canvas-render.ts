@@ -5,23 +5,38 @@ import { Rectangle } from '../shapes/rectangle';
 import { Triangle } from '../shapes/triangle';
 import { Polygon } from 'shapes/polygon';
 
-export class CanvasRender implements Render {
+export class CanvasRender extends Render {
+  // tslint:disable-next-line:ban-ts-ignore
+  // @ts-ignore
   private ctx: CanvasRenderingContext2D;
+  // tslint:disable-next-line:ban-ts-ignore
+  // @ts-ignore
+  private canvas: HTMLCanvasElement = null;
 
-  constructor(private rootElem: HTMLElement) {
+  constructor(name: string, private rootElem: HTMLElement) {
+    super(name);
+  }
+
+  init() {
     const canvas = document.createElement('canvas');
-
     canvas.setAttribute('id', 'canvas-container');
     canvas.setAttribute('width', '1000');
     canvas.setAttribute('height', '1000');
 
-    rootElem.appendChild(canvas);
+    this.rootElem.appendChild(canvas);
     this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    this.canvas = canvas;
+  }
+
+  destroy() {
+    if (this.canvas) {
+      this.canvas.remove();
+    }
   }
 
   remove(obj: Shape): void {}
 
-  draw(...objs: Shape[]): void {
+  drawObjects(...objs: Shape[]): void {
     for (const shape of objs) {
       this.ctx.save();
       if (shape instanceof Circle) {

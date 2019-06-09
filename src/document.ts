@@ -11,25 +11,37 @@ import { UndoManager } from './actions/undo-manager';
 import { Coordinate } from 'utilities/coordinate';
 import { ScaleAction } from 'actions/scale-action';
 import { PaintAction } from 'actions/paint-action';
+import { CreatePolygonAction } from './actions/create-polygon-action';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
   undoManager = new UndoManager();
   objId = 0;
-  renders: Render[] = [];
+  renders: Map<string, Render> = new Map<string, Render>();
+  // tslint:disable-next-line:ban-ts-ignore
+  // @ts-ignore
   currentRender: Render;
 
   constructor(render: Render) {
-    this.currentRender = render;
-    this.renders.push(render);
+    this.setCurrentRender(render);
+    this.renders.set(render.name, render);
   }
 
   setCurrentRender(render: Render) {
+    // remove old render if exists
+    if (this.currentRender) {
+      this.currentRender.destroy();
+    }
     this.currentRender = render;
+    this.currentRender.draw(...this.objects);
   }
 
   registerRender(render: Render) {
-    this.renders.push(render);
+    this.renders.set(render.name, render);
+  }
+
+  getRender(renderName: string): Render {
+    return this.renders.get(renderName) as Render;
   }
 
   undo() {
@@ -48,6 +60,7 @@ export class SimpleDrawDocument {
   remove(s: Shape): void {
     this.objects = this.objects.filter(o => o !== s);
     this.renders.forEach(render => render.remove(s));
+    this.draw();
   }
 
   add(r: Shape): void {
@@ -75,6 +88,10 @@ export class SimpleDrawDocument {
     return this.do(new CreateTriangleAction(this, this.objId++, p1, p2, p3));
   }
 
+  createPolygon(points: Coordinate[]) {
+    return this.do(new CreatePolygonAction(this, this.objId++, points));
+  }
+
   translate(s: Shape, xd: number, yd: number): void {
     return this.do(new TranslateAction(this, s, xd, yd));
   }
@@ -89,5 +106,9 @@ export class SimpleDrawDocument {
 
   paint(s: Shape, fillColor: string): void {
     return this.do(new PaintAction(this, s, fillColor));
+  }
+
+  getShapeById(id: number): Shape {
+    return this.objects.find(shape => shape.getId() === id) as Shape;
   }
 }

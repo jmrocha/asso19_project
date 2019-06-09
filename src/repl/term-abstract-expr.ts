@@ -3,6 +3,10 @@ import { DrawAbstractExpr } from './draw-abstract-expr';
 import { RemoveAbstractExpr } from './remove-abstract-expr';
 import { SimpleDrawDocument } from '../document';
 import { Render } from '../render/render';
+import { TranslateAbstractExpr } from './translate-abstract-expr';
+import { RotateAbstractExpr } from './rotate-abstract-expr';
+import { ScaleAbstractExpr } from './scale-abstract-expr';
+import { RenderAbstractExpr } from './render-abstract-expr';
 
 export class TermAbstractExpr extends AbstractExpr {
   constructor(simpleDrawDocument: SimpleDrawDocument, render: Render) {
@@ -11,22 +15,45 @@ export class TermAbstractExpr extends AbstractExpr {
 
   evaluate(input: string): string {
     const res = '';
-    if (input.indexOf('draw') !== -1) {
+    const command = input.split(' ')[0];
+
+    if (command.match('draw')) {
       const exprs = input.split('draw');
       const drawExpr = exprs[1];
 
-      new DrawAbstractExpr(this.simpleDrawDocument, this.render).evaluate(
-        drawExpr
-      );
-    } else if (input.indexOf('remove') !== -1) {
-      const expr = input.split('remove')[1];
-      new RemoveAbstractExpr(this.simpleDrawDocument, this.render).evaluate(
-        expr
-      );
-    } else if (input.indexOf('undo') !== -1) {
+      return new DrawAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(drawExpr);
+    } else if (command.match('remove')) {
+      return new RemoveAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(input);
+    } else if (command.match('undo')) {
       this.simpleDrawDocument.undo();
-    } else if (input.indexOf('redo') !== -1) {
+    } else if (command.match('redo')) {
       this.simpleDrawDocument.redo();
+    } else if (command.match('translate')) {
+      return new TranslateAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(input);
+    } else if (command.match('rotate')) {
+      return new RotateAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(input);
+    } else if (command.match('scale')) {
+      return new ScaleAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(input);
+    } else if (command.match('render')) {
+      return new RenderAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(input);
     } else {
       const command = input.split(' ')[0];
       throw new Error(`${command}: command not found`);
