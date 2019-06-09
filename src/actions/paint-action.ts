@@ -19,4 +19,13 @@ export class PaintAction implements UndoableAction<void> {
   undo() {
     this.shape.fillColor = this.oldFillColor;
   }
+
+  toJSON(docID: number): string {
+    return JSON.stringify({
+      docID,
+      type: 'PaintAction',
+      shape: JSON.stringify(this.shape),
+      fillColor: this.fillColor,
+    });
+  }
 }

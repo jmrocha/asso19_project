@@ -127,3 +127,9 @@ We want to be able to perform actions such as:
 The problem we are faced with is to create an interface that is capable of performing a multitude of actions without passing the responsibility and the need of knowledge on how to execute them to the objects on which the action is interacting with. These actions need to be stored in a data structure which allows us to execute and undo the actions in their respective performing order.
 
 The **Command pattern** helps us solving this problem, as we can encapsulate every action the user can take onto an object that stores the context the action needs in order to be executed or undone.
+
+### Multi-User Sessions
+
+We want to be able for users to participate in multi-user sessions, where all changes made to the canvas are reflected in all users' screens. The main problem with implementing such feature is making sure that all screens stay syncronized and the ability to export the document is not hindered at any point, which can occour most likely due to mishandling the incoming packets.
+In order to accomplish this, an implementation of a **publish-subscribe pattern** was implemented, thanks to the usage of a public MQTT broker that delegates the messages for the respective users through the use of websockets. Every user, when the session is opened, subscribes to a specific topic inside the broker, related to the session in question. 
+After this proof-of-concept was created, the group explored on how to make this use-case work in our favor. The syncronization of the sessions is accomplished by, whenever a user makes an action, a serialized string of the done action is sent to the broker, and each subscriber that is not the sender creates and executes the action, storing the reflection of the action in its own document, but not on the do/undo stacks, so that users cannot undo actions done by other users.

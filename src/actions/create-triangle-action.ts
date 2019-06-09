@@ -13,4 +13,15 @@ export class CreateTriangleAction extends CreateShapeAction<Triangle> {
   ) {
     super(doc, new Triangle(id, p1, p2, p3));
   }
+
+  toJSON(docID: number): string {
+    return JSON.stringify({
+      docID,
+      type: 'CreateTriangleAction',
+      objectID: this.shape.getId(),
+      p1: JSON.stringify(this.p1),
+      p2: JSON.stringify(this.p2),
+      p3: JSON.stringify(this.p3),
+    });
+  }
 }

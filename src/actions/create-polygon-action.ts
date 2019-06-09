@@ -11,4 +11,13 @@ export class CreatePolygonAction extends CreateShapeAction<Polygon> {
   ) {
     super(doc, new Polygon(id, ...points));
   }
+
+  toJSON(docID: number): string {
+    return JSON.stringify({
+      docID,
+      type: 'CreatePolygonAction',
+      objectID: this.shape.getId(),
+      points: JSON.stringify(this.points),
+    });
+  }
 }
