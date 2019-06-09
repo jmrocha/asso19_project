@@ -14,4 +14,8 @@ export abstract class CreateShapeAction<S extends Shape>
   undo() {
     this.doc.remove(this.shape);
   }
+
+  toJSON(docID: number) {
+    return '';
+  }
 }

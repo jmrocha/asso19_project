@@ -12,6 +12,8 @@ import { Coordinate } from 'utilities/coordinate';
 import { ScaleAction } from 'actions/scale-action';
 import { PaintAction } from 'actions/paint-action';
 import { CreatePolygonAction } from './actions/create-polygon-action';
+import { MqttClient } from 'mqtt';
+import { SyncManager } from './utilities/sync-manager';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
@@ -21,8 +23,37 @@ export class SimpleDrawDocument {
   // tslint:disable-next-line:ban-ts-ignore
   // @ts-ignore
   currentRender: Render;
+  syncManager: SyncManager = new SyncManager(this.client, this.docID);
 
-  constructor(render: Render) {
+  constructor(public docID: number, public client: MqttClient, render: Render) {
+    client.on('connect', () => {
+      client.subscribe(
+        { ASSOSimpleDraw: { qos: 1 }, ASSOSimpleDrawSync: { qos: 1 } },
+        err => {
+          if (!err) {
+            client.publish(
+              'ASSOSimpleDraw',
+              'Document with ID ' + this.docID + ' has connected!',
+              {
+                qos: 1,
+              }
+            );
+            client.publish(
+              'ASSOSimpleDrawSync',
+              JSON.stringify(
+                JSON.parse(
+                  '{ "docID": ' + this.docID + ', "type": "SYNC_REQUEST" }'
+                )
+              ),
+              {
+                qos: 1,
+              }
+            );
+          }
+        }
+      );
+    });
+
     this.setCurrentRender(render);
     this.renders.set(render.name, render);
   }
@@ -65,27 +96,32 @@ export class SimpleDrawDocument {
 
   add(r: Shape): void {
     this.objects.push(r);
+    this.objId++;
   }
 
   do<T>(a: Action<T>): T {
     if ((a as UndoableAction<T>).undo !== undefined) {
       this.undoManager.onActionDone(a as UndoableAction<T>);
+
+      //sync manager
+      this.syncManager.actions.push(a as UndoableAction<T>);
+      this.syncManager.publish(this.syncManager.syncExistentClients());
     }
     return a.do();
   }
 
   createRectangle(x: number, y: number, width: number, height: number): Shape {
     return this.do(
-      new CreateRectangleAction(this, this.objId++, x, y, width, height)
+      new CreateRectangleAction(this, this.objId, x, y, width, height)
     );
   }
 
   createCircle(x: number, y: number, radius: number): Shape {
-    return this.do(new CreateCircleAction(this, this.objId++, x, y, radius));
+    return this.do(new CreateCircleAction(this, this.objId, x, y, radius));
   }
 
   createTriangle(p1: Coordinate, p2: Coordinate, p3: Coordinate): Shape {
-    return this.do(new CreateTriangleAction(this, this.objId++, p1, p2, p3));
+    return this.do(new CreateTriangleAction(this, this.objId, p1, p2, p3));
   }
 
   createPolygon(points: Coordinate[]) {
