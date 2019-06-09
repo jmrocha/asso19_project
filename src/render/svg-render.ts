@@ -5,17 +5,14 @@ import { Circle } from '../shapes/circle';
 import { Triangle } from 'shapes/triangle';
 import { Polygon } from 'shapes/polygon';
 
-export class SVGRender implements Render {
+export class SVGRender extends Render {
+  // tslint:disable-next-line:ban-ts-ignore
+  // @ts-ignore
   private canvas: SVGElement;
   private shapes: Map<number, Shape> = new Map<number, Shape>();
 
-  constructor(private rootElem: HTMLElement) {
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('id', 'canvas');
-    svg.setAttribute('width', '100%');
-    svg.setAttribute('height', '100%');
-    this.rootElem.appendChild(svg);
-    this.canvas = svg;
+  constructor(name: string, private rootElem: HTMLElement) {
+    super(name);
   }
 
   remove(obj: Shape): void {
@@ -26,8 +23,20 @@ export class SVGRender implements Render {
     }
   }
 
-  draw(...objs: Shape[]): void {
-    this.canvas.innerHTML = '';
+  init() {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('id', 'canvas');
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+    this.rootElem.appendChild(svg);
+    this.canvas = svg;
+  }
+
+  destroy() {
+    this.canvas.remove();
+  }
+
+  drawObjects(...objs: Shape[]): void {
     for (const shape of objs) {
       if (shape instanceof Rectangle) {
         const e = document.createElementNS(

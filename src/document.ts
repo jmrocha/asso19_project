@@ -17,20 +17,31 @@ export class SimpleDrawDocument {
   objects = new Array<Shape>();
   undoManager = new UndoManager();
   objId = 0;
-  renders: Render[] = [];
+  renders: Map<string, Render> = new Map<string, Render>();
+  // tslint:disable-next-line:ban-ts-ignore
+  // @ts-ignore
   currentRender: Render;
 
   constructor(render: Render) {
-    this.currentRender = render;
-    this.renders.push(render);
+    this.setCurrentRender(render);
+    this.renders.set(render.name, render);
   }
 
   setCurrentRender(render: Render) {
+    if (this.currentRender) {
+      this.currentRender.destroy();
+    }
     this.currentRender = render;
+    this.currentRender.init();
+    this.currentRender.draw(...this.objects);
   }
 
   registerRender(render: Render) {
-    this.renders.push(render);
+    this.renders.set(render.name, render);
+  }
+
+  getRender(renderName: string): Render {
+    return this.renders.get(renderName) as Render;
   }
 
   undo() {

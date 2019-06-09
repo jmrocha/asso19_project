@@ -8,13 +8,16 @@ export class RenderAbstractExpr extends AbstractExpr {
   }
 
   evaluate(input: string): string {
-    const shapeId = Number(input.split('remove').splice(1)[0]);
-    try {
-      const shape = this.simpleDrawDocument.getShapeById(shapeId);
-      this.simpleDrawDocument.remove(shape);
-    } catch (error) {
-      throw new Error("Shape doesn't exist");
+    const renderName = input
+      .split('render')[1]
+      .trim()
+      .toLowerCase();
+
+    const render = this.simpleDrawDocument.getRender(renderName);
+    if (!render) {
+      throw new Error("render: render doesn't exist");
     }
+    this.simpleDrawDocument.setCurrentRender(render);
 
     return '';
   }
