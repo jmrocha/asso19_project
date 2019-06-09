@@ -12,7 +12,7 @@ import { Coordinate } from 'utilities/coordinate';
 import { ScaleAction } from 'actions/scale-action';
 import { PaintAction } from 'actions/paint-action';
 import { MqttClient } from 'mqtt';
-import { inspect } from 'util';
+import { SyncManager } from './utilities/sync-manager';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
@@ -20,14 +20,22 @@ export class SimpleDrawDocument {
   objId = 0;
   renders: Render[] = [];
   currentRender: Render;
+  syncManager: SyncManager = new SyncManager(this.client, this.docID);
 
   constructor(public docID: number, public client: MqttClient, render: Render) {
     client.on('connect', () => {
-      client.subscribe({ ASSOSimpleDraw: { qos: 1 } }, err => {
+      client.subscribe({ ASSOSimpleDraw: { qos: 1 }, ASSOSimpleDrawSync: {qos: 1} }, err => {
         if (!err) {
           client.publish(
             'ASSOSimpleDraw',
             'Document with ID ' + this.docID + ' has connected!',
+            {
+              qos: 1,
+            }
+          );
+          client.publish(
+            'ASSOSimpleDrawSync',
+            JSON.stringify(JSON.parse('{ "docID": ' + this.docID + ', "type": "SYNC_REQUEST" }')),
             {
               qos: 1,
             }
@@ -74,13 +82,10 @@ export class SimpleDrawDocument {
   do<T>(a: Action<T>): T {
     if ((a as UndoableAction<T>).undo !== undefined) {
       this.undoManager.onActionDone(a as UndoableAction<T>);
-      this.client.publish(
-        'ASSOSimpleDraw',
-        (a as UndoableAction<T>).toJSON(this.docID),
-        {
-          qos: 1,
-        }
-      );
+
+      //sync manager
+      this.syncManager.actions.push(a as UndoableAction<T>);
+      this.syncManager.publish(this.syncManager.syncExistentClients());
     }
     return a.do();
   }
