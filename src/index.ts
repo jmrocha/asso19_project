@@ -155,3 +155,11 @@ client.on('message', (topic, message) => {
     }
   }
 });
+
+// tslint:disable-next-line:ban-ts-ignore
+// @ts-ignore
+document.getElementById('import-link').onclick = () => {
+  // tslint:disable-next-line:ban-ts-ignore
+  // @ts-ignore
+  document.getElementById('file-upload').click();
+};
