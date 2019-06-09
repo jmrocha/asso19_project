@@ -138,7 +138,9 @@ client.on('message', (topic, message) => {
           //wtf
           if (simpleDrawDocument.syncManager.actions.length === 0) {
             const actions = JSON.parse(message.toString()).actions;
-            actions.forEach((element: any) => {
+            // tslint:disable-next-line:ban-ts-ignore
+            // @ts-ignore
+            actions.forEach((element) => {
               // tslint:disable-line
               messageHandler(JSON.stringify(element));
             });
