@@ -28,11 +28,11 @@ export class SimpleDrawDocument {
   }
 
   setCurrentRender(render: Render) {
+    // remove old render if exists
     if (this.currentRender) {
       this.currentRender.destroy();
     }
     this.currentRender = render;
-    this.currentRender.init();
     this.currentRender.draw(...this.objects);
   }
 
@@ -60,6 +60,7 @@ export class SimpleDrawDocument {
   remove(s: Shape): void {
     this.objects = this.objects.filter(o => o !== s);
     this.renders.forEach(render => render.remove(s));
+    this.draw();
   }
 
   add(r: Shape): void {

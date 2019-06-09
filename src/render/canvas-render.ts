@@ -9,6 +9,9 @@ export class CanvasRender extends Render {
   // tslint:disable-next-line:ban-ts-ignore
   // @ts-ignore
   private ctx: CanvasRenderingContext2D;
+  // tslint:disable-next-line:ban-ts-ignore
+  // @ts-ignore
+  private canvas: HTMLCanvasElement = null;
 
   constructor(name: string, private rootElem: HTMLElement) {
     super(name);
@@ -16,17 +19,19 @@ export class CanvasRender extends Render {
 
   init() {
     const canvas = document.createElement('canvas');
-
     canvas.setAttribute('id', 'canvas-container');
     canvas.setAttribute('width', '1000');
     canvas.setAttribute('height', '1000');
 
     this.rootElem.appendChild(canvas);
     this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    this.canvas = canvas;
   }
 
   destroy() {
-    this.rootElem.innerHTML = '';
+    if (this.canvas) {
+      this.canvas.remove();
+    }
   }
 
   remove(obj: Shape): void {}

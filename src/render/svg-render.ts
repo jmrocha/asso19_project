@@ -8,7 +8,7 @@ import { Polygon } from 'shapes/polygon';
 export class SVGRender extends Render {
   // tslint:disable-next-line:ban-ts-ignore
   // @ts-ignore
-  private canvas: SVGElement;
+  private canvas: SVGElement = null;
   private shapes: Map<number, Shape> = new Map<number, Shape>();
 
   constructor(name: string, private rootElem: HTMLElement) {
@@ -33,7 +33,9 @@ export class SVGRender extends Render {
   }
 
   destroy() {
-    this.canvas.remove();
+    if (this.canvas) {
+      this.canvas.remove();
+    }
   }
 
   drawObjects(...objs: Shape[]): void {
