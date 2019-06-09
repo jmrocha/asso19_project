@@ -39,13 +39,6 @@ export class ConcreteStrategyXMLExp implements Strategy {
       type: 'data:text/plain;charset=utf-8',
     });
     fileSaver.saveAs(blob, 'newXmlDoc.xml');
-
-    /*
-    Tools.download(
-      'newXmlDoc.xml',
-      new XMLSerializer().serializeToString(xmlDoc.documentElement)
-    );
-    */
   }
 }
 
@@ -80,14 +73,87 @@ export class ConcreteStrategyJSONExp implements Strategy {
     const fileSaver = require('file-saver');
     const blob = new Blob([result], { type: 'data:text/plain;charset=utf-8' });
     fileSaver.saveAs(blob, 'newJsonDoc.xml');
-
-    //Tools.download("newXmlDoc.xml", jsonDoc);
   }
 }
 
-/*
-export class ConcreteStrategyJSONImp implements Strategy {
+export class ConcreteStrategyXMLImp implements Strategy {
+  constructor(content: string) {
+    this.fileContent = content;
+  }
+
+  private fileContent: string;
+
   execute(objects: Shape[]): void {
+    //const importedXML = this.fileContent;
+    const importedXML =
+      '<shapes><rect coordinates="X: 400 Y: 400" width="50" height="50" fillColor="red" rotation="0" scaleX="1.5" scaleY="1.5"/><circle coordinates="X: 200 Y: 200" radius="50" fillColor="white" rotation="0" scaleX="1" scaleY="1"/><circle coordinates="X: 500 Y: 200" radius="50" fillColor="white" rotation="0" scaleX="1" scaleY="1"/></shapes>';
+
+    const parseXML = require('xml-parse-from-string');
+
+    const xmldoc = parseXML(importedXML);
+
+    console.log('Parsing XML:\n\nXml String:\n' + importedXML);
+    console.log('XML document:');
+    console.log(xmldoc);
+
+    //After importing, we search the shapes in the XML and draw them
+
+    /*
+    const xmlDoc: XMLDocument = document.implementation.createDocument(
+      '',
+      '',
+      null 
+    );
+    const storedShapes = xmlDoc.createElement('shapes');
+
+    const visitor = new JSONExporterVisitor(xmlDoc);
+
+    for (const shape of objects) {
+      storedShapes.appendChild(shape.accept(visitor));
+    }
+ 
+    xmlDoc.appendChild(storedShapes);
+    console.log(xmlDoc);  
+*/
+  }
+}
+
+export class ConcreteStrategyJSONImp implements Strategy {
+  constructor(content: string) {
+    this.fileContent = content;
+  }
+
+  private fileContent: string;
+
+  execute(objects: Shape[]): void {
+    //const importedJSON = fileContent;
+    const importedJSON =
+      '{"elements":[{"type":"element","name":"shapes","elements":[{"type":"element","name":"rect","attributes":{"coordinates":"X: 400 Y: 400","width":"50","height":"50","fillColor":"red","rotation":"0","scaleX":"1.5","scaleY":"1.5"}},{"type":"element","name":"circle","attributes":{"coordinates":"X: 200 Y: 200","radius":"50","fillColor":"white","rotation":"0","scaleX":"1","scaleY":"1"}},{"type":"element","name":"circle","attributes":{"coordinates":"X: 500 Y: 200","radius":"50","fillColor":"white","rotation":"0","scaleX":"1","scaleY":"1"}}]}]}';
+
+    //Convert Json to Xml
+    const convert = require('xml-js');
+    //const json = new XMLSerializer().serializeToString(xmlDoc.documentElement);
+    //var xml = require('fs').readFileSync('newXmlDoc.xml', 'utf8');
+    const options = { ignoreComment: true, compact: false };
+    const result = convert.json2xml(importedJSON, options);
+
+    console.log('Parsing JSON:\n\nJson string:\n' + importedJSON);
+    console.log('XML string:\n' + result);
+
+    const parseXML = require('xml-parse-from-string');
+
+    //const oParser = new DOMParser();
+    //const xmldoc = oParser.parseFromString(result, 'text/xml');
+
+    const doc = parseXML(result);
+    //const doc = parseXML(xmldoc);
+
+    console.log('XML Document:');
+    console.log(doc);
+
+    //After importing, we search the shapes in the XML and draw them
+
+    /*
     const jsonDoc: XMLDocument = document.implementation.createDocument(
       '',
       '',
@@ -104,32 +170,9 @@ export class ConcreteStrategyJSONImp implements Strategy {
     jsonDoc.appendChild(storedShapes);
     console.log(jsonDoc);
 
-    //Tools.download("newXmlDoc.xml", jsonDoc);
+    */
   }
 }
-
-export class ConcreteStrategyXMLImp implements Strategy {
-  execute(objects: Shape[]): void {
-    const xmlDoc: XMLDocument = document.implementation.createDocument(
-      '',
-      '',
-      null 
-    );
-    const storedShapes = xmlDoc.createElement('shapes');
-
-    const visitor = new JSONExporterVisitor(xmlDoc);
-
-    for (const shape of objects) {
-      storedShapes.appendChild(shape.accept(visitor));
-    }
-
-    xmlDoc.appendChild(storedShapes);
-    console.log(xmlDoc);
-
-    //Tools.download("newXmlDoc.xml", xmlDocs);
-  }
-}
-*/
 
 export class Context {
   private strategy!: Strategy;

@@ -60,3 +60,7 @@ simpleDrawDocument.draw(defaultRender);
 //simpleDrawDocument.export('XML');
 //console.log('\n');
 //simpleDrawDocument.export('JSON');
+
+simpleDrawDocument.import('XML');
+console.log('\n');
+simpleDrawDocument.import('JSON');

@@ -15,8 +15,8 @@ import {
   Context,
   ConcreteStrategyXMLExp,
   ConcreteStrategyJSONExp,
-  //ConcreteStrategyXMLImp,
-  //ConcreteStrategyJSONImp,
+  ConcreteStrategyXMLImp,
+  ConcreteStrategyJSONImp,
 } from 'persistence/exporter';
 
 export class SimpleDrawDocument {
@@ -87,18 +87,21 @@ export class SimpleDrawDocument {
     const result = context.executeStrategy(this.objects);
   }
 
-  /*
-  import(action : string) {
+  import(action: string) {
     const context = new Context();
 
+    //const read = require('file-reader');
+
     if (action === 'XML') {
-      context.setStrategy(new ConcreteStrategyXMLImp());
+      //read.file('newXmlDoc.xml');
+      //console.log(read);
+      //console.log('\n\n\n');
+      context.setStrategy(new ConcreteStrategyXMLImp('test' /*read*/));
     }
     if (action === 'JSON') {
-      context.setStrategy(new ConcreteStrategyJSONImp());
+      context.setStrategy(new ConcreteStrategyJSONImp('test'));
     }
 
     const result = context.executeStrategy(this.objects);
   }
-  */
 }

@@ -8,8 +8,10 @@
   "main": "script.js",
   "repository": "github:jmrocha/asso19_project",
   "dependencies": {
+    "file-reader": "^1.1.1",
     "file-saver": "^2.0.2",
-    "xml-js": "^1.6.11"
+    "xml-js": "^1.6.11",
+    "xml-parse-from-string": "^1.0.1"
   },
   "devDependencies": {
     "gts": "^1.0.0",
