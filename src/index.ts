@@ -11,6 +11,9 @@ import { Rectangle } from 'shapes/rectangle';
 import { connect } from 'mqtt';
 import { CreateRectangleAction } from 'actions/create-rectangle-action';
 import { UndoableAction } from 'actions/undoable-action';
+import { CreateCircleAction } from 'actions/create-circle-action';
+import { CreateTriangleAction } from 'actions/create-triangle-action';
+import { CreatePolygonAction } from 'actions/create-polygon-action';
 
 const docID = Date.now() + Math.random();
 const client = connect(
@@ -65,45 +68,68 @@ function isJson(item: string) {
 
 function messageHandler(message: string) {
   const parsedMessage = JSON.parse(message.toString());
+  let action;
 
   if (docID !== parsedMessage.docID) {
     switch (parsedMessage.type) {
       case 'CreateRectangleAction':
-        const rect = new Rectangle(
-          simpleDrawDocument.objId,
+        action = new CreateRectangleAction(
+          simpleDrawDocument,
+          parsedMessage.objectID,
           parsedMessage.x,
           parsedMessage.y,
           parsedMessage.width,
           parsedMessage.height
         );
-        simpleDrawDocument.add(rect);
+        action.do();
         simpleDrawDocument.syncManager.actions.push(
-          new CreateRectangleAction(
-            simpleDrawDocument,
-            parsedMessage.objectID,
-            parsedMessage.x,
-            parsedMessage.y,
-            parsedMessage.width,
-            parsedMessage.height
-          )
+          action
         );
         break;
       case 'CreateCircleAction':
-        const circle = new Circle(
+        action = new CreateCircleAction(
+          simpleDrawDocument,
           parsedMessage.objectID,
           parsedMessage.x,
           parsedMessage.y,
           parsedMessage.radius
         );
-        simpleDrawDocument.add(circle);
+        action.do();
+        simpleDrawDocument.syncManager.actions.push(
+          action
+        );
         break;
       case 'CreateTriangleAction':
-        //console.log(parsedMessage.p1);
-        //const triangle = new Triangle(parsedMessage.objectID, new Coordinate)
-        //simpleDrawDocument.add(triangle);
+        action = new CreateTriangleAction(
+          simpleDrawDocument,
+          parsedMessage.objectID,
+          new Coordinate(parsedMessage.p1X, parsedMessage.p1Y),
+          new Coordinate(parsedMessage.p2X, parsedMessage.p2Y),
+          new Coordinate(parsedMessage.p3X, parsedMessage.p3Y)
+        );
+        action.do();
+        simpleDrawDocument.syncManager.actions.push(
+          action
+        );
         break;
       case 'CreatePolygonAction':
-        //simpleDrawDocument.add(triangle);
+        const polygonPoints: Coordinate[] = [];
+        // tslint:disable-next-line:ban-ts-ignore
+        // @ts-ignore
+        parsedMessage.points.forEach((element) => { 
+          // tslint:disable-line
+          polygonPoints.push(new Coordinate(element.x, element.y));
+        });
+
+        action = new CreatePolygonAction(
+          simpleDrawDocument,
+          parsedMessage.objectID,
+          polygonPoints
+        );
+        action.do();
+        simpleDrawDocument.syncManager.actions.push(
+          action
+        );
         break;
       case 'TranslateAction':
         break;
