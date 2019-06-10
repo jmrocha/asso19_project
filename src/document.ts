@@ -17,13 +17,12 @@ import { SyncManager } from './utilities/sync-manager';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
-  undoManager = new UndoManager();
+  undoManager = new UndoManager(this);
   objId = 0;
   renders: Map<string, Render> = new Map<string, Render>();
   // tslint:disable-next-line:ban-ts-ignore
   // @ts-ignore
   currentRender: Render;
-  syncManager: SyncManager = new SyncManager(this.client, this.docID);
 
   constructor(public docID: number, public client: MqttClient, render: Render) {
     client.on('connect', () => {
@@ -89,7 +88,8 @@ export class SimpleDrawDocument {
   }
 
   remove(s: Shape): void {
-    this.objects = this.objects.filter(o => o !== s);
+    console.log('estou no remove com os objects: ' + JSON.stringify(s) );
+    this.objects = this.objects.filter(o => o.getId() !== s.getId());
     this.renders.forEach(render => render.remove(s));
     this.draw();
   }
@@ -102,10 +102,6 @@ export class SimpleDrawDocument {
   do<T>(a: Action<T>): T {
     if ((a as UndoableAction<T>).undo !== undefined) {
       this.undoManager.onActionDone(a as UndoableAction<T>);
-
-      //sync manager
-      this.syncManager.actions.push(a as UndoableAction<T>);
-      this.syncManager.publish(this.syncManager.syncExistentClients());
     }
     return a.do();
   }

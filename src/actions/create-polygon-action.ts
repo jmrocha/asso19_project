@@ -12,7 +12,7 @@ export class CreatePolygonAction extends CreateShapeAction<Polygon> {
     super(doc, new Polygon(id, ...points));
   }
 
-  toJSON(docID: number): string {
+  toJSON(docID: number, toDo: boolean): string {
     const pointsString = '[]';
     const points = JSON.parse(pointsString);
 
@@ -23,6 +23,7 @@ export class CreatePolygonAction extends CreateShapeAction<Polygon> {
     return JSON.stringify({
       docID,
       type: 'CreatePolygonAction',
+      doOrUndo: toDo ? 'do' : 'undo',
       objectID: this.shape.getId(),
       points,
     });

@@ -13,10 +13,11 @@ export class CreateCircleAction extends CreateShapeAction<Circle> {
     super(doc, new Circle(id, x, y, radius));
   }
 
-  toJSON(docID: number): string {
+  toJSON(docID: number, toDo: boolean): string {
     return JSON.stringify({
       docID,
       type: 'CreateCircleAction',
+      doOrUndo: toDo ? 'do' : 'undo',
       objectID: this.shape.getId(),
       x: this.x,
       y: this.y,

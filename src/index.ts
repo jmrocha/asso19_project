@@ -81,10 +81,13 @@ function messageHandler(message: string) {
           parsedMessage.width,
           parsedMessage.height
         );
-        action.do();
-        simpleDrawDocument.syncManager.actions.push(
-          action
-        );
+        if(parsedMessage.doOrUndo === 'do'){
+          action.do();
+          simpleDrawDocument.undoManager.syncManager.doAction(action);  
+        } else {
+          action.undo();
+          simpleDrawDocument.undoManager.syncManager.undoAction(action);
+        }
         break;
       case 'CreateCircleAction':
         action = new CreateCircleAction(
@@ -94,10 +97,13 @@ function messageHandler(message: string) {
           parsedMessage.y,
           parsedMessage.radius
         );
-        action.do();
-        simpleDrawDocument.syncManager.actions.push(
-          action
-        );
+        if(parsedMessage.doOrUndo === 'do'){
+          action.do();
+          simpleDrawDocument.undoManager.syncManager.doAction(action);
+        } else {
+          action.undo();
+          simpleDrawDocument.undoManager.syncManager.undoAction(action);
+        }
         break;
       case 'CreateTriangleAction':
         action = new CreateTriangleAction(
@@ -107,10 +113,13 @@ function messageHandler(message: string) {
           new Coordinate(parsedMessage.p2X, parsedMessage.p2Y),
           new Coordinate(parsedMessage.p3X, parsedMessage.p3Y)
         );
-        action.do();
-        simpleDrawDocument.syncManager.actions.push(
-          action
-        );
+        if(parsedMessage.doOrUndo === 'do'){
+          action.do();
+          simpleDrawDocument.undoManager.syncManager.doAction(action);
+        } else {
+          action.undo();
+          simpleDrawDocument.undoManager.syncManager.undoAction(action);
+        }
         break;
       case 'CreatePolygonAction':
         const polygonPoints: Coordinate[] = [];
@@ -126,10 +135,14 @@ function messageHandler(message: string) {
           parsedMessage.objectID,
           polygonPoints
         );
-        action.do();
-        simpleDrawDocument.syncManager.actions.push(
-          action
-        );
+
+        if(parsedMessage.doOrUndo === 'do'){
+          action.do();
+          simpleDrawDocument.undoManager.syncManager.doAction(action);
+        } else {
+          action.undo();
+          simpleDrawDocument.undoManager.syncManager.undoAction(action);
+        }
         break;
       case 'TranslateAction':
         break;
@@ -152,17 +165,18 @@ client.on('message', (topic, message) => {
       console.log(message.toString());
     }
   } else if (topic === 'ASSOSimpleDrawSync') {
+    console.log(JSON.parse(message.toString()));
     if (JSON.parse(message.toString()).docID !== docID) {
       if (JSON.parse(message.toString()).type === 'SYNC_REQUEST') {
-        simpleDrawDocument.syncManager.publish(
-          simpleDrawDocument.syncManager.syncNewClient(
+        simpleDrawDocument.undoManager.syncManager.publish(
+          simpleDrawDocument.undoManager.syncManager.syncNewClient(
             JSON.parse(message.toString()).docID
           )
         );
       } else if (JSON.parse(message.toString()).type === 'SYNC_NEW_CLIENT') {
         if (JSON.parse(message.toString()).newClientID === docID.toString()) {
           //wtf
-          if (simpleDrawDocument.syncManager.actions.length === 0) {
+          if (simpleDrawDocument.undoManager.syncManager.actions.length === 0) {
             const actions = JSON.parse(message.toString()).actions;
             // tslint:disable-next-line:ban-ts-ignore
             // @ts-ignore

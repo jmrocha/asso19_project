@@ -15,7 +15,7 @@ export abstract class CreateShapeAction<S extends Shape>
     this.doc.remove(this.shape);
   }
 
-  toJSON(docID: number) {
+  toJSON(docID: number, toDo: boolean) {
     return '';
   }
 }

@@ -28,13 +28,22 @@ export class TranslateAction implements UndoableAction<void> {
     this.shape.coordinates = [...this.oldCoordinates];
   }
 
-  toJSON(docID: number): string {
+  toJSON(docID: number, toDo: boolean): string {
+    const pointsString = '[]';
+    const points = JSON.parse(pointsString);
+
+    this.oldCoordinates.forEach((element) => {
+      points.push({"x": + element.x, "y": + element.y});
+    });
+
     return JSON.stringify({
       docID,
       type: 'TranslateAction',
-      shape: JSON.stringify(this.shape),
+      doOrUndo: toDo ? 'do' : 'undo',
+      objectID: this.shape.getId(),
       xd: this.xd,
       yd: this.yd,
+      oldCoordinates: points
     });
   }
 }
