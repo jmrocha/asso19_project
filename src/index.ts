@@ -81,9 +81,9 @@ function messageHandler(message: string) {
           parsedMessage.width,
           parsedMessage.height
         );
-        if(parsedMessage.doOrUndo === 'do'){
+        if (parsedMessage.doOrUndo === 'do') {
           action.do();
-          simpleDrawDocument.undoManager.syncManager.doAction(action);  
+          simpleDrawDocument.undoManager.syncManager.doAction(action);
         } else {
           action.undo();
           simpleDrawDocument.undoManager.syncManager.undoAction(action);
@@ -97,7 +97,7 @@ function messageHandler(message: string) {
           parsedMessage.y,
           parsedMessage.radius
         );
-        if(parsedMessage.doOrUndo === 'do'){
+        if (parsedMessage.doOrUndo === 'do') {
           action.do();
           simpleDrawDocument.undoManager.syncManager.doAction(action);
         } else {
@@ -113,7 +113,7 @@ function messageHandler(message: string) {
           new Coordinate(parsedMessage.p2X, parsedMessage.p2Y),
           new Coordinate(parsedMessage.p3X, parsedMessage.p3Y)
         );
-        if(parsedMessage.doOrUndo === 'do'){
+        if (parsedMessage.doOrUndo === 'do') {
           action.do();
           simpleDrawDocument.undoManager.syncManager.doAction(action);
         } else {
@@ -125,7 +125,7 @@ function messageHandler(message: string) {
         const polygonPoints: Coordinate[] = [];
         // tslint:disable-next-line:ban-ts-ignore
         // @ts-ignore
-        parsedMessage.points.forEach((element) => { 
+        parsedMessage.points.forEach(element => {
           // tslint:disable-line
           polygonPoints.push(new Coordinate(element.x, element.y));
         });
@@ -136,7 +136,7 @@ function messageHandler(message: string) {
           polygonPoints
         );
 
-        if(parsedMessage.doOrUndo === 'do'){
+        if (parsedMessage.doOrUndo === 'do') {
           action.do();
           simpleDrawDocument.undoManager.syncManager.doAction(action);
         } else {
@@ -180,7 +180,7 @@ client.on('message', (topic, message) => {
             const actions = JSON.parse(message.toString()).actions;
             // tslint:disable-next-line:ban-ts-ignore
             // @ts-ignore
-            actions.forEach((element) => {
+            actions.forEach(element => {
               // tslint:disable-line
               messageHandler(JSON.stringify(element));
             });

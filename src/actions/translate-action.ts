@@ -32,8 +32,8 @@ export class TranslateAction implements UndoableAction<void> {
     const pointsString = '[]';
     const points = JSON.parse(pointsString);
 
-    this.oldCoordinates.forEach((element) => {
-      points.push({"x": + element.x, "y": + element.y});
+    this.oldCoordinates.forEach(element => {
+      points.push({ x: +element.x, y: +element.y });
     });
 
     return JSON.stringify({
@@ -43,7 +43,7 @@ export class TranslateAction implements UndoableAction<void> {
       objectID: this.shape.getId(),
       xd: this.xd,
       yd: this.yd,
-      oldCoordinates: points
+      oldCoordinates: points,
     });
   }
 }

@@ -16,8 +16,8 @@ export class CreatePolygonAction extends CreateShapeAction<Polygon> {
     const pointsString = '[]';
     const points = JSON.parse(pointsString);
 
-    this.points.forEach((element) => {
-      points.push({"x": + element.x, "y": + element.y});
+    this.points.forEach(element => {
+      points.push({ x: +element.x, y: +element.y });
     });
 
     return JSON.stringify({

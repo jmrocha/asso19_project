@@ -88,7 +88,7 @@ export class SimpleDrawDocument {
   }
 
   remove(s: Shape): void {
-    console.log('estou no remove com os objects: ' + JSON.stringify(s) );
+    console.log('estou no remove com os objects: ' + JSON.stringify(s));
     this.objects = this.objects.filter(o => o.getId() !== s.getId());
     this.renders.forEach(render => render.remove(s));
     this.draw();

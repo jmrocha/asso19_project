@@ -7,12 +7,14 @@ export class SyncManager {
 
   constructor(public client: MqttClient, private docID: number) {}
 
-  doAction(action: UndoableAction<any>){ // tslint:disable-line
+  doAction(action: UndoableAction<any>) {
+    // tslint:disable-line
     this.actions.push(action);
     this.actionsDo.push(true);
   }
 
-  undoAction(action: UndoableAction<any>){ // tslint:disable-line
+  undoAction(action: UndoableAction<any>) {
+    // tslint:disable-line
     this.actions.push(action);
     this.actionsDo.push(false);
   }
@@ -34,7 +36,9 @@ export class SyncManager {
     const json = JSON.parse(jsonString);
 
     this.actions.forEach((element, index) => {
-      json.actions.push(JSON.parse(element.toJSON(this.docID, this.actionsDo[index])));
+      json.actions.push(
+        JSON.parse(element.toJSON(this.docID, this.actionsDo[index]))
+      );
     });
 
     return JSON.stringify(json);
@@ -49,7 +53,9 @@ export class SyncManager {
     const json = JSON.parse(jsonString);
 
     this.actions.forEach((element, index) => {
-      json.actions.push(JSON.parse(element.toJSON(this.docID, this.actionsDo[index])));
+      json.actions.push(
+        JSON.parse(element.toJSON(this.docID, this.actionsDo[index]))
+      );
     });
 
     return JSON.stringify(json);
