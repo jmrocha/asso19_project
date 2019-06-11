@@ -93,9 +93,7 @@ export class SimpleDrawDocument {
     //const read = require('file-reader');
 
     if (action === 'XML') {
-      //read.file('newXmlDoc.xml');
-      //console.log(read);
-      //console.log('\n\n\n');
+      //const read = require('fs').readFileSync('newXmlDoc.xml', 'utf8');
       context.setStrategy(new ConcreteStrategyXMLImp('test' /*read*/));
     }
     if (action === 'JSON') {

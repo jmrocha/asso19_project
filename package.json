@@ -10,8 +10,11 @@
   "dependencies": {
     "file-reader": "^1.1.1",
     "file-saver": "^2.0.2",
+    "file-system": "^2.2.2",
     "xml-js": "^1.6.11",
-    "xml-parse-from-string": "^1.0.1"
+    "xml-parse-from-string": "^1.0.1",
+    "xml-query": "^1.5.0",
+    "xml-reader": "^2.4.3"
   },
   "devDependencies": {
     "gts": "^1.0.0",

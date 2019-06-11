@@ -49,18 +49,27 @@ j.addEventListener('submit', (event: Event) => {
 const c = new Circle(200, 200, 50);
 const c1 = new Circle(200, 200, 50);
 const r = new Rectangle(400, 400, 50, 50);
+const t1 = new Triangle(
+  new Coordinate(100, 100),
+  new Coordinate(200, 200),
+  new Coordinate(100, 200)
+);
+const p1 = new Polygon(
+  new Coordinate(400, 400),
+  new Coordinate(500, 500),
+  new Coordinate(400, 500),
+  new Coordinate(300, 400)
+);
+
 simpleDrawDocument.add(r);
 simpleDrawDocument.add(c);
 simpleDrawDocument.add(c1);
+simpleDrawDocument.add(t1);
+simpleDrawDocument.add(p1);
 simpleDrawDocument.translate(c1, 300, 0);
 simpleDrawDocument.scale(r, 1.5, 1.5);
 simpleDrawDocument.paint(r, 'red');
 simpleDrawDocument.draw(defaultRender);
 
-//simpleDrawDocument.export('XML');
-//console.log('\n');
-//simpleDrawDocument.export('JSON');
-
 simpleDrawDocument.import('XML');
-console.log('\n');
 simpleDrawDocument.import('JSON');
