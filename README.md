@@ -1,4 +1,4 @@
-# Simple Draw
+﻿# Simple Draw
 
 [![Code Style: Google](https://img.shields.io/badge/code%20style-google-blueviolet.svg)](https://github.com/google/gts)
 
@@ -127,3 +127,5 @@ We want to be able to perform actions such as:
 The problem we are faced with is to create an interface that is capable of performing a multitude of actions without passing the responsibility and the need of knowledge on how to execute them to the objects on which the action is interacting with. These actions need to be stored in a data structure which allows us to execute and undo the actions in their respective performing order.
 
 The **Command pattern** helps us solving this problem, as we can encapsulate every action the user can take onto an object that stores the context the action needs in order to be executed or undone.
+
+### Export / Import
