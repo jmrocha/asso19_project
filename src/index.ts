@@ -11,6 +11,7 @@ import { Rectangle } from 'shapes/rectangle';
 import { connect } from 'mqtt';
 import { CreateRectangleAction } from 'actions/create-rectangle-action';
 import { UndoableAction } from 'actions/undoable-action';
+import { Controls } from './controls';
 
 const docID = Date.now() + Math.random();
 const client = connect(
@@ -22,30 +23,16 @@ const client = connect(
 );
 
 const canvas = document.getElementById('canvas') as HTMLElement;
-const defaultRender = new SVGRender('svg', canvas);
+export const defaultRender = new SVGRender('svg', canvas);
 const canvasRender = new CanvasRender('canvas', canvas);
-const simpleDrawDocument = new SimpleDrawDocument(docID, client, defaultRender);
-const e = document.getElementById('terminal') as HTMLInputElement;
-const t = new Terminal(e);
-const promptTextElem = t.getPromptTextElem();
+export const simpleDrawDocument = new SimpleDrawDocument(
+  docID,
+  client,
+  defaultRender
+);
+const controls = new Controls(simpleDrawDocument, defaultRender);
 
 simpleDrawDocument.registerRender(canvasRender);
-
-e.addEventListener('keydown', event => {
-  if (event.code === 'Enter') {
-    const expr = promptTextElem.value;
-    t.print(expr);
-    try {
-      const res = new ExprAbstractExpr(
-        simpleDrawDocument,
-        defaultRender
-      ).evaluate(expr);
-      t.printSuccess(res);
-    } catch (error) {
-      t.printError(error.message);
-    }
-  }
-});
 
 function isJson(item: string) {
   item = typeof item !== 'string' ? JSON.stringify(item) : item;
@@ -140,7 +127,7 @@ client.on('message', (topic, message) => {
             const actions = JSON.parse(message.toString()).actions;
             // tslint:disable-next-line:ban-ts-ignore
             // @ts-ignore
-            actions.forEach((element) => {
+            actions.forEach(element => {
               // tslint:disable-line
               messageHandler(JSON.stringify(element));
             });
@@ -155,11 +142,3 @@ client.on('message', (topic, message) => {
     }
   }
 });
-
-// tslint:disable-next-line:ban-ts-ignore
-// @ts-ignore
-document.getElementById('import-link').onclick = () => {
-  // tslint:disable-next-line:ban-ts-ignore
-  // @ts-ignore
-  document.getElementById('file-upload').click();
-};

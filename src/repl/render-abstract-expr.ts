@@ -13,11 +13,7 @@ export class RenderAbstractExpr extends AbstractExpr {
       .trim()
       .toLowerCase();
 
-    const render = this.simpleDrawDocument.getRender(renderName);
-    if (!render) {
-      throw new Error("render: render doesn't exist");
-    }
-    this.simpleDrawDocument.setCurrentRender(render);
+    this.simpleDrawDocument.changeRender(renderName);
 
     return '';
   }

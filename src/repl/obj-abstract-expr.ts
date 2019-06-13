@@ -13,28 +13,41 @@ export class ObjAbstractExpr extends AbstractExpr {
 
   evaluate(input: string): string {
     const shape = input.split(' ')[1];
+    const prefix = 'draw: ';
 
     switch (shape) {
       case 'rect':
-        return new RectObjAbstractExpr(
-          this.simpleDrawDocument,
-          this.render
-        ).evaluate(input);
+        return (
+          prefix +
+          new RectObjAbstractExpr(
+            this.simpleDrawDocument,
+            this.render
+          ).evaluate(input)
+        );
       case 'circle':
-        return new CircleObjAbstractExpr(
-          this.simpleDrawDocument,
-          this.render
-        ).evaluate(input);
+        return (
+          prefix +
+          new CircleObjAbstractExpr(
+            this.simpleDrawDocument,
+            this.render
+          ).evaluate(input)
+        );
       case 'polygon':
-        return new PolygonObjAbstractExpr(
-          this.simpleDrawDocument,
-          this.render
-        ).evaluate(input);
+        return (
+          prefix +
+          new PolygonObjAbstractExpr(
+            this.simpleDrawDocument,
+            this.render
+          ).evaluate(input)
+        );
       case 'triangle':
-        return new TriangleObjAbstractExpr(
-          this.simpleDrawDocument,
-          this.render
-        ).evaluate(input);
+        return (
+          prefix +
+          new TriangleObjAbstractExpr(
+            this.simpleDrawDocument,
+            this.render
+          ).evaluate(input)
+        );
       default:
         throw new Error(`draw: ${input} not recognized`);
     }

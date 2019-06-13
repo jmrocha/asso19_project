@@ -19,7 +19,10 @@ export class ExprAbstractExpr extends AbstractExpr {
       const exprs = input.split('and');
       const term = exprs[0];
       const expr = exprs[1];
-      res += new TermAbstractExpr(this.simpleDrawDocument, this.render).evaluate(term);
+      res += new TermAbstractExpr(
+        this.simpleDrawDocument,
+        this.render
+      ).evaluate(term);
       res += ', ';
       res += this.evaluate(expr);
     } else {
