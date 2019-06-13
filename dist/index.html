@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Simple Draw</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        body {
+            margin: 0;
+        }
+
+        #terminal {
+            background-color: black;
+            border: 1px solid black;
+            overflow: scroll;
+        }
+        #canvas {
+            background-color: white;
+            border: 1px solid black;
+        }
+
+        .flex-container > div {
+            width: 50%;
+            height: 100vh;
+        }
+
+        .flex-container {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .terminal-text {
+            position: relative;
+            display: inline-block;
+            font-family: Monaco, Arial, Helvetica, sans-serif;
+            line-height: 24px;
+            font-size: 14px;
+            color: white;
+            min-width: 360px;
+        }
+
+        .terminal-output {
+            display: block;
+        }
+
+        .terminal-prompt {
+            background: transparent;
+            border: 0;
+            resize: none;
+            vertical-align: top;
+        }
+
+        .terminal-prompt:focus {
+            outline: none;
+        }
+
+        .output-success {
+            color: green;
+        }
+
+        .output-error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Simple Draw</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                    <div class="btn-group mr-2" role="group" aria-label="First group">
+                        <button type="button" class="btn btn-secondary" id="undo-btn">Undo</button>
+                        <button type="button" class="btn btn-secondary" id="redo-btn">Redo</button>
+                    </div>
+                    <div class="btn-group mr-2" role="group" aria-label="Second group">
+                        <button type="button" class="btn btn-secondary" id="svg-btn">SVG</button>
+                        <button type="button" class="btn btn-secondary" id="canvas-btn">Canvas</button>
+                    </div>
+                </div>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="import-btn">Import</a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Export
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="#" id="export-xml-btn">XML</a>
+                        <a class="dropdown-item" href="#" id="export-json-btn">JSON</a>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </nav>
+    <div id="container" class="flex-container">
+        <div id="terminal"></div>
+        <div id="canvas"></div>
+        <input type="file" id="file-upload" style="display:none"/>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="./bundle.js"></script>
+</body>
+</html>
