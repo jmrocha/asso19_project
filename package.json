@@ -20,7 +20,7 @@
     "webpack-dev-server": "^3.4.1"
   },
   "scripts": {
-    "start": "npm run compile && http-server dist -o",
+    "start": "http-server dist -o",
     "dev": "webpack-dev-server --open --config webpack.config.dev.js",
     "check": "gts check",
     "clean": "gts clean",
