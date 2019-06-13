@@ -15,7 +15,7 @@ import { Controls } from './controls';
 
 const docID = Date.now() + Math.random();
 const client = connect(
-  'ws://iot.eclipse.org:80/ws',
+  'wss://iot.eclipse.org:443/ws',
   {
     clientId: docID.toString(),
     clean: false,
