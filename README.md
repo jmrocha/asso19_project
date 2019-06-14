@@ -106,19 +106,77 @@ The **Interpreter pattern** tells us how to solve this kind of problem:
 
 ![Pattern Diagram](https://www.plantuml.com/plantuml/png/ZP912i8m44NtESM0cuhs1YuKwqvGgXSOwr0YILkIgGhgtQrjfJPDmMp2_7dv-HEoj8o6Iwq4IrO4yMQ_XRL2Qo6Ic1hKGk39ii648QdrLLjkxeM1Xu1gXGUf2qMHmLkK9wMcZC4Ef0QDAJkJ0LDljJJfEVuMmL--S-XvJclJMUKYinJeYgf4fg2jPLQK_4M8cvE1O_0IefdrSurdtWxuY0xGDNUdosWl9frVQRHz9ACzpPwqU8RX8A47SJDw42UfXnZczK1kQY6MrOjMl-iD)
 
-### Undo/Redo Actions
+## Undo/Redo Actions
 
-We want to be able to perform actions such as:
+In SimpleDraw, we want users to be able to do a multitude of actions, such as creating various types of shapes and operate over them with algorithms such as translation, scale and rotation. In addition of performing such actions, users should be able to undo and redo these actions in the order they were performed. How should we design the program to perform these actions successfully? Our solution is that, by applying the **Command** pattern and it's respective characteristic functions (`do()` and `undo()`), we can be able to create a structure that supports the concept of performing actions in an easily scalable and maintainable format.
 
-	* Create multiple different shapes, such as rectangles, circles, triangles, etc.
-	* Translate objects around the canvas
-	* Add color to objects
-	* Scale objects given a multiplier
-	* Rotate objects given an angle
+### Command Pattern
 
-The problem we are faced with is to create an interface that is capable of performing a multitude of actions without passing the responsibility and the need of knowledge on how to execute them to the objects on which the action is interacting with. These actions need to be stored in a data structure which allows us to execute and undo the actions in their respective performing order.
+#### Problem in Context
 
-The **Command pattern** helps us solving this problem, as we can encapsulate every action the user can take onto an object that stores the context the action needs in order to be executed or undone.
+Users of this software should be able to perform actions on the program. These actions can range from creating a simple rectangle to color an object on the document and can be done by the user by typing a command in a REPL or, if implemented, by pressing the mouse button. We can directly apply these actions inside the respective calls inside the REPL/mouse click, but what if, for example, we want to implement keyboard shortcuts to create objects? The call for the object creation we called before in the REPL/mouse click would also need to be done in each respective keybind. Adding the possibility of undoing and redoing an action to this mess would prove itself to be a nightmare...
+
+#### Pattern Description
+
+**Command** decouples the object that invokes the operation from the one that knows how to perform it. To achieve this separation, the designer creates an abstract base class that maps a receiver (an object) with an action (a pointer to a member function). The base class contains a `do()` method that simply calls the action on the receiver.
+
+All clients of **Command** objects treat each object as a "black box" by simply invoking the object's virtual `do()` method whenever the client requires the object's "service".
+
+#### Implementation Details
+
+To implement this pattern we created an UndoManager that saves the encapsulated Command classes in do and undo stacks, for the undoing/redoing part of the design. For the actual Action classes, two Interfaces were created: the Action interface, which implements the `do()` method and is used to mostly perform actions that are not undoable, such as export/importing a document; the second interface, UndoableAction interface, extends the first and implements the `undo()` and `toJSON()` (used for broker messaging) method. This interface is used to perform undoable actions such as creating shapes and their respective transformations.
+
+Implementation of the UndoableAction interface
+```
+export interface UndoableAction<S> extends Action<S> {
+  do(): S;
+  undo(): void;
+  toJSON(docID: number): string;
+}
+```
+
+Implementation of an undoable Action
+```
+export class TranslateAction implements UndoableAction<void> {
+  oldCoordinates: Coordinate[] = [];
+
+  constructor(
+    private doc: SimpleDrawDocument, public shape: Shape, private xd: number, private yd: number
+  ) {}
+
+  do(): void {
+    this.shape.coordinates.forEach(element => {
+      this.oldCoordinates.push(new Coordinate(element.x, element.y));
+    });
+
+    this.shape.coordinates.forEach(element => {
+      element.x += this.xd;
+      element.y += this.yd;
+    });
+  }
+
+  undo() {
+    this.shape.coordinates = [...this.oldCoordinates];
+  }
+
+  toJSON(docID: number): string {
+    return JSON.stringify({
+      docID,
+      type: 'TranslateAction',
+      shape: JSON.stringify(this.shape),
+      xd: this.xd,
+      yd: this.yd,
+    });
+  }
+}
+```
+
+#### Consequences
+
+By implementing this feature we are able to construct and implement new actions to the system without messing with previous working code, greatly improving the code's readability and maintainability.
+Also, by encapsulating each command into an Action object, implementing new ways of performing it is made way simpler, as we only need to call the Action object and the object takes care of the implementation by itself.
+
+By using the **Command** pattern, features such as the multiuser take a hit on its ease of implementation as it would benefit if this feature was implemented with other patterns, such as Memento, due to the stateless broker used in the implementation of our multiuser.
 
 ### Multi-User Sessions
 
