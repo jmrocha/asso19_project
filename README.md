@@ -215,7 +215,7 @@ export class Context {
 ```
 
 
-```
+```typescript
 export interface Strategy {
   execute(objects: Shape[]): void;
 }
