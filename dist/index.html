@@ -77,16 +77,16 @@
             <div class="navbar-nav">
                 <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                     <div class="btn-group mr-2" role="group" aria-label="First group">
-                        <button type="button" class="btn btn-secondary">Undo</button>
-                        <button type="button" class="btn btn-secondary">Redo</button>
+                        <button type="button" class="btn btn-secondary" id="undo-btn">Undo</button>
+                        <button type="button" class="btn btn-secondary" id="redo-btn">Redo</button>
                     </div>
                     <div class="btn-group mr-2" role="group" aria-label="Second group">
-                        <button type="button" class="btn btn-secondary">SVG</button>
-                        <button type="button" class="btn btn-secondary">Canvas</button>
+                        <button type="button" class="btn btn-secondary" id="svg-btn">SVG</button>
+                        <button type="button" class="btn btn-secondary" id="canvas-btn">Canvas</button>
                     </div>
                 </div>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" id="import-link">Import</a>
+                    <a class="nav-link" href="#" id="import-btn">Import</a>
                 </li>
 
                 <li class="nav-item dropdown">
@@ -94,8 +94,8 @@
                         Export
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="#">XML</a>
-                        <a class="dropdown-item" href="#">JSON</a>
+                        <a class="dropdown-item" href="#" id="export-xml-btn">XML</a>
+                        <a class="dropdown-item" href="#" id="export-json-btn">JSON</a>
                     </div>
                 </li>
             </div>

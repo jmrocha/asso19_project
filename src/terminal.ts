@@ -14,6 +14,7 @@ export class Terminal {
 
     label.setAttribute('class', 'terminal-output');
     textArea.setAttribute('class', 'terminal-text terminal-prompt');
+    textArea.setAttribute('placeholder', 'help');
     terminalContainer.setAttribute('id', 'terminal-container');
 
     label.innerText = PROMPT;

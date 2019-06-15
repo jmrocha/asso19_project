@@ -1,6 +1,4 @@
 import { SimpleDrawDocument } from './document';
-import { Terminal } from './terminal';
-import { ExprAbstractExpr } from './repl/expr-abstract-expr';
 import { SVGRender } from './render/svg-render';
 import { CanvasRender } from 'render/canvas-render';
 import { connect } from 'mqtt';
@@ -12,10 +10,11 @@ import { TranslateActionWrapper } from 'messages/wrappers/translate-action-wrapp
 import { RotateActionWrapper } from 'messages/wrappers/rotate-action-wrapper';
 import { ScaleActionWrapper } from 'messages/wrappers/scale-action-wrapper';
 import { PaintActionWrapper } from 'messages/wrappers/paint-action-wrapper';
+import { Controls } from './controls';
 
 const docID = Date.now() + Math.random();
 const client = connect(
-  'ws://iot.eclipse.org:80/ws',
+  'wss://iot.eclipse.org:443/ws',
   {
     clientId: docID.toString(),
     clean: false,
@@ -23,30 +22,16 @@ const client = connect(
 );
 
 const canvas = document.getElementById('canvas') as HTMLElement;
-const defaultRender = new SVGRender('svg', canvas);
+export const defaultRender = new SVGRender('svg', canvas);
 const canvasRender = new CanvasRender('canvas', canvas);
-const simpleDrawDocument = new SimpleDrawDocument(docID, client, defaultRender);
-const e = document.getElementById('terminal') as HTMLInputElement;
-const t = new Terminal(e);
-const promptTextElem = t.getPromptTextElem();
+export const simpleDrawDocument = new SimpleDrawDocument(
+  docID,
+  client,
+  defaultRender
+);
+const controls = new Controls(simpleDrawDocument, defaultRender);
 
 simpleDrawDocument.registerRender(canvasRender);
-
-e.addEventListener('keydown', event => {
-  if (event.code === 'Enter') {
-    const expr = promptTextElem.value;
-    t.print(expr);
-    try {
-      const res = new ExprAbstractExpr(
-        simpleDrawDocument,
-        defaultRender
-      ).evaluate(expr);
-      t.printSuccess(res);
-    } catch (error) {
-      t.printError(error.message);
-    }
-  }
-});
 
 function isJson(item: string) {
   item = typeof item !== 'string' ? JSON.stringify(item) : item;
@@ -137,11 +122,3 @@ client.on('message', (topic, message) => {
     }
   }
 });
-
-// tslint:disable-next-line:ban-ts-ignore
-// @ts-ignore
-document.getElementById('import-link').onclick = () => {
-  // tslint:disable-next-line:ban-ts-ignore
-  // @ts-ignore
-  document.getElementById('file-upload').click();
-};

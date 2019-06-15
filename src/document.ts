@@ -14,6 +14,7 @@ import { PaintAction } from 'actions/paint-action';
 import { CreatePolygonAction } from './actions/create-polygon-action';
 import { MqttClient } from 'mqtt';
 import { SyncManager } from './utilities/sync-manager';
+import { ChangeRenderAction } from './actions/change-render-action';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
@@ -104,6 +105,10 @@ export class SimpleDrawDocument {
       this.undoManager.onActionDone(a as UndoableAction<T>);
     }
     return a.do();
+  }
+
+  changeRender(renderName: string): Render {
+    return this.do(new ChangeRenderAction(this, renderName));
   }
 
   createRectangle(x: number, y: number, width: number, height: number): Shape {
