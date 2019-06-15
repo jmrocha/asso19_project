@@ -2,22 +2,16 @@ import { SimpleDrawDocument } from './document';
 import { Terminal } from './terminal';
 import { ExprAbstractExpr } from './repl/expr-abstract-expr';
 import { SVGRender } from './render/svg-render';
-import { Coordinate } from 'utilities/coordinate';
-import { Circle } from 'shapes/circle';
-import { Triangle } from 'shapes/triangle';
-import { Polygon } from 'shapes/polygon';
 import { CanvasRender } from 'render/canvas-render';
-import { Rectangle } from 'shapes/rectangle';
 import { connect } from 'mqtt';
-import { CreateRectangleAction } from 'actions/create-rectangle-action';
-import { UndoableAction } from 'actions/undoable-action';
-import { CreateCircleAction } from 'actions/create-circle-action';
-import { CreateTriangleAction } from 'actions/create-triangle-action';
-import { CreatePolygonAction } from 'actions/create-polygon-action';
-import { TranslateAction } from 'actions/translate-action';
-import { RotateAction } from 'actions/rotate-action';
-import { ScaleAction } from 'actions/scale-action';
-import { PaintAction } from 'actions/paint-action';
+import { CreateRectangleActionWrapper } from 'messages/wrappers/create-rectangle-action-wrapper';
+import { CreateCircleActionWrapper } from 'messages/wrappers/create-circle-action-wrapper';
+import { CreateTriangleActionWrapper } from 'messages/wrappers/create-triangle-action-wrapper';
+import { CreatePolygonActionWrapper } from 'messages/wrappers/create-polygon-action-wrapper';
+import { TranslateActionWrapper } from 'messages/wrappers/translate-action-wrapper';
+import { RotateActionWrapper } from 'messages/wrappers/rotate-action-wrapper';
+import { ScaleActionWrapper } from 'messages/wrappers/scale-action-wrapper';
+import { PaintActionWrapper } from 'messages/wrappers/paint-action-wrapper';
 
 const docID = Date.now() + Math.random();
 const client = connect(
@@ -77,157 +71,28 @@ function messageHandler(message: string) {
   if (docID !== parsedMessage.docID) {
     switch (parsedMessage.type) {
       case 'CreateRectangleAction':
-        action = new CreateRectangleAction(
-          simpleDrawDocument,
-          parsedMessage.objectID,
-          parsedMessage.x,
-          parsedMessage.y,
-          parsedMessage.width,
-          parsedMessage.height
-        );
-        if (parsedMessage.doOrUndo === 'do') {
-          action.do();
-          simpleDrawDocument.undoManager.syncManager.doAction(action);
-        } else {
-          action.undo();
-          simpleDrawDocument.undoManager.syncManager.undoAction(action);
-        }
+        action = new CreateRectangleActionWrapper(simpleDrawDocument, message.toString());
         break;
       case 'CreateCircleAction':
-        action = new CreateCircleAction(
-          simpleDrawDocument,
-          parsedMessage.objectID,
-          parsedMessage.x,
-          parsedMessage.y,
-          parsedMessage.radius
-        );
-        if (parsedMessage.doOrUndo === 'do') {
-          action.do();
-          simpleDrawDocument.undoManager.syncManager.doAction(action);
-        } else {
-          action.undo();
-          simpleDrawDocument.undoManager.syncManager.undoAction(action);
-        }
+        action = new CreateCircleActionWrapper(simpleDrawDocument, message.toString());
         break;
       case 'CreateTriangleAction':
-        action = new CreateTriangleAction(
-          simpleDrawDocument,
-          parsedMessage.objectID,
-          new Coordinate(parsedMessage.p1X, parsedMessage.p1Y),
-          new Coordinate(parsedMessage.p2X, parsedMessage.p2Y),
-          new Coordinate(parsedMessage.p3X, parsedMessage.p3Y)
-        );
-        if (parsedMessage.doOrUndo === 'do') {
-          action.do();
-          simpleDrawDocument.undoManager.syncManager.doAction(action);
-        } else {
-          action.undo();
-          simpleDrawDocument.undoManager.syncManager.undoAction(action);
-        }
+        action = new CreateTriangleActionWrapper(simpleDrawDocument, message.toString());
         break;
       case 'CreatePolygonAction':
-        const polygonPoints: Coordinate[] = [];
-        // tslint:disable-next-line:ban-ts-ignore
-        // @ts-ignore
-        parsedMessage.points.forEach(element => {
-          // tslint:disable-line
-          polygonPoints.push(new Coordinate(element.x, element.y));
-        });
-
-        action = new CreatePolygonAction(
-          simpleDrawDocument,
-          parsedMessage.objectID,
-          polygonPoints
-        );
-
-        if (parsedMessage.doOrUndo === 'do') {
-          action.do();
-          simpleDrawDocument.undoManager.syncManager.doAction(action);
-        } else {
-          action.undo();
-          simpleDrawDocument.undoManager.syncManager.undoAction(action);
-        }
+        action = new CreatePolygonActionWrapper(simpleDrawDocument, message.toString());
         break;
       case 'TranslateAction':
-        const oldCoordinates: Coordinate[] = [];
-        // tslint:disable-next-line:ban-ts-ignore
-        // @ts-ignore
-        parsedMessage.oldCoordinates.forEach(element => {
-          // tslint:disable-line
-          oldCoordinates.push(new Coordinate(element.x, element.y));
-        });
-
-        action = new TranslateAction(
-          simpleDrawDocument,
-          simpleDrawDocument.getShapeById(parsedMessage.objectID),
-          parsedMessage.xd,
-          parsedMessage.yd
-        );
-        action.setOldCoordinates(oldCoordinates);
-
-        if (parsedMessage.doOrUndo === 'do') {
-          action.do();
-          simpleDrawDocument.undoManager.syncManager.doAction(action);
-        } else {
-          action.undo();
-          simpleDrawDocument.undoManager.syncManager.undoAction(action);
-        }
+        action = new TranslateActionWrapper(simpleDrawDocument, message.toString());
         break;
       case 'RotateAction':
-        const oldRotation: number = parsedMessage.oldRotation;
-
-        action = new RotateAction(
-          simpleDrawDocument,
-          simpleDrawDocument.getShapeById(parsedMessage.objectID),
-          parsedMessage.rotation
-        );
-        action.setOldRotation(oldRotation);
-
-        if (parsedMessage.doOrUndo === 'do') {
-          action.do();
-          simpleDrawDocument.undoManager.syncManager.doAction(action);
-        } else {
-          action.undo();
-          simpleDrawDocument.undoManager.syncManager.undoAction(action);
-        }
+        action = new RotateActionWrapper(simpleDrawDocument, message.toString());
         break;
       case 'ScaleAction':
-        const oldScaleX: number = parsedMessage.oldScaleX;
-        const oldScaleY: number = parsedMessage.oldScaleY;
-
-        action = new ScaleAction(
-          simpleDrawDocument,
-          simpleDrawDocument.getShapeById(parsedMessage.objectID),
-          parsedMessage.scaleX,
-          parsedMessage.scaleY
-        );
-        action.setOldScaling(oldScaleX, oldScaleY);
-
-        if (parsedMessage.doOrUndo === 'do') {
-          action.do();
-          simpleDrawDocument.undoManager.syncManager.doAction(action);
-        } else {
-          action.undo();
-          simpleDrawDocument.undoManager.syncManager.undoAction(action);
-        }
+        action = new ScaleActionWrapper(simpleDrawDocument, message.toString());
         break;
       case 'PaintAction':
-          const oldFillColor: string = parsedMessage.oldFillColor;
-
-          action = new PaintAction(
-            simpleDrawDocument,
-            simpleDrawDocument.getShapeById(parsedMessage.objectID),
-            parsedMessage.fillColor
-          );
-          action.setOldFillColor(oldFillColor);
-  
-          if (parsedMessage.doOrUndo === 'do') {
-            action.do();
-            simpleDrawDocument.undoManager.syncManager.doAction(action);
-          } else {
-            action.undo();
-            simpleDrawDocument.undoManager.syncManager.undoAction(action);
-          }
+        action = new PaintActionWrapper(simpleDrawDocument, message.toString());
         break;
       default:
         break;
