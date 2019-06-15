@@ -17,6 +17,7 @@ import { CreatePolygonAction } from 'actions/create-polygon-action';
 import { TranslateAction } from 'actions/translate-action';
 import { RotateAction } from 'actions/rotate-action';
 import { ScaleAction } from 'actions/scale-action';
+import { PaintAction } from 'actions/paint-action';
 
 const docID = Date.now() + Math.random();
 const client = connect(
@@ -211,6 +212,22 @@ function messageHandler(message: string) {
         }
         break;
       case 'PaintAction':
+          const oldFillColor: string = parsedMessage.oldFillColor;
+
+          action = new PaintAction(
+            simpleDrawDocument,
+            simpleDrawDocument.getShapeById(parsedMessage.objectID),
+            parsedMessage.fillColor
+          );
+          action.setOldFillColor(oldFillColor);
+  
+          if (parsedMessage.doOrUndo === 'do') {
+            action.do();
+            simpleDrawDocument.undoManager.syncManager.doAction(action);
+          } else {
+            action.undo();
+            simpleDrawDocument.undoManager.syncManager.undoAction(action);
+          }
         break;
       default:
         break;
