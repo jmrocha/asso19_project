@@ -20,12 +20,18 @@ export class RotateAction implements UndoableAction<void> {
     this.shape.rotation = this.oldRotation;
   }
 
-  toJSON(docID: number): string {
+  setOldRotation(oldRotation: number) {
+    this.oldRotation = oldRotation;
+  }
+
+  toJSON(docID: number, toDo: boolean): string {
     return JSON.stringify({
       docID,
       type: 'RotateAction',
-      shape: JSON.stringify(this.shape),
+      doOrUndo: toDo ? 'do' : 'undo',
+      objectID: this.shape.getId(),
       rotation: this.rotation,
+      oldRotation: this.oldRotation,
     });
   }
 }

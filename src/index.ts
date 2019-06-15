@@ -15,6 +15,7 @@ import { CreateCircleAction } from 'actions/create-circle-action';
 import { CreateTriangleAction } from 'actions/create-triangle-action';
 import { CreatePolygonAction } from 'actions/create-polygon-action';
 import { TranslateAction } from 'actions/translate-action';
+import { RotateAction } from 'actions/rotate-action';
 
 const docID = Date.now() + Math.random();
 const client = connect(
@@ -171,6 +172,22 @@ function messageHandler(message: string) {
         }
         break;
       case 'RotateAction':
+        const oldRotation: number = parsedMessage.oldRotation;
+
+        action = new RotateAction(
+          simpleDrawDocument,
+          simpleDrawDocument.getShapeById(parsedMessage.objectID),
+          parsedMessage.rotation
+        );
+        action.setOldRotation(oldRotation);
+
+        if (parsedMessage.doOrUndo === 'do') {
+          action.do();
+          simpleDrawDocument.undoManager.syncManager.doAction(action);
+        } else {
+          action.undo();
+          simpleDrawDocument.undoManager.syncManager.undoAction(action);
+        }
         break;
       case 'ScaleAction':
         break;
