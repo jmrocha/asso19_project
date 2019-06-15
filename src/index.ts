@@ -16,6 +16,7 @@ import { CreateTriangleAction } from 'actions/create-triangle-action';
 import { CreatePolygonAction } from 'actions/create-polygon-action';
 import { TranslateAction } from 'actions/translate-action';
 import { RotateAction } from 'actions/rotate-action';
+import { ScaleAction } from 'actions/scale-action';
 
 const docID = Date.now() + Math.random();
 const client = connect(
@@ -190,6 +191,24 @@ function messageHandler(message: string) {
         }
         break;
       case 'ScaleAction':
+        const oldScaleX: number = parsedMessage.oldScaleX;
+        const oldScaleY: number = parsedMessage.oldScaleY;
+
+        action = new ScaleAction(
+          simpleDrawDocument,
+          simpleDrawDocument.getShapeById(parsedMessage.objectID),
+          parsedMessage.scaleX,
+          parsedMessage.scaleY
+        );
+        action.setOldScaling(oldScaleX, oldScaleY);
+
+        if (parsedMessage.doOrUndo === 'do') {
+          action.do();
+          simpleDrawDocument.undoManager.syncManager.doAction(action);
+        } else {
+          action.undo();
+          simpleDrawDocument.undoManager.syncManager.undoAction(action);
+        }
         break;
       case 'PaintAction':
         break;
