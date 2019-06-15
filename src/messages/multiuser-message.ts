@@ -1,3 +1,3 @@
 export interface MultiuserMessage {
-    isToDo(): boolean;
+  isToDo(): boolean;
 }

@@ -56,22 +56,40 @@ function messageHandler(message: string) {
   if (docID !== parsedMessage.docID) {
     switch (parsedMessage.type) {
       case 'CreateRectangleAction':
-        action = new CreateRectangleActionWrapper(simpleDrawDocument, message.toString());
+        action = new CreateRectangleActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
         break;
       case 'CreateCircleAction':
-        action = new CreateCircleActionWrapper(simpleDrawDocument, message.toString());
+        action = new CreateCircleActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
         break;
       case 'CreateTriangleAction':
-        action = new CreateTriangleActionWrapper(simpleDrawDocument, message.toString());
+        action = new CreateTriangleActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
         break;
       case 'CreatePolygonAction':
-        action = new CreatePolygonActionWrapper(simpleDrawDocument, message.toString());
+        action = new CreatePolygonActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
         break;
       case 'TranslateAction':
-        action = new TranslateActionWrapper(simpleDrawDocument, message.toString());
+        action = new TranslateActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
         break;
       case 'RotateAction':
-        action = new RotateActionWrapper(simpleDrawDocument, message.toString());
+        action = new RotateActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
         break;
       case 'ScaleAction':
         action = new ScaleActionWrapper(simpleDrawDocument, message.toString());

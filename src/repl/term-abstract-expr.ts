@@ -55,7 +55,8 @@ export class TermAbstractExpr extends AbstractExpr {
         this.render
       ).evaluate(input);
     } else if (command.match('help')) {
-      return 'draw rect 10 10 10 10  <br/>' +
+      return (
+        'draw rect 10 10 10 10  <br/>' +
         'draw circle 10 10 10    <br/>' +
         'draw triangle 0,0 20,0 10,10 <br/>' +
         'draw polygon 220,10 300,210 170,250 123,234<br/>' +
@@ -66,7 +67,8 @@ export class TermAbstractExpr extends AbstractExpr {
         'rotate 2 90 y             <br/>' +
         'render svg                <br/>' +
         'render canvas             <br/>' +
-        'help                      <br/>';
+        'help                      <br/>'
+      );
     } else {
       const command = input.split(' ')[0];
       throw new Error(`${command}: command not found`);
