@@ -14,6 +14,7 @@ import { UndoableAction } from 'actions/undoable-action';
 import { CreateCircleAction } from 'actions/create-circle-action';
 import { CreateTriangleAction } from 'actions/create-triangle-action';
 import { CreatePolygonAction } from 'actions/create-polygon-action';
+import { TranslateAction } from 'actions/translate-action';
 
 const docID = Date.now() + Math.random();
 const client = connect(
@@ -145,6 +146,29 @@ function messageHandler(message: string) {
         }
         break;
       case 'TranslateAction':
+        const oldCoordinates: Coordinate[] = [];
+        // tslint:disable-next-line:ban-ts-ignore
+        // @ts-ignore
+        parsedMessage.oldCoordinates.forEach(element => {
+          // tslint:disable-line
+          oldCoordinates.push(new Coordinate(element.x, element.y));
+        });
+
+        action = new TranslateAction(
+          simpleDrawDocument,
+          simpleDrawDocument.getShapeById(parsedMessage.objectID),
+          parsedMessage.xd,
+          parsedMessage.yd
+        );
+        action.setOldCoordinates(oldCoordinates);
+
+        if (parsedMessage.doOrUndo === 'do') {
+          action.do();
+          simpleDrawDocument.undoManager.syncManager.doAction(action);
+        } else {
+          action.undo();
+          simpleDrawDocument.undoManager.syncManager.undoAction(action);
+        }
         break;
       case 'RotateAction':
         break;

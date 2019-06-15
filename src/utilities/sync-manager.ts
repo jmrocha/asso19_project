@@ -7,14 +7,12 @@ export class SyncManager {
 
   constructor(public client: MqttClient, private docID: number) {}
 
-  doAction(action: UndoableAction<any>) {
-    // tslint:disable-line
+  doAction(action: UndoableAction<any>) { // tslint:disable-line
     this.actions.push(action);
     this.actionsDo.push(true);
   }
 
-  undoAction(action: UndoableAction<any>) {
-    // tslint:disable-line
+  undoAction(action: UndoableAction<any>) { // tslint:disable-line
     this.actions.push(action);
     this.actionsDo.push(false);
   }
