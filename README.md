@@ -127,7 +127,7 @@ All clients of **Command** objects treat each object as a "black box" by simply 
 To implement this pattern we created an UndoManager that saves the encapsulated Command classes in do and undo stacks, for the undoing/redoing part of the design. For the actual Action classes, two Interfaces were created: the Action interface, which implements the `do()` method and is used to mostly perform actions that are not undoable, such as export/importing a document; the second interface, UndoableAction interface, extends the first and implements the `undo()` and `toJSON()` (used for broker messaging) method. This interface is used to perform undoable actions such as creating shapes and their respective transformations.
 
 Implementation of the UndoableAction interface
-```
+```typescript
 export interface UndoableAction<S> extends Action<S> {
   do(): S;
   undo(): void;
@@ -136,7 +136,7 @@ export interface UndoableAction<S> extends Action<S> {
 ```
 
 Implementation of an undoable Action
-```
+```typescript
 export class TranslateAction implements UndoableAction<void> {
   oldCoordinates: Coordinate[] = [];
 
@@ -200,7 +200,7 @@ So, both for the export and the import features, two different algorithms (class
 
 When it comes to implementation, at first, two simple classes were created, *Context* and *Strategy*, which can be seen bellow.
 
-```
+```typescript
 export class Context {
   private strategy!: Strategy;
 
@@ -224,7 +224,7 @@ export interface Strategy {
 The *Context* class is a simple class that handles which algorithm to use and directs to its execution. The *Strategy* class has only an abstract *execute()* method, which is implemented by its subclasses *ConcreteStrategyXMLExp*, *ConcreteStrategyJSONExp*, *ConcreteStrategyXMLImp*, *ConcreteStrategyJSONImp*. These are the ones that end up defining the different algorithms to be used (which can be seen here: https://github.com/jmrocha/asso19_project/blob/feature/ImportAndExport/src/persistence/exporter.ts#L17).
 This way, in order to perform, say, an export, it is only necessary to define the "strategy" to be used and then execute it, as seen in the below code:
 
-```
+```typescript
 export(action: string) {
     const context = new Context();
 
@@ -250,7 +250,7 @@ So, for the different shapes of the program (rectangle, circle, triangle, polygo
 
 When it comes to implementation, at first, a simple class was created, *Visitor*, which can be seen bellow. 
 
-```
+```typescript
 export interface Visitor {
   visitRectangle(rect: Rectangle): Element;
   visitCircle(circle: Circle): Element;
@@ -261,7 +261,7 @@ export interface Visitor {
 
 Also, in each of the necessary classes (*Rectangle*, *Triangle*, *Circle*, *Polygon*, *Shape*), an aditional *accept()* method was created to handle the additional functionality.
 
-```
+```typescript
 accept(visitor: Visitor): Element {
     return visitor.visitRectangle(this);
   }
@@ -270,7 +270,7 @@ accept(visitor: Visitor): Element {
 The Visitor class' methods are then implemented by the subclass *XMLExporterVisitor* (https://github.com/jmrocha/asso19_project/blob/feature/ImportAndExport/src/persistence/exporter.ts#L380).
 This way, in order to translate a shape's attributes into data, it is only necessary to execute it's *accept()* method, as seen in the below code:
 
-```
+```typescript
 const visitor = new XMLExporterVisitor(xmlDoc);
 
     for (const shape of objects) {
