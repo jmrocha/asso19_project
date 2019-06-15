@@ -178,11 +178,86 @@ Also, by encapsulating each command into an Action object, implementing new ways
 
 By using the **Command** pattern, features such as the multiuser take a hit on its ease of implementation as it would benefit if this feature was implemented with other patterns, such as Memento, due to the stateless broker used in the implementation of our multiuser.
 
-### Multi-User Sessions
+### Multi User Funcionality
 
-We want to be able for users to participate in multi-user sessions, where all changes made to the canvas are reflected in all users' screens. The main problem with implementing such feature is making sure that all screens stay syncronized and the ability to export the document is not hindered at any point, which can occour most likely due to mishandling the incoming packets.
-In order to accomplish this, an implementation of a **publish-subscribe pattern** was implemented, thanks to the usage of a public MQTT broker that delegates the messages for the respective users through the use of websockets. Every user, when the session is opened, subscribes to a specific topic inside the broker, related to the session in question.
-After this proof-of-concept was created, the group explored on how to make this use-case work in our favor. The syncronization of the sessions is accomplished by, whenever a user makes an action, a serialized string of the done action is sent to the broker, and each subscriber that is not the sender creates and executes the action, storing the reflection of the action in its own document, but not on the do/undo stacks, so that users cannot undo actions done by other users.
+We want our users to be able to share a SimpleDraw session with their friends and that everyone in the session is updated real-time with everyone's changes to the document. Changes that are made by one user cannot be undone/redone by another user, as the do/undo action stacks are user-bound, to prevent user frustration and work flow during the system's usage.
+In order to share sessions and to enable communication between every browser in the session, we adopted the usage of a **publish-subscribe** architecture, which uses a publicly available broker that manages the receiving and sending of the session messages to subscriber browsers. These messages are then parsed client-side and then the according action is reproduced onto everyone's screen.
+
+#### Factory Pattern
+
+##### Problem in Context
+
+The parsing of incoming messages can be a very repetitive process, the object which you are recreating on your screen can vary between multiple possible objects and the actions other users do on their browser need to also be reflected onto yours. So, your parser function needs to be able to handle the recreation of multiple different actions by using a simple string message as the source of information. In the future, more actions can be implemented and more actions need to be parsed as a consequence, how can this parsing function be easily readable and easy to build upon, without making a huge mess on the parser's code?
+
+##### Pattern Description
+
+According to sourcemaking.com, the **Factory Method** defines an interface for creating objects, but lets subclasses decide which classes to instantiate. Injection molding presses demonstrate this pattern. Manufacturers of plastic toys process plastic molding powder, and inject the plastic into molds of the desired shapes. The class of toy (car, action figure, etc.) is determined by the mold.
+
+##### Implementation Details
+
+All the logic related to parsing the message and constructing the respective objects needed to reflect actions done during the session is kept entirely inside wrapper objects which correspond to the respective recreated actions. A factory pattern is implemented inside the parsing function to construct the appropriate wrapper function that builds all the necessary logic which otherwise would be stuffed inside the parser and make this piece of code completely unsustainable and unmaintainable.
+
+```typescript
+function messageHandler(message: string) {
+  const parsedMessage = JSON.parse(message.toString());
+  let action;
+
+  if (docID !== parsedMessage.docID) {
+    switch (parsedMessage.type) {
+      case 'CreateRectangleAction':
+        action = new CreateRectangleActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
+        break;
+      case 'CreateCircleAction':
+        action = new CreateCircleActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
+        break;
+      case 'CreateTriangleAction':
+        action = new CreateTriangleActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
+        break;
+      case 'CreatePolygonAction':
+        action = new CreatePolygonActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
+        break;
+      case 'TranslateAction':
+        action = new TranslateActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
+        break;
+      case 'RotateAction':
+        action = new RotateActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
+        break;
+      case 'ScaleAction':
+        action = new ScaleActionWrapper(simpleDrawDocument, message.toString());
+        break;
+      case 'PaintAction':
+        action = new PaintActionWrapper(simpleDrawDocument, message.toString());
+        break;
+      default:
+        break;
+    }
+  }
+}
+```
+
+##### Consequences
+
+By implementing the **Factory Pattern** to create actions done by other users in the session, we are able to move all the responsibility of recreating the other people's actions to a handful of classes and keeping the logic inside the parsing function responsible for actual parsing and not the creation of objects unrelated to parsing. This separation of responsibilites and classes also eases the addition of new actions that can be recreated from the traded messages between browsers, as new code wont ever interfere with previously existent code.
+
+On the other side, the addition of these new actions means the creation of more wrapper classes, which can complicate the coding a bit more, but we believe the tradeoff between complexity and readability pays off in the long run.
 
 ### Export/Import Feature
 
