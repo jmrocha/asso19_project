@@ -106,23 +106,23 @@ The **Interpreter pattern** tells us how to solve this kind of problem:
 
 ![Pattern Diagram](https://www.plantuml.com/plantuml/png/ZP912i8m44NtESM0cuhs1YuKwqvGgXSOwr0YILkIgGhgtQrjfJPDmMp2_7dv-HEoj8o6Iwq4IrO4yMQ_XRL2Qo6Ic1hKGk39ii648QdrLLjkxeM1Xu1gXGUf2qMHmLkK9wMcZC4Ef0QDAJkJ0LDljJJfEVuMmL--S-XvJclJMUKYinJeYgf4fg2jPLQK_4M8cvE1O_0IefdrSurdtWxuY0xGDNUdosWl9frVQRHz9ACzpPwqU8RX8A47SJDw42UfXnZczK1kQY6MrOjMl-iD)
 
-## Undo/Redo Actions
+### Undo/Redo Actions
 
 In SimpleDraw, we want users to be able to do a multitude of actions, such as creating various types of shapes and operate over them with algorithms such as translation, scale and rotation. In addition of performing such actions, users should be able to undo and redo these actions in the order they were performed. How should we design the program to perform these actions successfully? Our solution is that, by applying the **Command** pattern and it's respective characteristic functions (`do()` and `undo()`), we can be able to create a structure that supports the concept of performing actions in an easily scalable and maintainable format.
 
-### Command Pattern
+#### Command Pattern
 
-#### Problem in Context
+##### Problem in Context
 
 Users of this software should be able to perform actions on the program. These actions can range from creating a simple rectangle to color an object on the document and can be done by the user by typing a command in a REPL or, if implemented, by pressing the mouse button. We can directly apply these actions inside the respective calls inside the REPL/mouse click, but what if, for example, we want to implement keyboard shortcuts to create objects? The call for the object creation we called before in the REPL/mouse click would also need to be done in each respective keybind. Adding the possibility of undoing and redoing an action to this mess would prove itself to be a nightmare...
 
-#### Pattern Description
+##### Pattern Description
 
 **Command** decouples the object that invokes the operation from the one that knows how to perform it. To achieve this separation, the designer creates an abstract base class that maps a receiver (an object) with an action (a pointer to a member function). The base class contains a `do()` method that simply calls the action on the receiver.
 
 All clients of **Command** objects treat each object as a "black box" by simply invoking the object's virtual `do()` method whenever the client requires the object's "service".
 
-#### Implementation Details
+##### Implementation Details
 
 To implement this pattern we created an UndoManager that saves the encapsulated Command classes in do and undo stacks, for the undoing/redoing part of the design. For the actual Action classes, two Interfaces were created: the Action interface, which implements the `do()` method and is used to mostly perform actions that are not undoable, such as export/importing a document; the second interface, UndoableAction interface, extends the first and implements the `undo()` and `toJSON()` (used for broker messaging) method. This interface is used to perform undoable actions such as creating shapes and their respective transformations.
 
@@ -171,7 +171,7 @@ export class TranslateAction implements UndoableAction<void> {
 }
 ```
 
-#### Consequences
+##### Consequences
 
 By implementing this feature we are able to construct and implement new actions to the system without messing with previous working code, greatly improving the code's readability and maintainability.
 Also, by encapsulating each command into an Action object, implementing new ways of performing it is made way simpler, as we only need to call the Action object and the object takes care of the implementation by itself.
@@ -186,6 +186,8 @@ After this proof-of-concept was created, the group explored on how to make this 
 
 ### Export/Import Feature
 
+##### Problem in Context
+
 For this feature, we want the application to be able to support persistence of the data in more than one format. We also want the user to be able to import data to the application, which translates into objects to be drawn. 
 Therefore, the application should be capable of exporting the objects created by the user to a file, which can be an XML file or a JSON file, and also capable of importing an XML or JSON file in order to load data to the program.
 
@@ -195,8 +197,12 @@ Furthermore, when it comes to the export feature, it is necessary to analyse eac
 
 #### Strategy Pattern
 
+##### Pattern Description
+
 According to Wikipedia, the "Strategy Pattern is a behavioral software design pattern that enables selecting an algorithm at runtime". Therefore, the Strategy pattern allows us to define a family of algorithms capable of doing a especific task, put them into separate classes, and make their objets interchangable.
 So, both for the export and the import features, two different algorithms (classes) were implemented, one for the XML file type, and another for the JSON file type.
+
+##### Implementation Details
 
 When it comes to implementation, at first, two simple classes were created, *Context* and *Strategy*, which can be seen bellow.
 
@@ -239,14 +245,20 @@ export(action: string) {
   }
 ```
 
+##### Consequences
+
 When it comes to consequences, the **Stratey Pattern** brought advantages: it allowed us to swap between algorithms at runtime, it allowed us to isolate the implementation details of the algorithms from the code that uses it, and it also allows for extensibility purposes, as it is possible to introduce new strategies (algorithms) without having to change the context. As for disadvantages, because we only implemented two different algorithms (XML and JSON), one can argue that the new classes introduced because of the pattern overcomplicate the program.
 
 
 #### Visitor Pattern
 
+##### Pattern Description
+
 According to Wikipedia, "The visitor design pattern is a way of separating an algorithm from an object structure on which it operates.
 In essence, the visitor allows adding new virtual functions to a family of classes, without modifying the classes. Instead, a visitor class is created that implements all of the appropriate specializations of the virtual function". Therefore, the **Visitor Pattern** allows us to extend a classe's functionality by creating functions outside of said class.
 So, for the different shapes of the program (rectangle, circle, triangle, polygon), a visitor sub-class was implemented, which implements the needed functionality (translate the shape's attributes into data).
+
+##### Implementation Details
 
 When it comes to implementation, at first, a simple class was created, *Visitor*, which can be seen bellow. 
 
@@ -277,5 +289,7 @@ const visitor = new XMLExporterVisitor(xmlDoc);
       storedShapes.appendChild(shape.accept(visitor));
     }
 ```
+
+##### Consequences
 
 When it comes to consequences, the **Visitor Pattern** brings very valuable advantages: it allowed us to traverse a complex object container (an array of objects of different types) and apply a especific functionality to each of those objects, and it also allows for extensibility purposes, as it is possible to introduce new behaviours/functionalities to classes without having to directly change those classes. As for disadvantages, visitors lack the access to private class fields and methods, which can be bad if you need those fields or methods for a certain functionality; fortunately, this wasn't a problem for us.
