@@ -15,14 +15,14 @@ import { PaintAction } from 'actions/paint-action';
 import { CreatePolygonAction } from './actions/create-polygon-action';
 import { SyncManager } from './utilities/sync-manager';
 import { ChangeRenderAction } from './actions/change-render-action';
-import {MqttClient} from "mqtt";
+import { MqttClient } from 'mqtt';
 import {
   ConcreteStrategyJSONExp,
   ConcreteStrategyJSONImp,
   ConcreteStrategyXMLExp,
   ConcreteStrategyXMLImp,
-  Context
-} from "./persistence/exporter";
+  Context,
+} from './persistence/exporter';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
@@ -104,8 +104,17 @@ export class SimpleDrawDocument {
   }
 
   add(r: Shape): void {
-    this.objects.push(r);
-    this.objId++;
+    let found = false;
+    for (let i = 0; i < this.objects.length; i++) {
+      if (this.objects[i].getId() === r.getId()) {
+        found = true;
+      }
+    }
+
+    if (!found) {
+      this.objects.push(r);
+      this.objId++;
+    }
   }
 
   do<T>(a: Action<T>): T {

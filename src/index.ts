@@ -27,7 +27,10 @@ const canvas = document.getElementById('canvas') as HTMLElement;
 export const defaultRender = new SVGRender('svg', canvas);
 const svgInvertedRender = new SVGInvertedRender('svg-inverted', canvas);
 const canvasRender = new CanvasRender('canvas', canvas);
-const canvasInvertedRender = new CanvasInvertedRender('canvas-inverted', canvas);
+const canvasInvertedRender = new CanvasInvertedRender(
+  'canvas-inverted',
+  canvas
+);
 export const simpleDrawDocument = new SimpleDrawDocument(
   docID,
   client,

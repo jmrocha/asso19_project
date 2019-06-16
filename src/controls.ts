@@ -28,9 +28,13 @@ export class Controls {
     this.undoBtn = document.getElementById('undo-btn') as HTMLElement;
     this.redoBtn = document.getElementById('redo-btn') as HTMLElement;
     this.svgBtn = document.getElementById('svg-btn') as HTMLElement;
-    this.svgInvertedBtn = document.getElementById('svg-inverted-btn') as HTMLElement;
+    this.svgInvertedBtn = document.getElementById(
+      'svg-inverted-btn'
+    ) as HTMLElement;
     this.canvasBtn = document.getElementById('canvas-btn') as HTMLElement;
-    this.canvasInvertedBtn = document.getElementById('canvas-inverted-btn') as HTMLElement;
+    this.canvasInvertedBtn = document.getElementById(
+      'canvas-inverted-btn'
+    ) as HTMLElement;
     this.importBtn = document.getElementById('import-btn') as HTMLElement;
     this.exportXMLBtn = document.getElementById(
       'export-xml-btn'

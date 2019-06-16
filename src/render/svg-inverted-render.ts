@@ -57,11 +57,17 @@ export class SVGInvertedRender extends Render {
           'rect'
         );
         e.setAttribute('id', `${shape.getId()}`);
-        e.setAttribute('style', 'stroke: ' + this.calculateInvertedColor(shape.strokeColor) + '; fill: ' + this.calculateInvertedColor(shape.fillColor));
+        e.setAttribute(
+          'style',
+          'stroke: ' +
+            this.calculateInvertedColor(shape.strokeColor) +
+            '; fill: ' +
+            this.calculateInvertedColor(shape.fillColor)
+        );
         e.setAttribute('x', shape.coordinates[0].x.toString());
         e.setAttribute('y', shape.coordinates[0].y.toString());
-        e.setAttribute('width', shape.width.toString());
-        e.setAttribute('height', shape.height.toString());
+        e.setAttribute('width', (shape.width * shape.scaleX).toString());
+        e.setAttribute('height', (shape.height * shape.scaleY).toString());
 
         //transformation (REPEATED CODE)
         let transformations = '';
@@ -75,10 +81,6 @@ export class SVGInvertedRender extends Render {
             shape.coordinates[0].y +
             ') ';
         }
-        if (shape.scaleX !== 1 || shape.scaleY !== 1) {
-          transformations +=
-            'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
-        }
         e.setAttribute('transform', transformations);
         //end transformations
 
@@ -86,12 +88,17 @@ export class SVGInvertedRender extends Render {
       } else if (shape instanceof Circle) {
         const e = document.createElementNS(
           'http://www.w3.org/2000/svg',
-          'circle'
+          'ellipse'
         );
+        e.setAttribute('id', `${shape.getId()}`);
         e.setAttribute('cx', shape.coordinates[0].x.toString());
         e.setAttribute('cy', shape.coordinates[0].y.toString());
-        e.setAttribute('r', shape.radius.toString());
-        e.setAttribute('stroke', this.calculateInvertedColor(shape.strokeColor));
+        e.setAttribute('rx', (shape.radius * shape.scaleX).toString());
+        e.setAttribute('ry', (shape.radius * shape.scaleY).toString());
+        e.setAttribute(
+          'stroke',
+          this.calculateInvertedColor(shape.strokeColor)
+        );
         e.setAttribute('fill', this.calculateInvertedColor(shape.fillColor));
 
         //transformation (REPEATED CODE)
@@ -106,10 +113,6 @@ export class SVGInvertedRender extends Render {
             shape.coordinates[0].y +
             ') ';
         }
-        if (shape.scaleX !== 1 || shape.scaleY !== 1) {
-          transformations +=
-            'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
-        }
         e.setAttribute('transform', transformations);
         //end transformations
 
@@ -119,14 +122,39 @@ export class SVGInvertedRender extends Render {
           'http://www.w3.org/2000/svg',
           'polygon'
         );
+        e.setAttribute('id', `${shape.getId()}`);
 
         let s = '';
-        shape.coordinates.forEach(element => {
-          s += element.x + ',' + element.y + ' ';
+        shape.coordinates.forEach((element, index) => {
+          if (index === 0) {
+            s += element.x + ',' + element.y + ' ';
+          } else {
+            if (shape.scaleX > 1) {
+              s += element.x * shape.scaleX - shape.coordinates[0].x + ',';
+            } else if (shape.scaleX === 1) {
+              s += element.x + ',';
+            } else {
+              s += (element.x + shape.coordinates[0].x) * shape.scaleX + ',';
+            }
+
+            if (shape.scaleY > 1) {
+              s += element.y * shape.scaleY - shape.coordinates[0].y + ' ';
+            } else if (shape.scaleY === 1) {
+              s += element.y + ' ';
+            } else {
+              s += (element.y + shape.coordinates[0].y) * shape.scaleY + ' ';
+            }
+          }
         });
 
         e.setAttribute('points', s);
-        e.setAttribute('style', 'stroke: ' + this.calculateInvertedColor(shape.strokeColor) + '; fill: ' + this.calculateInvertedColor(shape.fillColor));
+        e.setAttribute(
+          'style',
+          'stroke: ' +
+            this.calculateInvertedColor(shape.strokeColor) +
+            '; fill: ' +
+            this.calculateInvertedColor(shape.fillColor)
+        );
 
         //transformation (REPEATED CODE)
         let transformations = '';
@@ -139,10 +167,6 @@ export class SVGInvertedRender extends Render {
             ',' +
             shape.coordinates[0].y +
             ') ';
-        }
-        if (shape.scaleX !== 1 || shape.scaleY !== 1) {
-          transformations +=
-            'scale(' + shape.scaleX + ',' + shape.scaleY + ') ';
         }
         e.setAttribute('transform', transformations);
         //end transformations
