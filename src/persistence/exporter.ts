@@ -7,7 +7,7 @@ import { Tools } from 'utilities/tools';
 import { SimpleDrawDocument } from 'document';
 import { SVGRender } from 'render/svg-render';
 import { Coordinate } from 'utilities/coordinate';
-import {connect} from 'mqtt';
+import { connect } from 'mqtt';
 
 //Strategy Pattern
 
@@ -112,7 +112,6 @@ export class ConcreteStrategyXMLImp implements Strategy {
       .children()
       .size();
 
-
     // todo: use exported values
     const client = connect(
       'wss://iot.eclipse.org:443/ws',
@@ -126,7 +125,11 @@ export class ConcreteStrategyXMLImp implements Strategy {
     const defaultRender = new SVGRender('svg', canvas);
 
     // todo: use exported values
-    const newDoc = new SimpleDrawDocument(0, client, new SVGRender('svg', canvas));
+    const newDoc = new SimpleDrawDocument(
+      0,
+      client,
+      new SVGRender('svg', canvas)
+    );
 
     for (let i = 0; i < numChildren; i++) {
       const eachShape = xmlQuery(ast)
@@ -211,7 +214,8 @@ export class ConcreteStrategyXMLImp implements Strategy {
           const p3y = eachShapeAttributes['p3y'];
 
           // todo: use export id value
-          const newTriangle = new Triangle(0,
+          const newTriangle = new Triangle(
+            0,
             new Coordinate(p1x, p1y),
             new Coordinate(p2x, p2y),
             new Coordinate(p3x, p3y)
@@ -365,7 +369,8 @@ export class ConcreteStrategyJSONImp implements Strategy {
 
           // todo: use export id value
 
-          const newTriangle = new Triangle(0,
+          const newTriangle = new Triangle(
+            0,
             new Coordinate(p1x, p1y),
             new Coordinate(p2x, p2y),
             new Coordinate(p3x, p3y)

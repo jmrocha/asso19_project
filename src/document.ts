@@ -15,14 +15,14 @@ import { PaintAction } from 'actions/paint-action';
 import { CreatePolygonAction } from './actions/create-polygon-action';
 import { SyncManager } from './utilities/sync-manager';
 import { ChangeRenderAction } from './actions/change-render-action';
-import {MqttClient} from "mqtt";
+import { MqttClient } from 'mqtt';
 import {
   ConcreteStrategyJSONExp,
   ConcreteStrategyJSONImp,
   ConcreteStrategyXMLExp,
   ConcreteStrategyXMLImp,
-  Context
-} from "./persistence/exporter";
+  Context,
+} from './persistence/exporter';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
