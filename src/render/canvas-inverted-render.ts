@@ -5,7 +5,7 @@ import { Rectangle } from '../shapes/rectangle';
 import { Triangle } from '../shapes/triangle';
 import { Polygon } from 'shapes/polygon';
 
-export class CanvasRender extends Render {
+export class CanvasInvertedRender extends Render {
   // tslint:disable-next-line:ban-ts-ignore
   // @ts-ignore
   private ctx: CanvasRenderingContext2D;
@@ -25,6 +25,8 @@ export class CanvasRender extends Render {
 
     this.rootElem.appendChild(canvas);
     this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    this.ctx.fillStyle = 'black';
+    this.ctx.fillRect(0, 0, canvas.width, canvas.height);
     this.canvas = canvas;
   }
 
@@ -35,6 +37,16 @@ export class CanvasRender extends Render {
   }
 
   remove(obj: Shape): void {}
+
+  calculateInvertedColor(color: string): string {
+    const rgb: string[] = color.replace(/[^\d,]/g, '').split(',');
+
+    const red = 255 - Number(rgb[0]);
+    const green = 255 - Number(rgb[1]);
+    const blue = 255 - Number(rgb[2]);
+
+    return 'rgb(' + red + ',' + green + ',' + blue + ')';
+  }
 
   drawObjects(...objs: Shape[]): void {
     for (const shape of objs) {
@@ -59,8 +71,8 @@ export class CanvasRender extends Render {
         );
         this.ctx.closePath();
 
-        this.ctx.fillStyle = shape.fillColor;
-        this.ctx.strokeStyle = shape.strokeColor;
+        this.ctx.fillStyle = this.calculateInvertedColor(shape.fillColor);
+        this.ctx.strokeStyle = this.calculateInvertedColor(shape.strokeColor);
         this.ctx.fill();
         this.ctx.stroke();
       } else if (shape instanceof Rectangle) {
@@ -80,8 +92,8 @@ export class CanvasRender extends Render {
           shape.height
         );
 
-        this.ctx.fillStyle = shape.fillColor;
-        this.ctx.strokeStyle = shape.strokeColor;
+        this.ctx.fillStyle = this.calculateInvertedColor(shape.fillColor);
+        this.ctx.strokeStyle = this.calculateInvertedColor(shape.strokeColor);
         this.ctx.fill();
         this.ctx.stroke();
       } else if (shape instanceof Triangle || shape instanceof Polygon) {
@@ -103,8 +115,8 @@ export class CanvasRender extends Render {
         });
         this.ctx.closePath();
 
-        this.ctx.fillStyle = shape.fillColor;
-        this.ctx.strokeStyle = shape.strokeColor;
+        this.ctx.fillStyle = this.calculateInvertedColor(shape.fillColor);
+        this.ctx.strokeStyle = this.calculateInvertedColor(shape.strokeColor);
         this.ctx.fill();
         this.ctx.stroke();
       }

@@ -2,6 +2,7 @@ import { SimpleDrawDocument } from './document';
 import { Terminal } from './terminal';
 import { ExprAbstractExpr } from './repl/expr-abstract-expr';
 import { SVGRender } from './render/svg-render';
+import { SVGInvertedRender } from './render/svg-inverted-render';
 import { Coordinate } from 'utilities/coordinate';
 import { Circle } from 'shapes/circle';
 import { Triangle } from 'shapes/triangle';
@@ -12,6 +13,7 @@ import { connect } from 'mqtt';
 import { CreateRectangleAction } from 'actions/create-rectangle-action';
 import { UndoableAction } from 'actions/undoable-action';
 import { Controls } from './controls';
+import { CanvasInvertedRender } from 'render/canvas-inverted-render';
 
 const docID = Date.now() + Math.random();
 const client = connect(
@@ -23,8 +25,9 @@ const client = connect(
 );
 
 const canvas = document.getElementById('canvas') as HTMLElement;
-export const defaultRender = new SVGRender('svg', canvas);
-const canvasRender = new CanvasRender('canvas', canvas);
+export const defaultRender = new SVGInvertedRender('svg', canvas);
+//const canvasRender = new CanvasRender('canvas', canvas);
+const canvasRender = new CanvasInvertedRender('canvas', canvas);
 export const simpleDrawDocument = new SimpleDrawDocument(
   docID,
   client,
@@ -33,6 +36,7 @@ export const simpleDrawDocument = new SimpleDrawDocument(
 const controls = new Controls(simpleDrawDocument, defaultRender);
 
 simpleDrawDocument.registerRender(canvasRender);
+//simpleDrawDocument.registerRender(canvasInvertedRender);
 
 function isJson(item: string) {
   item = typeof item !== 'string' ? JSON.stringify(item) : item;
