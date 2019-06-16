@@ -1,19 +1,18 @@
 import { SimpleDrawDocument } from './document';
-import { Terminal } from './terminal';
-import { ExprAbstractExpr } from './repl/expr-abstract-expr';
 import { SVGRender } from './render/svg-render';
 import { SVGInvertedRender } from './render/svg-inverted-render';
-import { Coordinate } from 'utilities/coordinate';
-import { Circle } from 'shapes/circle';
-import { Triangle } from 'shapes/triangle';
-import { Polygon } from 'shapes/polygon';
-import { CanvasRender } from 'render/canvas-render';
-import { Rectangle } from 'shapes/rectangle';
-import { connect } from 'mqtt';
-import { CreateRectangleAction } from 'actions/create-rectangle-action';
-import { UndoableAction } from 'actions/undoable-action';
-import { Controls } from './controls';
 import { CanvasInvertedRender } from 'render/canvas-inverted-render';
+import { CanvasRender } from 'render/canvas-render';
+import { connect } from 'mqtt';
+import { CreateRectangleActionWrapper } from 'messages/wrappers/create-rectangle-action-wrapper';
+import { CreateCircleActionWrapper } from 'messages/wrappers/create-circle-action-wrapper';
+import { CreateTriangleActionWrapper } from 'messages/wrappers/create-triangle-action-wrapper';
+import { CreatePolygonActionWrapper } from 'messages/wrappers/create-polygon-action-wrapper';
+import { TranslateActionWrapper } from 'messages/wrappers/translate-action-wrapper';
+import { RotateActionWrapper } from 'messages/wrappers/rotate-action-wrapper';
+import { ScaleActionWrapper } from 'messages/wrappers/scale-action-wrapper';
+import { PaintActionWrapper } from 'messages/wrappers/paint-action-wrapper';
+import { Controls } from './controls';
 
 const docID = Date.now() + Math.random();
 const client = connect(
@@ -25,9 +24,10 @@ const client = connect(
 );
 
 const canvas = document.getElementById('canvas') as HTMLElement;
-export const defaultRender = new SVGInvertedRender('svg', canvas);
-//const canvasRender = new CanvasRender('canvas', canvas);
-const canvasRender = new CanvasInvertedRender('canvas', canvas);
+export const defaultRender = new SVGRender('svg', canvas);
+const svgInvertedRender = new SVGInvertedRender('svg-inverted', canvas);
+const canvasRender = new CanvasRender('canvas', canvas);
+const canvasInvertedRender = new CanvasInvertedRender('canvas-inverted', canvas);
 export const simpleDrawDocument = new SimpleDrawDocument(
   docID,
   client,
@@ -36,7 +36,8 @@ export const simpleDrawDocument = new SimpleDrawDocument(
 const controls = new Controls(simpleDrawDocument, defaultRender);
 
 simpleDrawDocument.registerRender(canvasRender);
-//simpleDrawDocument.registerRender(canvasInvertedRender);
+simpleDrawDocument.registerRender(canvasInvertedRender);
+simpleDrawDocument.registerRender(svgInvertedRender);
 
 function isJson(item: string) {
   item = typeof item !== 'string' ? JSON.stringify(item) : item;
@@ -56,53 +57,51 @@ function isJson(item: string) {
 
 function messageHandler(message: string) {
   const parsedMessage = JSON.parse(message.toString());
+  let action;
 
   if (docID !== parsedMessage.docID) {
     switch (parsedMessage.type) {
       case 'CreateRectangleAction':
-        const rect = new Rectangle(
-          simpleDrawDocument.objId,
-          parsedMessage.x,
-          parsedMessage.y,
-          parsedMessage.width,
-          parsedMessage.height
-        );
-        simpleDrawDocument.add(rect);
-        simpleDrawDocument.syncManager.actions.push(
-          new CreateRectangleAction(
-            simpleDrawDocument,
-            parsedMessage.objectID,
-            parsedMessage.x,
-            parsedMessage.y,
-            parsedMessage.width,
-            parsedMessage.height
-          )
+        action = new CreateRectangleActionWrapper(
+          simpleDrawDocument,
+          message.toString()
         );
         break;
       case 'CreateCircleAction':
-        const circle = new Circle(
-          parsedMessage.objectID,
-          parsedMessage.x,
-          parsedMessage.y,
-          parsedMessage.radius
+        action = new CreateCircleActionWrapper(
+          simpleDrawDocument,
+          message.toString()
         );
-        simpleDrawDocument.add(circle);
         break;
       case 'CreateTriangleAction':
-        //console.log(parsedMessage.p1);
-        //const triangle = new Triangle(parsedMessage.objectID, new Coordinate)
-        //simpleDrawDocument.add(triangle);
+        action = new CreateTriangleActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
         break;
       case 'CreatePolygonAction':
-        //simpleDrawDocument.add(triangle);
+        action = new CreatePolygonActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
         break;
       case 'TranslateAction':
+        action = new TranslateActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
         break;
       case 'RotateAction':
+        action = new RotateActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
         break;
       case 'ScaleAction':
+        action = new ScaleActionWrapper(simpleDrawDocument, message.toString());
         break;
       case 'PaintAction':
+        action = new PaintActionWrapper(simpleDrawDocument, message.toString());
         break;
       default:
         break;
@@ -117,17 +116,55 @@ client.on('message', (topic, message) => {
       console.log(message.toString());
     }
   } else if (topic === 'ASSOSimpleDrawSync') {
+    console.log(JSON.parse(message.toString()));
     if (JSON.parse(message.toString()).docID !== docID) {
       if (JSON.parse(message.toString()).type === 'SYNC_REQUEST') {
-        simpleDrawDocument.syncManager.publish(
-          simpleDrawDocument.syncManager.syncNewClient(
+        simpleDrawDocument.undoManager.syncManager.publish(
+          simpleDrawDocument.undoManager.syncManager.syncNewClient(
             JSON.parse(message.toString()).docID
           )
         );
       } else if (JSON.parse(message.toString()).type === 'SYNC_NEW_CLIENT') {
         if (JSON.parse(message.toString()).newClientID === docID.toString()) {
           //wtf
-          if (simpleDrawDocument.syncManager.actions.length === 0) {
+          if (simpleDrawDocument.undoManager.syncManager.actions.length === 0) {
+            const actions = JSON.parse(message.toString()).actions;
+            // tslint:disable-next-line:ban-ts-ignore
+            // @ts-ignore
+            actions.forEach(element => {
+              // tslint:disable-line
+              messageHandler(JSON.stringify(element));
+            });
+            simpleDrawDocument.draw();
+          }
+        }
+      } else if (JSON.parse(message.toString()).type === 'SYNC_MESSAGE') {
+        const actions = JSON.parse(message.toString()).actions;
+        messageHandler(JSON.stringify(actions[actions.length - 1]));
+        simpleDrawDocument.draw();
+      }
+    }
+  }
+});
+
+client.on('message', (topic, message) => {
+  if (topic === 'ASSOSimpleDraw') {
+    if (isJson(message.toString())) {
+    } else {
+      console.log(message.toString());
+    }
+  } else if (topic === 'ASSOSimpleDrawSync') {
+    if (JSON.parse(message.toString()).docID !== docID) {
+      if (JSON.parse(message.toString()).type === 'SYNC_REQUEST') {
+        simpleDrawDocument.undoManager.syncManager.publish(
+          simpleDrawDocument.undoManager.syncManager.syncNewClient(
+            JSON.parse(message.toString()).docID
+          )
+        );
+      } else if (JSON.parse(message.toString()).type === 'SYNC_NEW_CLIENT') {
+        if (JSON.parse(message.toString()).newClientID === docID.toString()) {
+          //wtf
+          if (simpleDrawDocument.undoManager.syncManager.actions.length === 0) {
             const actions = JSON.parse(message.toString()).actions;
             // tslint:disable-next-line:ban-ts-ignore
             // @ts-ignore
