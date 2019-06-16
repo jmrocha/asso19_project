@@ -377,4 +377,110 @@ The **Command pattern** helps us solving this problem, as we can encapsulate eve
 
 ### Export / Import
 
+##### Problem in Context
+
+For this feature, we want the application to be able to support persistence of the data in more than one format. We also want the user to be able to import data to the application, which translates into objects to be drawn. 
+Therefore, the application should be capable of exporting the objects created by the user to a file, which can be an XML file or a JSON file, and also capable of importing an XML or JSON file in order to load data to the program.
+
+In order to solve this problem, the program must implement two algorithms, one for each of the types of file to be handled, both for the exporting and for the importing. Then, when the user requests the export or import feature, the correct algorithm must be selected to be executed. This problem was handled with the use of the **Strategy Pattern**.
+
+Furthermore, when it comes to the export feature, it is necessary to analyse each object/shape drawn in the canvas and coherently transform it into data. Because each type of object/shape is different, it is necessary to process each object differently, based on its type. In order to solve this problem, we used the **Visitor Pattern**.
+
+#### Strategy Pattern
+
+##### Pattern Description
+
+According to Wikipedia, the "Strategy Pattern is a behavioral software design pattern that enables selecting an algorithm at runtime". Therefore, the Strategy pattern allows us to define a family of algorithms capable of doing a especific task, put them into separate classes, and make their objets interchangable.
+So, both for the export and the import features, two different algorithms (classes) were implemented, one for the XML file type, and another for the JSON file type.
+
+##### Implementation Details
+
+When it comes to implementation, at first, two simple classes were created, *Context* and *Strategy*, which can be seen bellow.
+
+```typescript
+export class Context {
+  private strategy!: Strategy;
+
+  setStrategy(strategy: Strategy) {
+    this.strategy = strategy;
+  }
+
+  executeStrategy(objects: Shape[]) {
+    return this.strategy.execute(objects);
+  }
+}
+```
+
+
+```typescript
+export interface Strategy {
+  execute(objects: Shape[]): void;
+}
+```
+
+The *Context* class is a simple class that handles which algorithm to use and directs to its execution. The *Strategy* class has only an abstract *execute()* method, which is implemented by its subclasses *ConcreteStrategyXMLExp*, *ConcreteStrategyJSONExp*, *ConcreteStrategyXMLImp*, *ConcreteStrategyJSONImp*. These are the ones that end up defining the different algorithms to be used (which can be seen here: https://github.com/jmrocha/asso19_project/blob/feature/ImportAndExport/src/persistence/exporter.ts#L17).
+This way, in order to perform, say, an export, it is only necessary to define the "strategy" to be used and then execute it, as seen in the below code:
+
+```typescript
+export(action: string) {
+    const context = new Context();
+
+    if (action === 'XML') {
+      context.setStrategy(new ConcreteStrategyXMLExp());
+    }
+    if (action === 'JSON') {
+      context.setStrategy(new ConcreteStrategyJSONExp());
+    }
+
+    context.executeStrategy(this.objects);
+  }
+```
+
+##### Consequences
+
+When it comes to consequences, the **Stratey Pattern** brought advantages: it allowed us to swap between algorithms at runtime, it allowed us to isolate the implementation details of the algorithms from the code that uses it, and it also allows for extensibility purposes, as it is possible to introduce new strategies (algorithms) without having to change the context. As for disadvantages, because we only implemented two different algorithms (XML and JSON), one can argue that the new classes introduced because of the pattern overcomplicate the program.
+
+
+#### Visitor Pattern
+
+##### Pattern Description
+
+According to Wikipedia, "The visitor design pattern is a way of separating an algorithm from an object structure on which it operates.
+In essence, the visitor allows adding new virtual functions to a family of classes, without modifying the classes. Instead, a visitor class is created that implements all of the appropriate specializations of the virtual function". Therefore, the **Visitor Pattern** allows us to extend a classe's functionality by creating functions outside of said class.
+So, for the different shapes of the program (rectangle, circle, triangle, polygon), a visitor sub-class was implemented, which implements the needed functionality (translate the shape's attributes into data).
+
+##### Implementation Details
+
+When it comes to implementation, at first, a simple class was created, *Visitor*, which can be seen bellow. 
+
+```typescript
+export interface Visitor {
+  visitRectangle(rect: Rectangle): Element;
+  visitCircle(circle: Circle): Element;
+  visitPolygon(polyg: Polygon): Element;
+  visitTriangle(triangle: Triangle): Element;
+}
+```
+
+Also, in each of the necessary classes (*Rectangle*, *Triangle*, *Circle*, *Polygon*, *Shape*), an aditional *accept()* method was created to handle the additional functionality.
+
+```typescript
+accept(visitor: Visitor): Element {
+    return visitor.visitRectangle(this);
+  }
+```
+
+The Visitor class' methods are then implemented by the subclass *XMLExporterVisitor* (https://github.com/jmrocha/asso19_project/blob/feature/ImportAndExport/src/persistence/exporter.ts#L380).
+This way, in order to translate a shape's attributes into data, it is only necessary to execute it's *accept()* method, as seen in the below code:
+
+```typescript
+const visitor = new XMLExporterVisitor(xmlDoc);
+
+    for (const shape of objects) {
+      storedShapes.appendChild(shape.accept(visitor));
+    }
+```
+
+##### Consequences
+
 When it comes to consequences, the **Visitor Pattern** brings very valuable advantages: it allowed us to traverse a complex object container (an array of objects of different types) and apply a especific functionality to each of those objects, and it also allows for extensibility purposes, as it is possible to introduce new behaviours/functionalities to classes without having to directly change those classes. As for disadvantages, visitors lack the access to private class fields and methods, which can be bad if you need those fields or methods for a certain functionality; fortunately, this wasn't a problem for us.

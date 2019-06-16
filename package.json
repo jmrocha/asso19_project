@@ -15,7 +15,8 @@
     "xml-js": "^1.6.11",
     "xml-parse-from-string": "^1.0.1",
     "xml-query": "^1.5.0",
-    "xml-reader": "^2.4.3"
+    "xml-reader": "^2.4.3",
+    "http-server": "^0.11.1"
   },
   "devDependencies": {
     "gts": "^1.0.0",
@@ -27,7 +28,7 @@
     "webpack-dev-server": "^3.4.1"
   },
   "scripts": {
-    "start": "npm run compile && http-server dist -o",
+    "start": "http-server dist -o",
     "dev": "webpack-dev-server --open --config webpack.config.dev.js",
     "check": "gts check",
     "clean": "gts clean",

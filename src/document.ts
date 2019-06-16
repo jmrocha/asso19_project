@@ -11,6 +11,7 @@ import { UndoManager } from './actions/undo-manager';
 import { Coordinate } from 'utilities/coordinate';
 import { ScaleAction } from 'actions/scale-action';
 import { PaintAction } from 'actions/paint-action';
+
 import {
   Context,
   ConcreteStrategyXMLExp,
