@@ -8,8 +8,4 @@ export abstract class AbstractExpr {
   ) {}
 
   abstract evaluate(input: string): string;
-
-  setRender(render: Render): void {
-    this.render = render;
-  }
 }

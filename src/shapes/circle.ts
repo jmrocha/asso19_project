@@ -3,8 +3,8 @@ import { Coordinate } from '../utilities/coordinate';
 import { Visitor } from 'persistence/exporter';
 
 export class Circle extends Shape {
-  constructor(x: number, y: number, public radius: number) {
-    super(new Coordinate(x, y));
+  constructor(id: number, x: number, y: number, public radius: number) {
+    super(id, new Coordinate(x, y));
   }
 
   accept(visitor: Visitor): Element {

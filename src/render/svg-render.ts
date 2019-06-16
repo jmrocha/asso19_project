@@ -5,9 +5,25 @@ import { Circle } from '../shapes/circle';
 import { Triangle } from 'shapes/triangle';
 import { Polygon } from 'shapes/polygon';
 
-export class SVGRender implements Render {
-  private canvas: SVGElement;
-  constructor(private rootElem: HTMLElement) {
+export class SVGRender extends Render {
+  // tslint:disable-next-line:ban-ts-ignore
+  // @ts-ignore
+  private canvas: SVGElement = null;
+  private shapes: Map<number, Shape> = new Map<number, Shape>();
+
+  constructor(name: string, private rootElem: HTMLElement) {
+    super(name);
+  }
+
+  remove(obj: Shape): void {
+    const e = document.getElementById(`${obj.getId()}`);
+    if (e) {
+      e.remove();
+      this.shapes.delete(obj.getId());
+    }
+  }
+
+  init() {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('id', 'canvas');
     svg.setAttribute('width', '100%');
@@ -16,13 +32,20 @@ export class SVGRender implements Render {
     this.canvas = svg;
   }
 
-  draw(...objs: Shape[]): void {
+  destroy() {
+    if (this.canvas) {
+      this.canvas.remove();
+    }
+  }
+
+  drawObjects(...objs: Shape[]): void {
     for (const shape of objs) {
       if (shape instanceof Rectangle) {
         const e = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'rect'
         );
+        e.setAttribute('id', `${shape.getId()}`);
         e.setAttribute('style', 'stroke: black; fill: ' + shape.fillColor);
         e.setAttribute('x', shape.coordinates[0].x.toString());
         e.setAttribute('y', shape.coordinates[0].y.toString());

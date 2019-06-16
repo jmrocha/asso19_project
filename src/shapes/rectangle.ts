@@ -4,12 +4,13 @@ import { Visitor } from 'persistence/exporter';
 
 export class Rectangle extends Shape {
   constructor(
+    id: number,
     x: number,
     y: number,
     public width: number,
     public height: number
   ) {
-    super(new Coordinate(x, y));
+    super(id, new Coordinate(x, y));
   }
 
   accept(visitor: Visitor): Element {

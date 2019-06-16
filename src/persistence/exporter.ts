@@ -7,6 +7,7 @@ import { Tools } from 'utilities/tools';
 import { SimpleDrawDocument } from 'document';
 import { SVGRender } from 'render/svg-render';
 import { Coordinate } from 'utilities/coordinate';
+import {connect} from 'mqtt';
 
 //Strategy Pattern
 
@@ -111,7 +112,21 @@ export class ConcreteStrategyXMLImp implements Strategy {
       .children()
       .size();
 
-    const newDoc = new SimpleDrawDocument();
+
+    // todo: use exported values
+    const client = connect(
+      'wss://iot.eclipse.org:443/ws',
+      {
+        clientId: '0',
+        clean: false,
+      }
+    );
+
+    const canvas = document.getElementById('canvas') as HTMLElement;
+    const defaultRender = new SVGRender('svg', canvas);
+
+    // todo: use exported values
+    const newDoc = new SimpleDrawDocument(0, client, new SVGRender('svg', canvas));
 
     for (let i = 0; i < numChildren; i++) {
       const eachShape = xmlQuery(ast)
@@ -134,7 +149,8 @@ export class ConcreteStrategyXMLImp implements Strategy {
           const height = eachShapeAttributes['height'];
           const width = eachShapeAttributes['width'];
 
-          const newRect = new Rectangle(coordX, coordY, width, height);
+          // todo: use export id value
+          const newRect = new Rectangle(0, coordX, coordY, width, height);
           newRect.fillColor = fillColor;
           newRect.rotation = rotation;
           newRect.scaleX = scaleX;
@@ -148,7 +164,8 @@ export class ConcreteStrategyXMLImp implements Strategy {
           const coordY = eachShapeAttributes['y'];
           const radius = eachShapeAttributes['radius'];
 
-          const newCircle = new Circle(coordX, coordY, radius);
+          // todo: use export id value
+          const newCircle = new Circle(0, coordX, coordY, radius);
           newCircle.fillColor = fillColor;
           newCircle.rotation = rotation;
           newCircle.scaleX = scaleX;
@@ -159,7 +176,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
         }
         case 'polyg': {
           const numCoords = eachShapeAttributes['numCoords'];
-          const coordsArray: Coordinate[] = new Array();
+          const coordsArray: Coordinate[] = [];
 
           for (let i = 0; i < numCoords; i++) {
             const pString = 'p';
@@ -175,7 +192,8 @@ export class ConcreteStrategyXMLImp implements Strategy {
             coordsArray.push(coord);
           }
 
-          const newPolyg = new Polygon(...coordsArray);
+          // todo: use export id value
+          const newPolyg = new Polygon(0, ...coordsArray);
           newPolyg.fillColor = fillColor;
           newPolyg.rotation = rotation;
           newPolyg.scaleX = scaleX;
@@ -192,7 +210,8 @@ export class ConcreteStrategyXMLImp implements Strategy {
           const p3x = eachShapeAttributes['p3x'];
           const p3y = eachShapeAttributes['p3y'];
 
-          const newTriangle = new Triangle(
+          // todo: use export id value
+          const newTriangle = new Triangle(0,
             new Coordinate(p1x, p1y),
             new Coordinate(p2x, p2y),
             new Coordinate(p3x, p3y)
@@ -212,9 +231,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
       }
     }
 
-    const canvas = document.getElementById('canvas') as HTMLElement;
-    const defaultRender = new SVGRender(canvas);
-    newDoc.draw(defaultRender);
+    newDoc.draw();
   }
 }
 
@@ -249,7 +266,20 @@ export class ConcreteStrategyJSONImp implements Strategy {
       .children()
       .size();
 
-    const newDoc = new SimpleDrawDocument();
+    // todo: use exported values
+    const client = connect(
+      'wss://iot.eclipse.org:443/ws',
+      {
+        clientId: '0',
+        clean: false,
+      }
+    );
+
+    const canvas = document.getElementById('canvas') as HTMLElement;
+    const defaultRender = new SVGRender('svg', canvas);
+
+    // todo: use exported values
+    const newDoc = new SimpleDrawDocument(0, client, defaultRender);
 
     for (let i = 0; i < numChildren; i++) {
       const eachShape = xmlQuery(ast)
@@ -272,7 +302,8 @@ export class ConcreteStrategyJSONImp implements Strategy {
           const height = eachShapeAttributes['height'];
           const width = eachShapeAttributes['width'];
 
-          const newRect = new Rectangle(coordX, coordY, width, height);
+          // todo: use export id value
+          const newRect = new Rectangle(0, coordX, coordY, width, height);
           newRect.fillColor = fillColor;
           newRect.rotation = rotation;
           newRect.scaleX = scaleX;
@@ -286,7 +317,8 @@ export class ConcreteStrategyJSONImp implements Strategy {
           const coordY = eachShapeAttributes['y'];
           const radius = eachShapeAttributes['radius'];
 
-          const newCircle = new Circle(coordX, coordY, radius);
+          // todo: use export id value
+          const newCircle = new Circle(0, coordX, coordY, radius);
           newCircle.fillColor = fillColor;
           newCircle.rotation = rotation;
           newCircle.scaleX = scaleX;
@@ -297,7 +329,7 @@ export class ConcreteStrategyJSONImp implements Strategy {
         }
         case 'polyg': {
           const numCoords = eachShapeAttributes['numCoords'];
-          const coordsArray: Coordinate[] = new Array();
+          const coordsArray: Coordinate[] = [];
 
           for (let i = 0; i < numCoords; i++) {
             const pString = 'p';
@@ -313,7 +345,8 @@ export class ConcreteStrategyJSONImp implements Strategy {
             coordsArray.push(coord);
           }
 
-          const newPolyg = new Polygon(...coordsArray);
+          // todo: use export id value
+          const newPolyg = new Polygon(0, ...coordsArray);
           newPolyg.fillColor = fillColor;
           newPolyg.rotation = rotation;
           newPolyg.scaleX = scaleX;
@@ -330,7 +363,9 @@ export class ConcreteStrategyJSONImp implements Strategy {
           const p3x = eachShapeAttributes['p3x'];
           const p3y = eachShapeAttributes['p3y'];
 
-          const newTriangle = new Triangle(
+          // todo: use export id value
+
+          const newTriangle = new Triangle(0,
             new Coordinate(p1x, p1y),
             new Coordinate(p2x, p2y),
             new Coordinate(p3x, p3y)
@@ -350,9 +385,7 @@ export class ConcreteStrategyJSONImp implements Strategy {
       }
     }
 
-    const canvas = document.getElementById('canvas') as HTMLElement;
-    const defaultRender = new SVGRender(canvas);
-    newDoc.draw(defaultRender);
+    newDoc.draw();
   }
 }
 
