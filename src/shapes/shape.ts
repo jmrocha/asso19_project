@@ -1,4 +1,5 @@
 import { Coordinate } from '../utilities/coordinate';
+import { Visitor } from 'persistence/exporter';
 
 export abstract class Shape {
   coordinates: Coordinate[];
@@ -12,6 +13,8 @@ export abstract class Shape {
     this.id = id;
     this.coordinates = coordinates;
   }
+
+  abstract accept(visitor: Visitor): Element;
 
   getId(): number {
     return this.id;

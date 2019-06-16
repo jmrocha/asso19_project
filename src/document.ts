@@ -11,10 +11,18 @@ import { UndoManager } from './actions/undo-manager';
 import { Coordinate } from 'utilities/coordinate';
 import { ScaleAction } from 'actions/scale-action';
 import { PaintAction } from 'actions/paint-action';
+
 import { CreatePolygonAction } from './actions/create-polygon-action';
-import { MqttClient } from 'mqtt';
 import { SyncManager } from './utilities/sync-manager';
 import { ChangeRenderAction } from './actions/change-render-action';
+import {MqttClient} from "mqtt";
+import {
+  ConcreteStrategyJSONExp,
+  ConcreteStrategyJSONImp,
+  ConcreteStrategyXMLExp,
+  ConcreteStrategyXMLImp,
+  Context
+} from "./persistence/exporter";
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
@@ -143,6 +151,35 @@ export class SimpleDrawDocument {
 
   paint(s: Shape, fillColor: string): void {
     return this.do(new PaintAction(this, s, fillColor));
+  }
+
+  export(action: string) {
+    const context = new Context();
+
+    if (action === 'XML') {
+      context.setStrategy(new ConcreteStrategyXMLExp());
+    }
+    if (action === 'JSON') {
+      context.setStrategy(new ConcreteStrategyJSONExp());
+    }
+
+    const result = context.executeStrategy(this.objects);
+  }
+
+  import(action: string) {
+    const context = new Context();
+
+    //const read = require('file-reader');
+
+    if (action === 'XML') {
+      //const read = require('fs').readFileSync('newXmlDoc.xml', 'utf8');
+      context.setStrategy(new ConcreteStrategyXMLImp('test' /*read*/));
+    }
+    if (action === 'JSON') {
+      context.setStrategy(new ConcreteStrategyJSONImp('test'));
+    }
+
+    const result = context.executeStrategy(this.objects);
   }
 
   getShapeById(id: number): Shape {

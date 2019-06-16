@@ -1,4 +1,4 @@
-# Simple Draw
+﻿# Simple Draw
 
 [![Code Style: Google](https://img.shields.io/badge/code%20style-google-blueviolet.svg)](https://github.com/google/gts)
 
@@ -112,23 +112,23 @@ The **Interpreter pattern** tells us how to solve this kind of problem:
 
 ![Pattern Diagram](https://www.plantuml.com/plantuml/png/ZP912i8m44NtESM0cuhs1YuKwqvGgXSOwr0YILkIgGhgtQrjfJPDmMp2_7dv-HEoj8o6Iwq4IrO4yMQ_XRL2Qo6Ic1hKGk39ii648QdrLLjkxeM1Xu1gXGUf2qMHmLkK9wMcZC4Ef0QDAJkJ0LDljJJfEVuMmL--S-XvJclJMUKYinJeYgf4fg2jPLQK_4M8cvE1O_0IefdrSurdtWxuY0xGDNUdosWl9frVQRHz9ACzpPwqU8RX8A47SJDw42UfXnZczK1kQY6MrOjMl-iD)
 
-## Undo/Redo Actions
+### Undo/Redo Actions
 
 In SimpleDraw, we want users to be able to do a multitude of actions, such as creating various types of shapes and operate over them with algorithms such as translation, scale and rotation. In addition of performing such actions, users should be able to undo and redo these actions in the order they were performed. How should we design the program to perform these actions successfully? Our solution is that, by applying the **Command** pattern and it's respective characteristic functions (`do()` and `undo()`), we can be able to create a structure that supports the concept of performing actions in an easily scalable and maintainable format.
 
-### Command Pattern
+#### Command Pattern
 
-#### Problem in Context
+##### Problem in Context
 
 Users of this software should be able to perform actions on the program. These actions can range from creating a simple rectangle to color an object on the document and can be done by the user by typing a command in a REPL or, if implemented, by pressing the mouse button. We can directly apply these actions inside the respective calls inside the REPL/mouse click, but what if, for example, we want to implement keyboard shortcuts to create objects? The call for the object creation we called before in the REPL/mouse click would also need to be done in each respective keybind. Adding the possibility of undoing and redoing an action to this mess would prove itself to be a nightmare...
 
-#### Pattern Description
+##### Pattern Description
 
 **Command** decouples the object that invokes the operation from the one that knows how to perform it. To achieve this separation, the designer creates an abstract base class that maps a receiver (an object) with an action (a pointer to a member function). The base class contains a `do()` method that simply calls the action on the receiver.
 
 All clients of **Command** objects treat each object as a "black box" by simply invoking the object's virtual `do()` method whenever the client requires the object's "service".
 
-#### Implementation Details
+##### Implementation Details
 
 To implement this pattern we created an UndoManager that saves the encapsulated Command classes in do and undo stacks, for the undoing/redoing part of the design. For the actual Action classes, two Interfaces were created: the Action interface, which implements the `do()` method and is used to mostly perform actions that are not undoable, such as export/importing a document; the second interface, UndoableAction interface, extends the first and implements the `undo()` and `toJSON()` (used for broker messaging) method. This interface is used to perform undoable actions such as creating shapes and their respective transformations.
 
@@ -177,20 +177,97 @@ export class TranslateAction implements UndoableAction<void> {
 }
 ```
 
-#### Consequences
+##### Consequences
 
 By implementing this feature we are able to construct and implement new actions to the system without messing with previous working code, greatly improving the code's readability and maintainability.
 Also, by encapsulating each command into an Action object, implementing new ways of performing it is made way simpler, as we only need to call the Action object and the object takes care of the implementation by itself.
 
 By using the **Command** pattern, features such as the multiuser take a hit on its ease of implementation as it would benefit if this feature was implemented with other patterns, such as Memento, due to the stateless broker used in the implementation of our multiuser.
 
-### Multi-User Sessions
+### Multi User Funcionality
 
-We want to be able for users to participate in multi-user sessions, where all changes made to the canvas are reflected in all users' screens. The main problem with implementing such feature is making sure that all screens stay syncronized and the ability to export the document is not hindered at any point, which can occour most likely due to mishandling the incoming packets.
-In order to accomplish this, an implementation of a **publish-subscribe pattern** was implemented, thanks to the usage of a public MQTT broker that delegates the messages for the respective users through the use of websockets. Every user, when the session is opened, subscribes to a specific topic inside the broker, related to the session in question.
-After this proof-of-concept was created, the group explored on how to make this use-case work in our favor. The syncronization of the sessions is accomplished by, whenever a user makes an action, a serialized string of the done action is sent to the broker, and each subscriber that is not the sender creates and executes the action, storing the reflection of the action in its own document, but not on the do/undo stacks, so that users cannot undo actions done by other users.
+We want our users to be able to share a SimpleDraw session with their friends and that everyone in the session is updated real-time with everyone's changes to the document. Changes that are made by one user cannot be undone/redone by another user, as the do/undo action stacks are user-bound, to prevent user frustration and work flow during the system's usage.
+In order to share sessions and to enable communication between every browser in the session, we adopted the usage of a **publish-subscribe** architecture, which uses a publicly available broker that manages the receiving and sending of the session messages to subscriber browsers. These messages are then parsed client-side and then the according action is reproduced onto everyone's screen.
+
+#### Factory Pattern
+
+##### Problem in Context
+
+The parsing of incoming messages can be a very repetitive process, the object which you are recreating on your screen can vary between multiple possible objects and the actions other users do on their browser need to also be reflected onto yours. So, your parser function needs to be able to handle the recreation of multiple different actions by using a simple string message as the source of information. In the future, more actions can be implemented and more actions need to be parsed as a consequence, how can this parsing function be easily readable and easy to build upon, without making a huge mess on the parser's code?
+
+##### Pattern Description
+
+According to sourcemaking.com, the **Factory Method** defines an interface for creating objects, but lets subclasses decide which classes to instantiate. Injection molding presses demonstrate this pattern. Manufacturers of plastic toys process plastic molding powder, and inject the plastic into molds of the desired shapes. The class of toy (car, action figure, etc.) is determined by the mold.
+
+##### Implementation Details
+
+All the logic related to parsing the message and constructing the respective objects needed to reflect actions done during the session is kept entirely inside wrapper objects which correspond to the respective recreated actions. A factory pattern is implemented inside the parsing function to construct the appropriate wrapper function that builds all the necessary logic which otherwise would be stuffed inside the parser and make this piece of code completely unsustainable and unmaintainable.
+
+```typescript
+function messageHandler(message: string) {
+  const parsedMessage = JSON.parse(message.toString());
+  let action;
+
+  if (docID !== parsedMessage.docID) {
+    switch (parsedMessage.type) {
+      case 'CreateRectangleAction':
+        action = new CreateRectangleActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
+        break;
+      case 'CreateCircleAction':
+        action = new CreateCircleActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
+        break;
+      case 'CreateTriangleAction':
+        action = new CreateTriangleActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
+        break;
+      case 'CreatePolygonAction':
+        action = new CreatePolygonActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
+        break;
+      case 'TranslateAction':
+        action = new TranslateActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
+        break;
+      case 'RotateAction':
+        action = new RotateActionWrapper(
+          simpleDrawDocument,
+          message.toString()
+        );
+        break;
+      case 'ScaleAction':
+        action = new ScaleActionWrapper(simpleDrawDocument, message.toString());
+        break;
+      case 'PaintAction':
+        action = new PaintActionWrapper(simpleDrawDocument, message.toString());
+        break;
+      default:
+        break;
+    }
+  }
+}
+```
+
+##### Consequences
+
+By implementing the **Factory Pattern** to create actions done by other users in the session, we are able to move all the responsibility of recreating the other people's actions to a handful of classes and keeping the logic inside the parsing function responsible for actual parsing and not the creation of objects unrelated to parsing. This separation of responsibilites and classes also eases the addition of new actions that can be recreated from the traded messages between browsers, as new code wont ever interfere with previously existent code.
+
+On the other side, the addition of these new actions means the creation of more wrapper classes, which can complicate the coding a bit more, but we believe the tradeoff between complexity and readability pays off in the long run.
 
 ### Export/Import Feature
+
+##### Problem in Context
 
 For this feature, we want the application to be able to support persistence of the data in more than one format. We also want the user to be able to import data to the application, which translates into objects to be drawn. 
 Therefore, the application should be capable of exporting the objects created by the user to a file, which can be an XML file or a JSON file, and also capable of importing an XML or JSON file in order to load data to the program.
@@ -201,8 +278,12 @@ Furthermore, when it comes to the export feature, it is necessary to analyse eac
 
 #### Strategy Pattern
 
+##### Pattern Description
+
 According to Wikipedia, the "Strategy Pattern is a behavioral software design pattern that enables selecting an algorithm at runtime". Therefore, the Strategy pattern allows us to define a family of algorithms capable of doing a especific task, put them into separate classes, and make their objets interchangable.
 So, both for the export and the import features, two different algorithms (classes) were implemented, one for the XML file type, and another for the JSON file type.
+
+##### Implementation Details
 
 When it comes to implementation, at first, two simple classes were created, *Context* and *Strategy*, which can be seen bellow.
 
@@ -245,14 +326,20 @@ export(action: string) {
   }
 ```
 
+##### Consequences
+
 When it comes to consequences, the **Stratey Pattern** brought advantages: it allowed us to swap between algorithms at runtime, it allowed us to isolate the implementation details of the algorithms from the code that uses it, and it also allows for extensibility purposes, as it is possible to introduce new strategies (algorithms) without having to change the context. As for disadvantages, because we only implemented two different algorithms (XML and JSON), one can argue that the new classes introduced because of the pattern overcomplicate the program.
 
 
 #### Visitor Pattern
 
+##### Pattern Description
+
 According to Wikipedia, "The visitor design pattern is a way of separating an algorithm from an object structure on which it operates.
 In essence, the visitor allows adding new virtual functions to a family of classes, without modifying the classes. Instead, a visitor class is created that implements all of the appropriate specializations of the virtual function". Therefore, the **Visitor Pattern** allows us to extend a classe's functionality by creating functions outside of said class.
 So, for the different shapes of the program (rectangle, circle, triangle, polygon), a visitor sub-class was implemented, which implements the needed functionality (translate the shape's attributes into data).
+
+##### Implementation Details
 
 When it comes to implementation, at first, a simple class was created, *Visitor*, which can be seen bellow. 
 
@@ -283,5 +370,117 @@ const visitor = new XMLExporterVisitor(xmlDoc);
       storedShapes.appendChild(shape.accept(visitor));
     }
 ```
+
+##### Consequences
+
+The **Command pattern** helps us solving this problem, as we can encapsulate every action the user can take onto an object that stores the context the action needs in order to be executed or undone.
+
+### Export / Import
+
+##### Problem in Context
+
+For this feature, we want the application to be able to support persistence of the data in more than one format. We also want the user to be able to import data to the application, which translates into objects to be drawn. 
+Therefore, the application should be capable of exporting the objects created by the user to a file, which can be an XML file or a JSON file, and also capable of importing an XML or JSON file in order to load data to the program.
+
+In order to solve this problem, the program must implement two algorithms, one for each of the types of file to be handled, both for the exporting and for the importing. Then, when the user requests the export or import feature, the correct algorithm must be selected to be executed. This problem was handled with the use of the **Strategy Pattern**.
+
+Furthermore, when it comes to the export feature, it is necessary to analyse each object/shape drawn in the canvas and coherently transform it into data. Because each type of object/shape is different, it is necessary to process each object differently, based on its type. In order to solve this problem, we used the **Visitor Pattern**.
+
+#### Strategy Pattern
+
+##### Pattern Description
+
+According to Wikipedia, the "Strategy Pattern is a behavioral software design pattern that enables selecting an algorithm at runtime". Therefore, the Strategy pattern allows us to define a family of algorithms capable of doing a especific task, put them into separate classes, and make their objets interchangable.
+So, both for the export and the import features, two different algorithms (classes) were implemented, one for the XML file type, and another for the JSON file type.
+
+##### Implementation Details
+
+When it comes to implementation, at first, two simple classes were created, *Context* and *Strategy*, which can be seen bellow.
+
+```typescript
+export class Context {
+  private strategy!: Strategy;
+
+  setStrategy(strategy: Strategy) {
+    this.strategy = strategy;
+  }
+
+  executeStrategy(objects: Shape[]) {
+    return this.strategy.execute(objects);
+  }
+}
+```
+
+
+```typescript
+export interface Strategy {
+  execute(objects: Shape[]): void;
+}
+```
+
+The *Context* class is a simple class that handles which algorithm to use and directs to its execution. The *Strategy* class has only an abstract *execute()* method, which is implemented by its subclasses *ConcreteStrategyXMLExp*, *ConcreteStrategyJSONExp*, *ConcreteStrategyXMLImp*, *ConcreteStrategyJSONImp*. These are the ones that end up defining the different algorithms to be used (which can be seen here: https://github.com/jmrocha/asso19_project/blob/feature/ImportAndExport/src/persistence/exporter.ts#L17).
+This way, in order to perform, say, an export, it is only necessary to define the "strategy" to be used and then execute it, as seen in the below code:
+
+```typescript
+export(action: string) {
+    const context = new Context();
+
+    if (action === 'XML') {
+      context.setStrategy(new ConcreteStrategyXMLExp());
+    }
+    if (action === 'JSON') {
+      context.setStrategy(new ConcreteStrategyJSONExp());
+    }
+
+    context.executeStrategy(this.objects);
+  }
+```
+
+##### Consequences
+
+When it comes to consequences, the **Stratey Pattern** brought advantages: it allowed us to swap between algorithms at runtime, it allowed us to isolate the implementation details of the algorithms from the code that uses it, and it also allows for extensibility purposes, as it is possible to introduce new strategies (algorithms) without having to change the context. As for disadvantages, because we only implemented two different algorithms (XML and JSON), one can argue that the new classes introduced because of the pattern overcomplicate the program.
+
+
+#### Visitor Pattern
+
+##### Pattern Description
+
+According to Wikipedia, "The visitor design pattern is a way of separating an algorithm from an object structure on which it operates.
+In essence, the visitor allows adding new virtual functions to a family of classes, without modifying the classes. Instead, a visitor class is created that implements all of the appropriate specializations of the virtual function". Therefore, the **Visitor Pattern** allows us to extend a classe's functionality by creating functions outside of said class.
+So, for the different shapes of the program (rectangle, circle, triangle, polygon), a visitor sub-class was implemented, which implements the needed functionality (translate the shape's attributes into data).
+
+##### Implementation Details
+
+When it comes to implementation, at first, a simple class was created, *Visitor*, which can be seen bellow. 
+
+```typescript
+export interface Visitor {
+  visitRectangle(rect: Rectangle): Element;
+  visitCircle(circle: Circle): Element;
+  visitPolygon(polyg: Polygon): Element;
+  visitTriangle(triangle: Triangle): Element;
+}
+```
+
+Also, in each of the necessary classes (*Rectangle*, *Triangle*, *Circle*, *Polygon*, *Shape*), an aditional *accept()* method was created to handle the additional functionality.
+
+```typescript
+accept(visitor: Visitor): Element {
+    return visitor.visitRectangle(this);
+  }
+```
+
+The Visitor class' methods are then implemented by the subclass *XMLExporterVisitor* (https://github.com/jmrocha/asso19_project/blob/feature/ImportAndExport/src/persistence/exporter.ts#L380).
+This way, in order to translate a shape's attributes into data, it is only necessary to execute it's *accept()* method, as seen in the below code:
+
+```typescript
+const visitor = new XMLExporterVisitor(xmlDoc);
+
+    for (const shape of objects) {
+      storedShapes.appendChild(shape.accept(visitor));
+    }
+```
+
+##### Consequences
 
 When it comes to consequences, the **Visitor Pattern** brings very valuable advantages: it allowed us to traverse a complex object container (an array of objects of different types) and apply a especific functionality to each of those objects, and it also allows for extensibility purposes, as it is possible to introduce new behaviours/functionalities to classes without having to directly change those classes. As for disadvantages, visitors lack the access to private class fields and methods, which can be bad if you need those fields or methods for a certain functionality; fortunately, this wasn't a problem for us.

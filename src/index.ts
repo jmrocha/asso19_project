@@ -140,3 +140,40 @@ client.on('message', (topic, message) => {
     }
   }
 });
+
+client.on('message', (topic, message) => {
+  if (topic === 'ASSOSimpleDraw') {
+    if (isJson(message.toString())) {
+    } else {
+      console.log(message.toString());
+    }
+  } else if (topic === 'ASSOSimpleDrawSync') {
+    if (JSON.parse(message.toString()).docID !== docID) {
+      if (JSON.parse(message.toString()).type === 'SYNC_REQUEST') {
+        simpleDrawDocument.undoManager.syncManager.publish(
+          simpleDrawDocument.undoManager.syncManager.syncNewClient(
+            JSON.parse(message.toString()).docID
+          )
+        );
+      } else if (JSON.parse(message.toString()).type === 'SYNC_NEW_CLIENT') {
+        if (JSON.parse(message.toString()).newClientID === docID.toString()) {
+          //wtf
+          if (simpleDrawDocument.undoManager.syncManager.actions.length === 0) {
+            const actions = JSON.parse(message.toString()).actions;
+            // tslint:disable-next-line:ban-ts-ignore
+            // @ts-ignore
+            actions.forEach(element => {
+              // tslint:disable-line
+              messageHandler(JSON.stringify(element));
+            });
+            simpleDrawDocument.draw();
+          }
+        }
+      } else if (JSON.parse(message.toString()).type === 'SYNC_MESSAGE') {
+        const actions = JSON.parse(message.toString()).actions;
+        messageHandler(JSON.stringify(actions[actions.length - 1]));
+        simpleDrawDocument.draw();
+      }
+    }
+  }
+});

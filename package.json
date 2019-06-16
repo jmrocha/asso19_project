@@ -8,8 +8,15 @@
   "main": "script.js",
   "repository": "github:jmrocha/asso19_project",
   "dependencies": {
-    "http-server": "^0.11.1",
-    "mqtt": "^3.0.0"
+    "file-reader": "^1.1.1",
+    "file-saver": "^2.0.2",
+    "file-system": "^2.2.2",
+    "mqtt": "^3.0.0",
+    "xml-js": "^1.6.11",
+    "xml-parse-from-string": "^1.0.1",
+    "xml-query": "^1.5.0",
+    "xml-reader": "^2.4.3",
+    "http-server": "^0.11.1"
   },
   "devDependencies": {
     "gts": "^1.0.0",
