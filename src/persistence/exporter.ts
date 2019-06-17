@@ -69,7 +69,7 @@ export class ConcreteStrategyJSONExp implements Strategy {
     //Download File
     const fileSaver = require('file-saver');
     const blob = new Blob([result], { type: 'data:text/plain;charset=utf-8' });
-    fileSaver.saveAs(blob, 'newJsonDoc.xml');
+    fileSaver.saveAs(blob, 'newJsonDoc.json');
   }
 }
 
@@ -121,6 +121,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
       const eachShapeName = eachShape['name'];
       const eachShapeAttributes = eachShape.attributes;
 
+      const id = eachShapeAttributes['id'];
       const fillColor = eachShapeAttributes['fillColor'];
       const rotation = eachShapeAttributes['rotation'];
       const scaleX = eachShapeAttributes['scaleX'];
@@ -133,8 +134,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
           const height = eachShapeAttributes['height'];
           const width = eachShapeAttributes['width'];
 
-          // todo: use export id value
-          const newRect = new Rectangle(0, coordX, coordY, width, height);
+          const newRect = new Rectangle(id, coordX, coordY, width, height);
           newRect.fillColor = fillColor;
           newRect.rotation = rotation;
           newRect.scaleX = scaleX;
@@ -148,8 +148,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
           const coordY = eachShapeAttributes['y'];
           const radius = eachShapeAttributes['radius'];
 
-          // todo: use export id value
-          const newCircle = new Circle(0, coordX, coordY, radius);
+          const newCircle = new Circle(id, coordX, coordY, radius);
           newCircle.fillColor = fillColor;
           newCircle.rotation = rotation;
           newCircle.scaleX = scaleX;
@@ -176,8 +175,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
             coordsArray.push(coord);
           }
 
-          // todo: use export id value
-          const newPolyg = new Polygon(0, ...coordsArray);
+          const newPolyg = new Polygon(id, ...coordsArray);
           newPolyg.fillColor = fillColor;
           newPolyg.rotation = rotation;
           newPolyg.scaleX = scaleX;
@@ -194,9 +192,8 @@ export class ConcreteStrategyXMLImp implements Strategy {
           const p3x = eachShapeAttributes['p3x'];
           const p3y = eachShapeAttributes['p3y'];
 
-          // todo: use export id value
           const newTriangle = new Triangle(
-            0,
+            id,
             new Coordinate(p1x, p1y),
             new Coordinate(p2x, p2y),
             new Coordinate(p3x, p3y)
@@ -269,6 +266,7 @@ export class ConcreteStrategyJSONImp implements Strategy {
       const eachShapeName = eachShape['name'];
       const eachShapeAttributes = eachShape.attributes;
 
+      const id = eachShapeAttributes['id'];
       const fillColor = eachShapeAttributes['fillColor'];
       const rotation = eachShapeAttributes['rotation'];
       const scaleX = eachShapeAttributes['scaleX'];
@@ -282,7 +280,7 @@ export class ConcreteStrategyJSONImp implements Strategy {
           const width = eachShapeAttributes['width'];
 
           // todo: use export id value
-          const newRect = new Rectangle(0, coordX, coordY, width, height);
+          const newRect = new Rectangle(id, coordX, coordY, width, height);
           newRect.fillColor = fillColor;
           newRect.rotation = rotation;
           newRect.scaleX = scaleX;
@@ -297,7 +295,7 @@ export class ConcreteStrategyJSONImp implements Strategy {
           const radius = eachShapeAttributes['radius'];
 
           // todo: use export id value
-          const newCircle = new Circle(0, coordX, coordY, radius);
+          const newCircle = new Circle(id, coordX, coordY, radius);
           newCircle.fillColor = fillColor;
           newCircle.rotation = rotation;
           newCircle.scaleX = scaleX;
@@ -325,7 +323,7 @@ export class ConcreteStrategyJSONImp implements Strategy {
           }
 
           // todo: use export id value
-          const newPolyg = new Polygon(0, ...coordsArray);
+          const newPolyg = new Polygon(id, ...coordsArray);
           newPolyg.fillColor = fillColor;
           newPolyg.rotation = rotation;
           newPolyg.scaleX = scaleX;
@@ -345,7 +343,7 @@ export class ConcreteStrategyJSONImp implements Strategy {
           // todo: use export id value
 
           const newTriangle = new Triangle(
-            0,
+            id,
             new Coordinate(p1x, p1y),
             new Coordinate(p2x, p2y),
             new Coordinate(p3x, p3y)
@@ -396,6 +394,7 @@ export class XMLExporterVisitor implements Visitor {
   visitRectangle(rect: Rectangle): Element {
     const rectElement: Element = this.xmlDoc.createElement('rect');
 
+    rectElement.setAttribute('id', rect.getId().toString());
     rectElement.setAttribute('x', rect.coordinates[0].x.toString());
     rectElement.setAttribute('y', rect.coordinates[0].y.toString());
     rectElement.setAttribute('width', rect.width.toString());
@@ -411,6 +410,7 @@ export class XMLExporterVisitor implements Visitor {
   visitCircle(circle: Circle): Element {
     const circleElement: Element = this.xmlDoc.createElement('circle');
 
+    circleElement.setAttribute('id', circle.getId().toString());
     circleElement.setAttribute('x', circle.coordinates[0].x.toString());
     circleElement.setAttribute('y', circle.coordinates[0].y.toString());
     circleElement.setAttribute('radius', circle.radius.toString());
@@ -424,6 +424,8 @@ export class XMLExporterVisitor implements Visitor {
 
   visitPolygon(polyg: Polygon): Element {
     const polygElement: Element = this.xmlDoc.createElement('polyg');
+
+    polygElement.setAttribute('id', polyg.getId().toString());
 
     const numCoords = polyg.coordinates.length;
 
@@ -451,6 +453,7 @@ export class XMLExporterVisitor implements Visitor {
   visitTriangle(triangle: Triangle): Element {
     const triangleElement: Element = this.xmlDoc.createElement('triangle');
 
+    triangleElement.setAttribute('id', triangle.getId().toString());
     triangleElement.setAttribute('p1x', triangle.coordinates[0].x.toString());
     triangleElement.setAttribute('p1y', triangle.coordinates[0].y.toString());
     triangleElement.setAttribute('p2x', triangle.coordinates[1].x.toString());
