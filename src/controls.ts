@@ -2,7 +2,7 @@ import { ExprAbstractExpr } from './repl/expr-abstract-expr';
 import { SimpleDrawDocument } from './document';
 import { Render } from './render/render';
 import { Terminal } from './terminal';
-import {SVGRender} from "./render/svg-render";
+import { SVGRender } from './render/svg-render';
 
 export class Controls {
   private terminal: Terminal;
