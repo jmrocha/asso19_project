@@ -20,12 +20,18 @@ export class PaintAction implements UndoableAction<void> {
     this.shape.fillColor = this.oldFillColor;
   }
 
-  toJSON(docID: number): string {
+  setOldFillColor(fillColor: string) {
+    this.oldFillColor = fillColor;
+  }
+
+  toJSON(docID: number, toDo: boolean): string {
     return JSON.stringify({
       docID,
       type: 'PaintAction',
-      shape: JSON.stringify(this.shape),
+      doOrUndo: toDo ? 'do' : 'undo',
+      objectID: this.shape.getId(),
       fillColor: this.fillColor,
+      oldFillColor: this.oldFillColor,
     });
   }
 }

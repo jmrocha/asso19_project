@@ -8,12 +8,12 @@ import { Polygon } from 'shapes/polygon';
 export class CanvasRender extends Render {
   // tslint:disable-next-line:ban-ts-ignore
   // @ts-ignore
-  private ctx: CanvasRenderingContext2D;
+  protected ctx: CanvasRenderingContext2D;
   // tslint:disable-next-line:ban-ts-ignore
   // @ts-ignore
-  private canvas: HTMLCanvasElement = null;
+  protected canvas: HTMLCanvasElement = null;
 
-  constructor(name: string, private rootElem: HTMLElement) {
+  constructor(name: string, protected rootElem: HTMLElement) {
     super(name);
   }
 
@@ -36,75 +36,66 @@ export class CanvasRender extends Render {
 
   remove(obj: Shape): void {}
 
+  colorObject(s: Shape): void {
+    this.ctx.fillStyle = s.fillColor;
+    this.ctx.strokeStyle = s.strokeColor;
+    this.ctx.fill();
+    this.ctx.stroke();
+  }
+
   drawObjects(...objs: Shape[]): void {
     for (const shape of objs) {
       this.ctx.save();
       if (shape instanceof Circle) {
-        //transformation (REPEATED CODE)
-        if (shape.rotation !== 0) {
-          this.ctx.rotate((shape.rotation * Math.PI) / 180); //convert degrees to radians
-        }
-        if (shape.scaleX !== 1 || shape.scaleY !== 1) {
-          this.ctx.scale(shape.scaleX, shape.scaleY);
-        }
-        //end transformations
-
         this.ctx.beginPath();
-        this.ctx.arc(
+        this.ctx.ellipse(
           shape.coordinates[0].x,
           shape.coordinates[0].y,
-          shape.radius,
+          shape.radius * shape.scaleX,
+          shape.radius * shape.scaleY,
+          shape.rotation,
           0,
           2 * Math.PI
         );
         this.ctx.closePath();
-
-        this.ctx.fillStyle = shape.fillColor;
-        this.ctx.fill();
-        this.ctx.stroke();
       } else if (shape instanceof Rectangle) {
-        //transformation (REPEATED CODE)
-        if (shape.rotation !== 0) {
-          this.ctx.rotate((shape.rotation * Math.PI) / 180); //convert degrees to radians
-        }
-        if (shape.scaleX !== 1 || shape.scaleY !== 1) {
-          this.ctx.scale(shape.scaleX, shape.scaleY);
-        }
-        //end transformations
-
         this.ctx.rect(
           shape.coordinates[0].x,
           shape.coordinates[0].y,
-          shape.width,
-          shape.height
+          shape.width * shape.scaleX,
+          shape.height * shape.scaleY
         );
-
-        this.ctx.fillStyle = shape.fillColor;
-        this.ctx.fill();
-        this.ctx.stroke();
       } else if (shape instanceof Triangle || shape instanceof Polygon) {
-        //transformation (REPEATED CODE)
-        if (shape.rotation !== 0) {
-          this.ctx.rotate((shape.rotation * Math.PI) / 180); //convert degrees to radians
-        }
-        if (shape.scaleX !== 1 || shape.scaleY !== 1) {
-          this.ctx.scale(shape.scaleX, shape.scaleY);
-        }
-        //end transformations
-
         this.ctx.beginPath();
         this.ctx.moveTo(shape.coordinates[0].x, shape.coordinates[0].y);
+
         shape.coordinates.forEach((element, index) => {
           if (index > 0) {
-            this.ctx.lineTo(element.x, element.y);
+            let x = 0;
+            let y = 0;
+
+            if (shape.scaleX > 1) {
+              x = element.x * shape.scaleX - shape.coordinates[0].x;
+            } else if (shape.scaleX === 1) {
+              x = element.x;
+            } else {
+              x = (element.x + shape.coordinates[0].x) * shape.scaleX;
+            }
+
+            if (shape.scaleY > 1) {
+              y = element.y * shape.scaleY - shape.coordinates[0].y;
+            } else if (shape.scaleY === 1) {
+              y = element.y;
+            } else {
+              y = (element.y + shape.coordinates[0].y) * shape.scaleY;
+            }
+
+            this.ctx.lineTo(x, y);
           }
         });
         this.ctx.closePath();
-
-        this.ctx.fillStyle = shape.fillColor;
-        this.ctx.fill();
-        this.ctx.stroke();
       }
+      this.colorObject(shape);
       this.ctx.restore();
     }
   }

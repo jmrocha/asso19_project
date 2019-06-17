@@ -11,20 +11,27 @@ import { UndoManager } from './actions/undo-manager';
 import { Coordinate } from 'utilities/coordinate';
 import { ScaleAction } from 'actions/scale-action';
 import { PaintAction } from 'actions/paint-action';
+
 import { CreatePolygonAction } from './actions/create-polygon-action';
-import { MqttClient } from 'mqtt';
 import { SyncManager } from './utilities/sync-manager';
 import { ChangeRenderAction } from './actions/change-render-action';
+import { MqttClient } from 'mqtt';
+import {
+  ConcreteStrategyJSONExp,
+  ConcreteStrategyJSONImp,
+  ConcreteStrategyXMLExp,
+  ConcreteStrategyXMLImp,
+  Context,
+} from './persistence/exporter';
 
 export class SimpleDrawDocument {
   objects = new Array<Shape>();
-  undoManager = new UndoManager();
+  undoManager = new UndoManager(this);
   objId = 0;
   renders: Map<string, Render> = new Map<string, Render>();
   // tslint:disable-next-line:ban-ts-ignore
   // @ts-ignore
   currentRender: Render;
-  syncManager: SyncManager = new SyncManager(this.client, this.docID);
 
   constructor(public docID: number, public client: MqttClient, render: Render) {
     client.on('connect', () => {
@@ -90,23 +97,29 @@ export class SimpleDrawDocument {
   }
 
   remove(s: Shape): void {
-    this.objects = this.objects.filter(o => o !== s);
+    console.log('estou no remove com os objects: ' + JSON.stringify(s));
+    this.objects = this.objects.filter(o => o.getId() !== s.getId());
     this.renders.forEach(render => render.remove(s));
     this.draw();
   }
 
   add(r: Shape): void {
-    this.objects.push(r);
-    this.objId++;
+    let found = false;
+    for (let i = 0; i < this.objects.length; i++) {
+      if (this.objects[i].getId() === r.getId()) {
+        found = true;
+      }
+    }
+
+    if (!found) {
+      this.objects.push(r);
+      this.objId++;
+    }
   }
 
   do<T>(a: Action<T>): T {
     if ((a as UndoableAction<T>).undo !== undefined) {
       this.undoManager.onActionDone(a as UndoableAction<T>);
-
-      //sync manager
-      this.syncManager.actions.push(a as UndoableAction<T>);
-      this.syncManager.publish(this.syncManager.syncExistentClients());
     }
     return a.do();
   }
@@ -147,6 +160,32 @@ export class SimpleDrawDocument {
 
   paint(s: Shape, fillColor: string): void {
     return this.do(new PaintAction(this, s, fillColor));
+  }
+
+  export(action: string) {
+    const context = new Context();
+
+    if (action === 'XML') {
+      context.setStrategy(new ConcreteStrategyXMLExp());
+    }
+    if (action === 'JSON') {
+      context.setStrategy(new ConcreteStrategyJSONExp());
+    }
+
+    const result = context.executeStrategy(this.objects, this);
+  }
+
+  import(action: string, content: string) {
+    const context = new Context();
+
+    if (action === 'XML') {
+      context.setStrategy(new ConcreteStrategyXMLImp(content));
+    }
+    if (action === 'JSON') {
+      context.setStrategy(new ConcreteStrategyJSONImp(content));
+    }
+
+    const result = context.executeStrategy(this.objects, this);
   }
 
   getShapeById(id: number): Shape {

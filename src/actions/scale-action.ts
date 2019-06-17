@@ -25,13 +25,21 @@ export class ScaleAction implements UndoableAction<void> {
     this.shape.scaleY = this.oldScaleY;
   }
 
-  toJSON(docID: number): string {
+  setOldScaling(oldScaleX: number, oldScaleY: number) {
+    this.oldScaleX = oldScaleX;
+    this.oldScaleY = oldScaleY;
+  }
+
+  toJSON(docID: number, toDo: boolean): string {
     return JSON.stringify({
       docID,
       type: 'ScaleAction',
-      shape: JSON.stringify(this.shape),
+      doOrUndo: toDo ? 'do' : 'undo',
+      objectID: this.shape.getId(),
       scaleX: this.scaleX,
       scaleY: this.scaleY,
+      oldScaleX: this.oldScaleX,
+      oldScaleY: this.oldScaleY,
     });
   }
 }

@@ -14,10 +14,11 @@ export class CreateRectangleAction extends CreateShapeAction<Rectangle> {
     super(doc, new Rectangle(id, x, y, width, height));
   }
 
-  toJSON(docID: number): string {
+  toJSON(docID: number, toDo: boolean): string {
     return JSON.stringify({
       docID,
       type: 'CreateRectangleAction',
+      doOrUndo: toDo ? 'do' : 'undo',
       objectID: this.shape.getId(),
       x: this.x,
       y: this.y,

@@ -1,4 +1,4 @@
-# Simple Draw
+﻿# Simple Draw
 
 [![Code Style: Google](https://img.shields.io/badge/code%20style-google-blueviolet.svg)](https://github.com/google/gts)
 
@@ -17,15 +17,25 @@ Run:
 npm start
 ```
 
+## Development
+Having the dependencies installed, run:
+```bash
+npm run dev
+```
+
 ## Functionalities
-- SimpleDraw is based on the notion of documents;
-- Documents are rendered either in SVG or HTMLCanvas;
-- Multiple views of the same model;
-- Two interaction modes: point-n-click and REPLs;
-- Support persistence in multiple formats (TXT, XML, BIN);
-- Extendible with different objects (triangles, arrows, ...);
-- Extendible with new tools (rotate, translate, grid, ...);
-- Support (un)limited Undo / Redo of all operations;
+- [x] SimpleDraw is based on the notion of documents;
+- [x] Documents are rendered either in SVG or HTMLCanvas;
+- [x] Multiple views of the same model;
+- [x] Two interaction modes: point-n-click and REPLs;
+- [x] Support persistence in multiple formats (XML and JSON);
+- [x] Extendible with different objects (triangles, arrows, ...);
+- [x] Extendible with new tools (rotate, translate, grid, ...);
+- [x] Support (un)limited Undo / Redo of all operations;
+- [ ] Management of multiple documents;
+- [ ] Support of new tools with plugins;
+- [ ] Interactivity to manipulate objects created;
+- [ ] Support for group and layers;
 
 ## Authors
 
@@ -33,19 +43,11 @@ npm start
 - João Rocha;
 - Sérgio Salgado.
 
-## Logical View
-
-### Application Class Diagram
-
-![Application Class Diagram](https://www.plantuml.com/plantuml/png/VLHRJiCm4FptANA1z0G8jKeH4g8WDQNYT-iknLBYHFQMXyJXCOxjhfFGJy_ClYTPMW93vxOHGcb2ymOIYotg8neX6x2sgFVtsRi2_G4sG56Zshx1jO7FTIVFBMeAn0vDgpHasUjtw96zLv9KfsEgoY0GLih81WF3YIrA0drA71mi6P1KS96la0Nl36ZRE2f3N_Insu26avlaqiyV2eTHzLNVCybUMKKT3xhxwZj3jUk5yFGTWbutZxFuG_tyD2A4xxaeozkKF5SKDp-BnLLkMcrEDLVR3UShpvmnKkcG4GW6YC_9ED4rGs9_SkuS1ejfMS_ow_mZYTQPdDtDMfPpNhgg79ihATpUfixYxDXVhFSq2_DKChjlRLZ3WAGMmcv4M9UlSlaKEPfza8ED1fmbP_2aWbYwKFS7-0K0)
-
-### Architecture Style
-![Architecture Style](https://www.plantuml.com/plantuml/png/SoWkIImgAStDuUBYKW22jAB4t5G59UUSpDIy4YM5Qh0W24I7UiQ2ERKe2eDJYyfIYr0KXgScAK24uHguGBeLT7NjK6GLh1GyGa82WD8EgNafG3S00000)
-
 ## Decision Points
 
-### REPL
-We want to be able to execute commands such as:
+### Read Eval Print Loop (REPL)
+Users should be able to interact with our app through commands, like in a shell.
+An example of this commands is:
 ```
 draw rect 10 10 10 10   // draws a rectangle at point (10, 10) with width 10 and height 10
 draw circle 10 10 10    // draws a square at point (10, 10) with radius 10
@@ -67,7 +69,7 @@ use 2                     // use the document with id 2
 render SVG                // change render to SVG
 help                      // shows possible commands
 ```
-And to support concatenation of operations such as:
+Including the concatenation of operations:
 ```
 draw rect 10 10 10 10 and draw circle 10 10 10 and export json
 ```
@@ -102,13 +104,244 @@ int -> [0-9]+
 float -> [0-9]+\.[0-9]+
 ```
 
-The **Interpreter pattern** tells us how to solve this kind of problem:
+#### Interpreter Pattern
+##### Problem in Context
+Having the grammar defined, the next step is to implement it, and this implies
+parsing, validating and interpreting several commands. The problem lies in the
+way we divide the logic to perform this steps. An easy solution would be to
+create a single class that has all the responsibility of interpreting the language,
+but the code would quickly become 'spaghetti' code... Adding or fixing a rule in
+the future would be an hard task because we'd need to swim in an excessive number
+of lines of code.
 
-![Pattern Diagram](https://www.plantuml.com/plantuml/png/ZP912i8m44NtESM0cuhs1YuKwqvGgXSOwr0YILkIgGhgtQrjfJPDmMp2_7dv-HEoj8o6Iwq4IrO4yMQ_XRL2Qo6Ic1hKGk39ii648QdrLLjkxeM1Xu1gXGUf2qMHmLkK9wMcZC4Ef0QDAJkJ0LDljJJfEVuMmL--S-XvJclJMUKYinJeYgf4fg2jPLQK_4M8cvE1O_0IefdrSurdtWxuY0xGDNUdosWl9frVQRHz9ACzpPwqU8RX8A47SJDw42UfXnZczK1kQY6MrOjMl-iD)
+##### Pattern Description
+The Interpreter pattern suggests modeling the language domain with a recursive grammar,
+where each production in the grammar is either a 'composite' (a production that
+produces non-terminal symbols), or a terminal symbol. The Interpreter relies on the recursive
+traversal of the Composite pattern to interpret the commands it is asked to process.
+
+##### Implementation Details
+The abstract class `AbstractExpr` represents any expression to be interpreted, and the method `evaluate(input)` will be implemented by the its derived classes, that will delegate the work accordingly to the current rule being processed.
+```typescript
+// The base class for all expressions
+export abstract class AbstractExpr {
+  protected constructor(
+    protected simpleDrawDocument: SimpleDrawDocument,
+    protected render: Render
+  ) {}
+
+  // each rule will know how to process the corresponding expression
+  abstract evaluate(input: string): string;
+}
+
+// A class that knows how to interpret a 'draw' production
+export class DrawAbstractExpr extends AbstractExpr {
+  constructor(simpleDrawDocument: SimpleDrawDocument, render: Render) {
+    super(simpleDrawDocument, render);
+  }
+
+  evaluate(input: string): string {
+    const res = new ObjAbstractExpr(
+      this.simpleDrawDocument,
+      this.render
+    ).evaluate(input);
+    this.simpleDrawDocument.draw();
+    return res;
+  }
+}
+
+// A class that actually knows how to draw a rectangle
+export class RectObjAbstractExpr extends AbstractExpr {
+  constructor(simpleDrawDocument: SimpleDrawDocument, render: Render) {
+    super(simpleDrawDocument, render);
+  }
+
+  evaluate(input: string): string {
+    const exprs = input.split('rect')[1].split(' ');
+
+    let x, y, width, height;
+
+    x = Number(exprs[1]);
+    y = Number(exprs[2]);
+    width = Number(exprs[3]);
+    height = Number(exprs[4]);
+
+    const action = this.simpleDrawDocument.createRectangle(x, y, width, height);
+
+    return `Created rectangle with id ${action.getId()}`;
+  }
+}
+```
+##### Consequences
+- The code becomes more complex;
+- Having to much rules, implies having the same amount of classes;
+- Extending, maintaining and testing becomes easier because the logic for each
+rule is encapsulated.
+
+### SVG and HTMLCanvas rendering with different modes
+
+In SimpleDraw, we want users to be able to pick between different rendering modes during runtime. This feature should not affect the view of other users in the session and must be controlled by pressing buttons on the top bar of the screen. We planned to be able to render the document in two formats: SVG and HTMLCanvas and each of these modes should have different 'sub-modes' to change between. In our system, we enable the users to change between normal rendering (rendering of the colors as they are originally) or inverted color rendering, where we render all the colors of the objects invertedly (black becomes white, etc.).
+
+![](https://i.gyazo.com/a5712466595ae994ef78cacf5ac18919.gif)
+
+#### Strategy Pattern
+
+##### Problem in Context
+
+The available rendering modes should be able to render the same document in the same way, despite the different APIs used. The way a rectangle is created in SVG differs from the way a rectangle is created in HTMLCanvas and with the increase of the number of rendering APIs we support, maintaining logic to render a rectangle in multiple different APIs gets harder and harder if the code is not structured properly. This problem only gets bigger if we introduce more objects to draw on top of it, turning otherwise simple code into a huge pile of unreadable and unmaintainable code.
+So, the solution here is to create classes that do pretty much the same, but in different ways and interacting with different APIs.
+
+##### Pattern Description
+
+According to refactoring.guru, the **Strategy pattern** suggests that you take a class that does something specific in a lot of different ways and extract all of these algorithms into separate classes called strategies.
+The original class, called context, must have a field for storing a reference to one of the strategies. The context delegates the work to a linked strategy object instead of executing it on its own.
+The context isn’t responsible for selecting an appropriate algorithm for the job. Instead, the client passes the desired strategy to the context. In fact, the context doesn’t know much about strategies. It works with all strategies through the same generic interface, which only exposes a single method for triggering the algorithm encapsulated within the selected strategy.
+
+##### Implementation Details
+
+To apply the **Strategy Pattern**, the SimpleDrawDocument class keeps information about the available 'strategies' (render modes) it can change between and then, by using the buttons present on top of the screen, the user is able to select which strategy the document is using to render itself currently.
+
+Rendering strategies being registered on the document.
+```typescript
+const defaultRender = new SVGRender('svg', canvas);
+const svgInvertedRender = new SVGInvertedRender('svg-inverted', canvas);
+const canvasRender = new CanvasRender('canvas', canvas);
+const canvasInvertedRender = new CanvasInvertedRender(
+  'canvas-inverted',
+  canvas
+);
+export const simpleDrawDocument = new SimpleDrawDocument(
+  docID,
+  client,
+  defaultRender
+);
+const controls = new Controls(simpleDrawDocument, defaultRender);
+
+simpleDrawDocument.registerRender(canvasRender);
+simpleDrawDocument.registerRender(canvasInvertedRender);
+simpleDrawDocument.registerRender(svgInvertedRender);
+```
+
+Strategy changing 'on the fly' by click-listeners on the buttons
+```typescript
+this.svgBtn.onclick = () => {
+  this.simpleDrawDocument.changeRender('svg');
+};
+
+this.svgInvertedBtn.onclick = () => {
+  this.simpleDrawDocument.changeRender('svg-inverted');
+};
+
+this.canvasBtn.onclick = () => {
+  this.simpleDrawDocument.changeRender('canvas');
+};
+
+this.canvasInvertedBtn.onclick = () => {
+  this.simpleDrawDocument.changeRender('canvas-inverted');
+};
+```
+
+##### Consequences
+
+By using the **Strategy Pattern**, we are able to swap rendering algorithms on the spot, at runtime. The isolation between the implementation of the algorithm and the document code works great and proves to be greatly scalable, because more different rendering algorithms can be added to the system without interfering with previously existent ones.
+One counterpart that can be made is that, with only having few strategies to choose from, the addition of more classes to the mix can bloat the code, but we believe that the choosing of this pattern helps the code in the long run, without overcomplicating it, which leads to a greater maintainability.
+
+#### Template Method
+
+##### Problem in Context
+
+The implementation of different rendering modes (normal and inverted colors, for example) in each rendering algorithm used, means that more strategies need to be implemented and more `draw()` methods need to be created. But our rendering modes only change the rendering of colors the shapes contain, why should this strategy implement a `draw()` method, resulting in duplicated 'unused' code and be aware on how to draw the objects it intends, when it only wants to change the colors (a portion of the drawing algorithm)? Wouldn't it be easier if the drawing algorithm was divided into parts and each of these alternative strategies only override the necessary methods?
+
+##### Pattern Description
+
+According to refactoring.guru, the **Template Method** pattern suggests that you break down an algorithm into a series of steps, turn these steps into methods, and put a series of calls to these methods inside a single “template method.” The steps may either be abstract, or have some default implementation. To use the algorithm, the client is supposed to provide its own subclass, implement all abstract steps, and override some of the optional ones if needed (but not the template method itself).
+
+##### Implementation Details
+
+Lets pick the example of HTMLCanvas rendering. In our CanvasRender class, a `drawObjects()` method is responsible of rendering the array of objects in the document, creating the HTMLCanvas elements accordingly.
+
+```typescript
+drawObjects(...objs: Shape[]): void {
+	for (const shape of objs) {
+	  this.ctx.save();
+	  if (shape instanceof Circle) {
+		this.ctx.beginPath();
+		this.ctx.ellipse(
+		  shape.coordinates[0].x,
+		  shape.coordinates[0].y,
+		  shape.radius * shape.scaleX,
+		  shape.radius * shape.scaleY,
+		  shape.rotation,
+		  0,
+		  2 * Math.PI
+		);
+		this.ctx.closePath();
+
+	  } else if (shape instanceof Rectangle) {
+		this.ctx.rect(
+		  shape.coordinates[0].x,
+		  shape.coordinates[0].y,
+		  shape.width * shape.scaleX,
+		  shape.height * shape.scaleY
+		);
+	  } else if (shape instanceof Triangle || shape instanceof Polygon) {
+		this.ctx.beginPath();
+		this.ctx.moveTo(shape.coordinates[0].x, shape.coordinates[0].y);
+
+		shape.coordinates.forEach((element, index) => {
+		  if (index > 0) {
+			let x = 0;
+			let y = 0;
+
+			if (shape.scaleX > 1) {
+			  x = element.x * shape.scaleX - shape.coordinates[0].x;
+			} else if (shape.scaleX === 1) {
+			  x = element.x;
+			} else {
+			  x = (element.x + shape.coordinates[0].x) * shape.scaleX;
+			}
+
+			if (shape.scaleY > 1) {
+			  y = element.y * shape.scaleY - shape.coordinates[0].y;
+			} else if (shape.scaleY === 1) {
+			  y = element.y;
+			} else {
+			  y = (element.y + shape.coordinates[0].y) * shape.scaleY;
+			}
+
+			this.ctx.lineTo(x, y);
+		  }
+		});
+		this.ctx.closePath();
+	  }
+	  this.colorObject(shape);
+	  this.ctx.restore();
+	}
+}
+```
+
+This CanvasRender strategy renders the 'normal' colors of the object inside the `colorObject(s: Shape)` method above. What we did, in order to prevent unnecessary duplicated code in the related strategy CanvasInvertedRender was for this class to override the `colorObject(s: Shape)` method, making the code much more readable and easy to maintainability, as the logic for 'drawing' the shapes is maintained between strategies.
+
+```typescript
+colorObject(s: Shape): void {
+	this.ctx.fillStyle = this.calculateInvertedColor(s.fillColor);
+	this.ctx.strokeStyle = this.calculateInvertedColor(s.strokeColor);
+	this.ctx.fill();
+	this.ctx.stroke();
+}
+```
+
+##### Consequences
+
+As the `drawObjects()` method is relatively large (and will only get larger with the introduction of more shapes), we are able to put the drawing methods inside the main classes (which render 'normally') SVGRender and CanvasRender, preventing duplicated code and the shape drawing logic being in classes that have nothing to do with it. This, however, comes with a tradeoff, as the code gets bigger and the more different rendering modes are implemented, the `drawObjects()` method needs to be fractured in more steps, making it harder to maintain.
 
 ### Undo/Redo Actions
 
 In SimpleDraw, we want users to be able to do a multitude of actions, such as creating various types of shapes and operate over them with algorithms such as translation, scale and rotation. In addition of performing such actions, users should be able to undo and redo these actions in the order they were performed. How should we design the program to perform these actions successfully? Our solution is that, by applying the **Command** pattern and it's respective characteristic functions (`do()` and `undo()`), we can be able to create a structure that supports the concept of performing actions in an easily scalable and maintainable format.
+
+![](https://i.gyazo.com/7a9fe196f04cc9b55bd9c86d19f5afc7.gif)
+
+![](https://i.gyazo.com/c3104adbcd5461b7a5074e6e7e370a27.gif)
 
 #### Command Pattern
 
@@ -182,6 +415,8 @@ By using the **Command** pattern, features such as the multiuser take a hit on i
 
 We want our users to be able to share a SimpleDraw session with their friends and that everyone in the session is updated real-time with everyone's changes to the document. Changes that are made by one user cannot be undone/redone by another user, as the do/undo action stacks are user-bound, to prevent user frustration and work flow during the system's usage.
 In order to share sessions and to enable communication between every browser in the session, we adopted the usage of a **publish-subscribe** architecture, which uses a publicly available broker that manages the receiving and sending of the session messages to subscriber browsers. These messages are then parsed client-side and then the according action is reproduced onto everyone's screen.
+
+![](https://i.gyazo.com/c12fb18532bef6f64e232e4cd43470b1.gif)
 
 #### Factory Pattern
 
@@ -263,7 +498,7 @@ On the other side, the addition of these new actions means the creation of more 
 
 ##### Problem in Context
 
-For this feature, we want the application to be able to support persistence of the data in more than one format. We also want the user to be able to import data to the application, which translates into objects to be drawn. 
+For this feature, we want the application to be able to support persistence of the data in more than one format. We also want the user to be able to import data to the application, which translates into objects to be drawn.
 Therefore, the application should be capable of exporting the objects created by the user to a file, which can be an XML file or a JSON file, and also capable of importing an XML or JSON file in order to load data to the program.
 
 In order to solve this problem, the program must implement two algorithms, one for each of the types of file to be handled, both for the exporting and for the importing. Then, when the user requests the export or import feature, the correct algorithm must be selected to be executed. This problem was handled with the use of the **Strategy Pattern**.
@@ -335,7 +570,117 @@ So, for the different shapes of the program (rectangle, circle, triangle, polygo
 
 ##### Implementation Details
 
-When it comes to implementation, at first, a simple class was created, *Visitor*, which can be seen bellow. 
+When it comes to implementation, at first, a simple class was created, *Visitor*, which can be seen bellow.
+
+```typescript
+export interface Visitor {
+  visitRectangle(rect: Rectangle): Element;
+  visitCircle(circle: Circle): Element;
+  visitPolygon(polyg: Polygon): Element;
+  visitTriangle(triangle: Triangle): Element;
+}
+```
+
+Also, in each of the necessary classes (*Rectangle*, *Triangle*, *Circle*, *Polygon*, *Shape*), an aditional *accept()* method was created to handle the additional functionality.
+
+```typescript
+accept(visitor: Visitor): Element {
+    return visitor.visitRectangle(this);
+  }
+```
+
+The Visitor class' methods are then implemented by the subclass *XMLExporterVisitor* (https://github.com/jmrocha/asso19_project/blob/feature/ImportAndExport/src/persistence/exporter.ts#L380).
+This way, in order to translate a shape's attributes into data, it is only necessary to execute it's *accept()* method, as seen in the below code:
+
+```typescript
+const visitor = new XMLExporterVisitor(xmlDoc);
+
+    for (const shape of objects) {
+      storedShapes.appendChild(shape.accept(visitor));
+    }
+```
+
+##### Consequences
+
+The **Command pattern** helps us solving this problem, as we can encapsulate every action the user can take onto an object that stores the context the action needs in order to be executed or undone.
+
+### Export / Import
+
+##### Problem in Context
+
+For this feature, we want the application to be able to support persistence of the data in more than one format. We also want the user to be able to import data to the application, which translates into objects to be drawn.
+Therefore, the application should be capable of exporting the objects created by the user to a file, which can be an XML file or a JSON file, and also capable of importing an XML or JSON file in order to load data to the program.
+
+In order to solve this problem, the program must implement two algorithms, one for each of the types of file to be handled, both for the exporting and for the importing. Then, when the user requests the export or import feature, the correct algorithm must be selected to be executed. This problem was handled with the use of the **Strategy Pattern**.
+
+Furthermore, when it comes to the export feature, it is necessary to analyse each object/shape drawn in the canvas and coherently transform it into data. Because each type of object/shape is different, it is necessary to process each object differently, based on its type. In order to solve this problem, we used the **Visitor Pattern**.
+
+#### Strategy Pattern
+
+##### Pattern Description
+
+According to Wikipedia, the "Strategy Pattern is a behavioral software design pattern that enables selecting an algorithm at runtime". Therefore, the Strategy pattern allows us to define a family of algorithms capable of doing a especific task, put them into separate classes, and make their objets interchangable.
+So, both for the export and the import features, two different algorithms (classes) were implemented, one for the XML file type, and another for the JSON file type.
+
+##### Implementation Details
+
+When it comes to implementation, at first, two simple classes were created, *Context* and *Strategy*, which can be seen bellow.
+
+```typescript
+export class Context {
+  private strategy!: Strategy;
+
+  setStrategy(strategy: Strategy) {
+    this.strategy = strategy;
+  }
+
+  executeStrategy(objects: Shape[]) {
+    return this.strategy.execute(objects);
+  }
+}
+```
+
+
+```typescript
+export interface Strategy {
+  execute(objects: Shape[]): void;
+}
+```
+
+The *Context* class is a simple class that handles which algorithm to use and directs to its execution. The *Strategy* class has only an abstract *execute()* method, which is implemented by its subclasses *ConcreteStrategyXMLExp*, *ConcreteStrategyJSONExp*, *ConcreteStrategyXMLImp*, *ConcreteStrategyJSONImp*. These are the ones that end up defining the different algorithms to be used (which can be seen here: https://github.com/jmrocha/asso19_project/blob/feature/ImportAndExport/src/persistence/exporter.ts#L17).
+This way, in order to perform, say, an export, it is only necessary to define the "strategy" to be used and then execute it, as seen in the below code:
+
+```typescript
+export(action: string) {
+    const context = new Context();
+
+    if (action === 'XML') {
+      context.setStrategy(new ConcreteStrategyXMLExp());
+    }
+    if (action === 'JSON') {
+      context.setStrategy(new ConcreteStrategyJSONExp());
+    }
+
+    context.executeStrategy(this.objects);
+  }
+```
+
+##### Consequences
+
+When it comes to consequences, the **Stratey Pattern** brought advantages: it allowed us to swap between algorithms at runtime, it allowed us to isolate the implementation details of the algorithms from the code that uses it, and it also allows for extensibility purposes, as it is possible to introduce new strategies (algorithms) without having to change the context. As for disadvantages, because we only implemented two different algorithms (XML and JSON), one can argue that the new classes introduced because of the pattern overcomplicate the program.
+
+
+#### Visitor Pattern
+
+##### Pattern Description
+
+According to Wikipedia, "The visitor design pattern is a way of separating an algorithm from an object structure on which it operates.
+In essence, the visitor allows adding new virtual functions to a family of classes, without modifying the classes. Instead, a visitor class is created that implements all of the appropriate specializations of the virtual function". Therefore, the **Visitor Pattern** allows us to extend a classe's functionality by creating functions outside of said class.
+So, for the different shapes of the program (rectangle, circle, triangle, polygon), a visitor sub-class was implemented, which implements the needed functionality (translate the shape's attributes into data).
+
+##### Implementation Details
+
+When it comes to implementation, at first, a simple class was created, *Visitor*, which can be seen bellow.
 
 ```typescript
 export interface Visitor {
