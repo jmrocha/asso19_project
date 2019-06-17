@@ -12,12 +12,15 @@ export class Controls {
   private readonly redoBtn: HTMLElement;
   private readonly svgBtn: HTMLElement;
   private readonly canvasBtn: HTMLElement;
-  private readonly importBtn: HTMLElement;
+  private readonly importXMLBtn: HTMLElement;
+  private readonly importJSONBtn: HTMLElement;
   private readonly exportXMLBtn: HTMLElement;
   private readonly exportJSONBtn: HTMLElement;
   private readonly normalViewBtn: HTMLElement;
   private readonly invertedViewBtn: HTMLElement;
   private fileUploadForm: HTMLElement;
+  private importAction = '';
+
   constructor(
     private simpleDrawDocument: SimpleDrawDocument,
     private render: Render
@@ -30,7 +33,12 @@ export class Controls {
     this.redoBtn = document.getElementById('redo-btn') as HTMLElement;
     this.svgBtn = document.getElementById('svg-btn') as HTMLElement;
     this.canvasBtn = document.getElementById('canvas-btn') as HTMLElement;
-    this.importBtn = document.getElementById('import-btn') as HTMLElement;
+    this.importXMLBtn = document.getElementById(
+      'import-xml-btn'
+    ) as HTMLElement;
+    this.importJSONBtn = document.getElementById(
+      'import-json-btn'
+    ) as HTMLElement;
     this.exportXMLBtn = document.getElementById(
       'export-xml-btn'
     ) as HTMLElement;
@@ -49,11 +57,29 @@ export class Controls {
     console.assert(this.redoBtn);
     console.assert(this.svgBtn);
     console.assert(this.canvasBtn);
-    console.assert(this.importBtn);
+    console.assert(this.importXMLBtn);
+    console.assert(this.importJSONBtn);
     console.assert(this.exportXMLBtn);
     console.assert(this.exportJSONBtn);
 
     this.bindEvents();
+  }
+
+  fileOnChange(event: Event) {
+    // tslint:disable-next-line:ban-ts-ignore
+    // @ts-ignore
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = e => {
+      // tslint:disable-next-line:ban-ts-ignore
+      // @ts-ignore
+      const fileString = e.target.result;
+      //Import File
+      this.simpleDrawDocument.import(this.importAction, fileString);
+    };
+
+    reader.readAsText(file);
   }
 
   bindEvents() {
@@ -72,6 +98,10 @@ export class Controls {
         }
       }
     });
+
+    this.fileUploadForm.onchange = e => this.fileOnChange(e);
+
+    //this.fileUploadFormJSON.onchange = e => this.fileOnChange(e, 'JSON');
 
     // tslint:disable-next-line:ban-ts-ignore
     // @ts-ignore
@@ -99,19 +129,32 @@ export class Controls {
 
     // tslint:disable-next-line:ban-ts-ignore
     // @ts-ignore
-    this.importBtn.onclick = () => {
+    this.importXMLBtn.onclick = () => {
       // tslint:disable-next-line:ban-ts-ignore
       // @ts-ignore
+      this.importAction = 'XML';
+      this.fileUploadForm.click();
+    };
+
+    this.importJSONBtn.onclick = () => {
+      // tslint:disable-next-line:ban-ts-ignore
+      // @ts-ignore
+      this.importAction = 'JSON';
       this.fileUploadForm.click();
     };
 
     // tslint:disable-next-line:ban-ts-ignore
     // @ts-ignore
-    this.exportXMLBtn.onclick = () => {};
+    this.exportXMLBtn.onclick = () => {
+      this.simpleDrawDocument.export('XML');
+    };
 
     // tslint:disable-next-line:ban-ts-ignore
     // @ts-ignore
-    this.exportJSONBtn.onclick = () => {};
+
+    this.exportJSONBtn.onclick = () => {
+      this.simpleDrawDocument.export('JSON');
+    };
 
     this.normalViewBtn.onclick = () => {
       if (this.simpleDrawDocument.currentRender instanceof SVGRender) {

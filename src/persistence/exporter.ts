@@ -3,7 +3,6 @@ import { Circle } from 'shapes/circle';
 import { Polygon } from 'shapes/polygon';
 import { Triangle } from 'shapes/triangle';
 import { Shape } from 'shapes/shape';
-import { Tools } from 'utilities/tools';
 import { SimpleDrawDocument } from 'document';
 import { SVGRender } from 'render/svg-render';
 import { Coordinate } from 'utilities/coordinate';
@@ -12,11 +11,11 @@ import { connect } from 'mqtt';
 //Strategy Pattern
 
 export interface Strategy {
-  execute(objects: Shape[]): void;
+  execute(objects: Shape[], currentDocument: SimpleDrawDocument): void;
 }
 
 export class ConcreteStrategyXMLExp implements Strategy {
-  execute(objects: Shape[]): void {
+  execute(objects: Shape[], currentDocument: SimpleDrawDocument): void {
     const xmlDoc: XMLDocument = document.implementation.createDocument(
       '',
       '',
@@ -45,7 +44,7 @@ export class ConcreteStrategyXMLExp implements Strategy {
 }
 
 export class ConcreteStrategyJSONExp implements Strategy {
-  execute(objects: Shape[]): void {
+  execute(objects: Shape[], currentDocument: SimpleDrawDocument): void {
     const xmlDoc: XMLDocument = document.implementation.createDocument(
       '',
       '',
@@ -70,7 +69,7 @@ export class ConcreteStrategyJSONExp implements Strategy {
     //Download File
     const fileSaver = require('file-saver');
     const blob = new Blob([result], { type: 'data:text/plain;charset=utf-8' });
-    fileSaver.saveAs(blob, 'newJsonDoc.xml');
+    fileSaver.saveAs(blob, 'newJsonDoc.json');
   }
 }
 
@@ -81,29 +80,11 @@ export class ConcreteStrategyXMLImp implements Strategy {
 
   private fileContent: string;
 
-  execute(objects: Shape[]): void {
-    //const importedXML = this.fileContent;
-
-    const importedXML =
-      '<shapes><rect x="400" y="400" width="50" height="50" fillColor="red" rotation="0" scaleX="1.5" scaleY="1.5"/><circle x="200" y="200" radius="50" fillColor="white" rotation="0" scaleX="1" scaleY="1"/><circle x="500" y="200" radius="50" fillColor="white" rotation="0" scaleX="1" scaleY="1"/></shapes>';
-
-    const importedXMLwithTriangle =
-      '<shapes><rect x="400" y="400" width="50" height="50" fillColor="red" rotation="0" scaleX="1.5" scaleY="1.5"/><circle x="200" y="200" radius="50" fillColor="white" rotation="0" scaleX="1" scaleY="1"/><circle x="500" y="200" radius="50" fillColor="white" rotation="0" scaleX="1" scaleY="1"/><triangle p1x="100" p1y="100" p2x="200" p2y="200" p3x="100" p3y="200" fillColor="white" rotation="0" scaleX="1" scaleY="1"/></shapes>';
-
-    const importedXMLwithAllShapes =
-      '<shapes><rect x="400" y="400" width="50" height="50" fillColor="red" rotation="0" scaleX="1.5" scaleY="1.5"/><circle x="200" y="200" radius="50" fillColor="white" rotation="0" scaleX="1" scaleY="1"/><circle x="500" y="200" radius="50" fillColor="white" rotation="0" scaleX="1" scaleY="1"/><triangle p1x="100" p1y="100" p2x="200" p2y="200" p3x="100" p3y="200" fillColor="white" rotation="0" scaleX="1" scaleY="1"/><polyg p1x="400" p1y="400" p2x="500" p2y="500" p3x="400" p3y="500" p4x="300" p4y="400" numCoords="4" fillColor="white" rotation="0" scaleX="1" scaleY="1"/></shapes>';
-
-    /*
-    const parseXML = require('xml-parse-from-string');
-    const xmldoc = parseXML(importedXML);
-
-    console.log('Parsing XML:\n\nXml String:\n' + importedXML);
-    console.log('XML document:');
-    console.log(xmldoc);
-    */
+  execute(objects: Shape[], currentDocument: SimpleDrawDocument): void {
+    const importedXMLFile = this.fileContent;
 
     const xmlReader = require('xml-reader');
-    const ast = xmlReader.parseSync(importedXMLwithAllShapes);
+    const ast = xmlReader.parseSync(importedXMLFile);
 
     //After importing, we search the shapes in the XML and draw them
     const xmlQuery = require('xml-query');
@@ -111,6 +92,8 @@ export class ConcreteStrategyXMLImp implements Strategy {
       .find('shapes')
       .children()
       .size();
+
+    const newShapes = new Array<Shape>();
 
     // todo: use exported values
     const client = connect(
@@ -120,17 +103,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
         clean: false,
       }
     );
-
-    const canvas = document.getElementById('canvas') as HTMLElement;
-    const defaultRender = new SVGRender('svg', canvas);
-
-    // todo: use exported values
-    const newDoc = new SimpleDrawDocument(
-      0,
-      client,
-      new SVGRender('svg', canvas)
-    );
-
+    
     for (let i = 0; i < numChildren; i++) {
       const eachShape = xmlQuery(ast)
         .find('shapes')
@@ -140,6 +113,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
       const eachShapeName = eachShape['name'];
       const eachShapeAttributes = eachShape.attributes;
 
+      const id = eachShapeAttributes['id'];
       const fillColor = eachShapeAttributes['fillColor'];
       const rotation = eachShapeAttributes['rotation'];
       const scaleX = eachShapeAttributes['scaleX'];
@@ -152,14 +126,13 @@ export class ConcreteStrategyXMLImp implements Strategy {
           const height = eachShapeAttributes['height'];
           const width = eachShapeAttributes['width'];
 
-          // todo: use export id value
-          const newRect = new Rectangle(0, coordX, coordY, width, height);
+          const newRect = new Rectangle(id, coordX, coordY, width, height);
           newRect.fillColor = fillColor;
           newRect.rotation = rotation;
           newRect.scaleX = scaleX;
           newRect.scaleY = scaleY;
 
-          newDoc.add(newRect);
+          newShapes.push(newRect);
           break;
         }
         case 'circle': {
@@ -167,14 +140,13 @@ export class ConcreteStrategyXMLImp implements Strategy {
           const coordY = eachShapeAttributes['y'];
           const radius = eachShapeAttributes['radius'];
 
-          // todo: use export id value
-          const newCircle = new Circle(0, coordX, coordY, radius);
+          const newCircle = new Circle(id, coordX, coordY, radius);
           newCircle.fillColor = fillColor;
           newCircle.rotation = rotation;
           newCircle.scaleX = scaleX;
           newCircle.scaleY = scaleY;
 
-          newDoc.add(newCircle);
+          newShapes.push(newCircle);
           break;
         }
         case 'polyg': {
@@ -195,14 +167,13 @@ export class ConcreteStrategyXMLImp implements Strategy {
             coordsArray.push(coord);
           }
 
-          // todo: use export id value
-          const newPolyg = new Polygon(0, ...coordsArray);
+          const newPolyg = new Polygon(id, ...coordsArray);
           newPolyg.fillColor = fillColor;
           newPolyg.rotation = rotation;
           newPolyg.scaleX = scaleX;
           newPolyg.scaleY = scaleY;
 
-          newDoc.add(newPolyg);
+          newShapes.push(newPolyg);
           break;
         }
         case 'triangle': {
@@ -213,9 +184,8 @@ export class ConcreteStrategyXMLImp implements Strategy {
           const p3x = eachShapeAttributes['p3x'];
           const p3y = eachShapeAttributes['p3y'];
 
-          // todo: use export id value
           const newTriangle = new Triangle(
-            0,
+            id,
             new Coordinate(p1x, p1y),
             new Coordinate(p2x, p2y),
             new Coordinate(p3x, p3y)
@@ -226,7 +196,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
           newTriangle.scaleX = scaleX;
           newTriangle.scaleY = scaleY;
 
-          newDoc.add(newTriangle);
+          newShapes.push(newTriangle);
           break;
         }
         default: {
@@ -235,7 +205,8 @@ export class ConcreteStrategyXMLImp implements Strategy {
       }
     }
 
-    newDoc.draw();
+    currentDocument.objects = newShapes;
+    currentDocument.draw();
   }
 }
 
@@ -246,19 +217,13 @@ export class ConcreteStrategyJSONImp implements Strategy {
 
   private fileContent: string;
 
-  execute(objects: Shape[]): void {
-    //const importedJSON = fileContent;
-
-    const importedJSON =
-      '{"elements":[{"type":"element","name":"shapes","elements":[{"type":"element","name":"rect","attributes":{"x":"400","y":"400","width":"50","height":"50","fillColor":"red","rotation":"0","scaleX":"1.5","scaleY":"1.5"}},{"type":"element","name":"circle","attributes":{"x":"200","y":"200","radius":"50","fillColor":"white","rotation":"0","scaleX":"1","scaleY":"1"}},{"type":"element","name":"circle","attributes":{"x":"500","y":"200","radius":"50","fillColor":"white","rotation":"0","scaleX":"1","scaleY":"1"}}]}]}';
-
-    const importedJSONwithAllShapes =
-      '{"elements":[{"type":"element","name":"shapes","elements":[{"type":"element","name":"rect","attributes":{"x":"400","y":"400","width":"50","height":"50","fillColor":"red","rotation":"0","scaleX":"1.5","scaleY":"1.5"}},{"type":"element","name":"circle","attributes":{"x":"200","y":"200","radius":"50","fillColor":"white","rotation":"0","scaleX":"1","scaleY":"1"}},{"type":"element","name":"circle","attributes":{"x":"500","y":"200","radius":"50","fillColor":"white","rotation":"0","scaleX":"1","scaleY":"1"}},{"type":"element","name":"triangle","attributes":{"p1x":"100","p1y":"100","p2x":"200","p2y":"200","p3x":"100","p3y":"200","fillColor":"white","rotation":"0","scaleX":"1","scaleY":"1"}},{"type":"element","name":"polyg","attributes":{"p1x":"400","p1y":"400","p2x":"500","p2y":"500","p3x":"400","p3y":"500","p4x":"300","p4y":"400","numCoords":"4","fillColor":"white","rotation":"0","scaleX":"1","scaleY":"1"}}]}]}';
+  execute(objects: Shape[], currentDocument: SimpleDrawDocument): void {
+    const importedJSONFile = this.fileContent;
 
     //Convert Json to Xml
     const convert = require('xml-js');
     const options = { ignoreComment: true, compact: false };
-    const result = convert.json2xml(importedJSONwithAllShapes, options);
+    const result = convert.json2xml(importedJSONFile, options);
 
     const xmlReader = require('xml-reader');
     const ast = xmlReader.parseSync(result);
@@ -270,20 +235,7 @@ export class ConcreteStrategyJSONImp implements Strategy {
       .children()
       .size();
 
-    // todo: use exported values
-    const client = connect(
-      'wss://iot.eclipse.org:443/ws',
-      {
-        clientId: '0',
-        clean: false,
-      }
-    );
-
-    const canvas = document.getElementById('canvas') as HTMLElement;
-    const defaultRender = new SVGRender('svg', canvas);
-
-    // todo: use exported values
-    const newDoc = new SimpleDrawDocument(0, client, defaultRender);
+    const newShapes = new Array<Shape>();
 
     for (let i = 0; i < numChildren; i++) {
       const eachShape = xmlQuery(ast)
@@ -294,6 +246,7 @@ export class ConcreteStrategyJSONImp implements Strategy {
       const eachShapeName = eachShape['name'];
       const eachShapeAttributes = eachShape.attributes;
 
+      const id = eachShapeAttributes['id'];
       const fillColor = eachShapeAttributes['fillColor'];
       const rotation = eachShapeAttributes['rotation'];
       const scaleX = eachShapeAttributes['scaleX'];
@@ -306,14 +259,13 @@ export class ConcreteStrategyJSONImp implements Strategy {
           const height = eachShapeAttributes['height'];
           const width = eachShapeAttributes['width'];
 
-          // todo: use export id value
-          const newRect = new Rectangle(0, coordX, coordY, width, height);
+          const newRect = new Rectangle(id, coordX, coordY, width, height);
           newRect.fillColor = fillColor;
           newRect.rotation = rotation;
           newRect.scaleX = scaleX;
           newRect.scaleY = scaleY;
 
-          newDoc.add(newRect);
+          newShapes.push(newRect);
           break;
         }
         case 'circle': {
@@ -321,14 +273,13 @@ export class ConcreteStrategyJSONImp implements Strategy {
           const coordY = eachShapeAttributes['y'];
           const radius = eachShapeAttributes['radius'];
 
-          // todo: use export id value
-          const newCircle = new Circle(0, coordX, coordY, radius);
+          const newCircle = new Circle(id, coordX, coordY, radius);
           newCircle.fillColor = fillColor;
           newCircle.rotation = rotation;
           newCircle.scaleX = scaleX;
           newCircle.scaleY = scaleY;
 
-          newDoc.add(newCircle);
+          newShapes.push(newCircle);
           break;
         }
         case 'polyg': {
@@ -349,14 +300,13 @@ export class ConcreteStrategyJSONImp implements Strategy {
             coordsArray.push(coord);
           }
 
-          // todo: use export id value
-          const newPolyg = new Polygon(0, ...coordsArray);
+          const newPolyg = new Polygon(id, ...coordsArray);
           newPolyg.fillColor = fillColor;
           newPolyg.rotation = rotation;
           newPolyg.scaleX = scaleX;
           newPolyg.scaleY = scaleY;
 
-          newDoc.add(newPolyg);
+          newShapes.push(newPolyg);
           break;
         }
         case 'triangle': {
@@ -367,10 +317,8 @@ export class ConcreteStrategyJSONImp implements Strategy {
           const p3x = eachShapeAttributes['p3x'];
           const p3y = eachShapeAttributes['p3y'];
 
-          // todo: use export id value
-
           const newTriangle = new Triangle(
-            0,
+            id,
             new Coordinate(p1x, p1y),
             new Coordinate(p2x, p2y),
             new Coordinate(p3x, p3y)
@@ -381,7 +329,7 @@ export class ConcreteStrategyJSONImp implements Strategy {
           newTriangle.scaleX = scaleX;
           newTriangle.scaleY = scaleY;
 
-          newDoc.add(newTriangle);
+          newShapes.push(newTriangle);
           break;
         }
         default: {
@@ -390,7 +338,8 @@ export class ConcreteStrategyJSONImp implements Strategy {
       }
     }
 
-    newDoc.draw();
+    currentDocument.objects = newShapes;
+    currentDocument.draw();
   }
 }
 
@@ -401,8 +350,8 @@ export class Context {
     this.strategy = strategy;
   }
 
-  executeStrategy(objects: Shape[]) {
-    return this.strategy.execute(objects);
+  executeStrategy(objects: Shape[], currentDocument: SimpleDrawDocument) {
+    return this.strategy.execute(objects, currentDocument);
   }
 }
 
@@ -421,6 +370,7 @@ export class XMLExporterVisitor implements Visitor {
   visitRectangle(rect: Rectangle): Element {
     const rectElement: Element = this.xmlDoc.createElement('rect');
 
+    rectElement.setAttribute('id', rect.getId().toString());
     rectElement.setAttribute('x', rect.coordinates[0].x.toString());
     rectElement.setAttribute('y', rect.coordinates[0].y.toString());
     rectElement.setAttribute('width', rect.width.toString());
@@ -436,6 +386,7 @@ export class XMLExporterVisitor implements Visitor {
   visitCircle(circle: Circle): Element {
     const circleElement: Element = this.xmlDoc.createElement('circle');
 
+    circleElement.setAttribute('id', circle.getId().toString());
     circleElement.setAttribute('x', circle.coordinates[0].x.toString());
     circleElement.setAttribute('y', circle.coordinates[0].y.toString());
     circleElement.setAttribute('radius', circle.radius.toString());
@@ -449,6 +400,8 @@ export class XMLExporterVisitor implements Visitor {
 
   visitPolygon(polyg: Polygon): Element {
     const polygElement: Element = this.xmlDoc.createElement('polyg');
+
+    polygElement.setAttribute('id', polyg.getId().toString());
 
     const numCoords = polyg.coordinates.length;
 
@@ -476,6 +429,7 @@ export class XMLExporterVisitor implements Visitor {
   visitTriangle(triangle: Triangle): Element {
     const triangleElement: Element = this.xmlDoc.createElement('triangle');
 
+    triangleElement.setAttribute('id', triangle.getId().toString());
     triangleElement.setAttribute('p1x', triangle.coordinates[0].x.toString());
     triangleElement.setAttribute('p1y', triangle.coordinates[0].y.toString());
     triangleElement.setAttribute('p2x', triangle.coordinates[1].x.toString());

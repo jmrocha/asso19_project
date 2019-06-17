@@ -172,23 +172,20 @@ export class SimpleDrawDocument {
       context.setStrategy(new ConcreteStrategyJSONExp());
     }
 
-    const result = context.executeStrategy(this.objects);
+    const result = context.executeStrategy(this.objects, this);
   }
 
-  import(action: string) {
+  import(action: string, content: string) {
     const context = new Context();
 
-    //const read = require('file-reader');
-
     if (action === 'XML') {
-      //const read = require('fs').readFileSync('newXmlDoc.xml', 'utf8');
-      context.setStrategy(new ConcreteStrategyXMLImp('test' /*read*/));
+      context.setStrategy(new ConcreteStrategyXMLImp(content));
     }
     if (action === 'JSON') {
-      context.setStrategy(new ConcreteStrategyJSONImp('test'));
+      context.setStrategy(new ConcreteStrategyJSONImp(content));
     }
 
-    const result = context.executeStrategy(this.objects);
+    const result = context.executeStrategy(this.objects, this);
   }
 
   getShapeById(id: number): Shape {
