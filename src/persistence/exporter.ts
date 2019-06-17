@@ -81,28 +81,10 @@ export class ConcreteStrategyXMLImp implements Strategy {
   private fileContent: string;
 
   execute(objects: Shape[]): void {
-    //const importedXML = this.fileContent;
-
-    const importedXML =
-      '<shapes><rect x="400" y="400" width="50" height="50" fillColor="red" rotation="0" scaleX="1.5" scaleY="1.5"/><circle x="200" y="200" radius="50" fillColor="white" rotation="0" scaleX="1" scaleY="1"/><circle x="500" y="200" radius="50" fillColor="white" rotation="0" scaleX="1" scaleY="1"/></shapes>';
-
-    const importedXMLwithTriangle =
-      '<shapes><rect x="400" y="400" width="50" height="50" fillColor="red" rotation="0" scaleX="1.5" scaleY="1.5"/><circle x="200" y="200" radius="50" fillColor="white" rotation="0" scaleX="1" scaleY="1"/><circle x="500" y="200" radius="50" fillColor="white" rotation="0" scaleX="1" scaleY="1"/><triangle p1x="100" p1y="100" p2x="200" p2y="200" p3x="100" p3y="200" fillColor="white" rotation="0" scaleX="1" scaleY="1"/></shapes>';
-
-    const importedXMLwithAllShapes =
-      '<shapes><rect x="400" y="400" width="50" height="50" fillColor="red" rotation="0" scaleX="1.5" scaleY="1.5"/><circle x="200" y="200" radius="50" fillColor="white" rotation="0" scaleX="1" scaleY="1"/><circle x="500" y="200" radius="50" fillColor="white" rotation="0" scaleX="1" scaleY="1"/><triangle p1x="100" p1y="100" p2x="200" p2y="200" p3x="100" p3y="200" fillColor="white" rotation="0" scaleX="1" scaleY="1"/><polyg p1x="400" p1y="400" p2x="500" p2y="500" p3x="400" p3y="500" p4x="300" p4y="400" numCoords="4" fillColor="white" rotation="0" scaleX="1" scaleY="1"/></shapes>';
-
-    /*
-    const parseXML = require('xml-parse-from-string');
-    const xmldoc = parseXML(importedXML);
-
-    console.log('Parsing XML:\n\nXml String:\n' + importedXML);
-    console.log('XML document:');
-    console.log(xmldoc);
-    */
+    const importedXMLFile = this.fileContent;
 
     const xmlReader = require('xml-reader');
-    const ast = xmlReader.parseSync(importedXMLwithAllShapes);
+    const ast = xmlReader.parseSync(importedXMLFile);
 
     //After importing, we search the shapes in the XML and draw them
     const xmlQuery = require('xml-query');
@@ -246,18 +228,12 @@ export class ConcreteStrategyJSONImp implements Strategy {
   private fileContent: string;
 
   execute(objects: Shape[]): void {
-    //const importedJSON = fileContent;
-
-    const importedJSON =
-      '{"elements":[{"type":"element","name":"shapes","elements":[{"type":"element","name":"rect","attributes":{"x":"400","y":"400","width":"50","height":"50","fillColor":"red","rotation":"0","scaleX":"1.5","scaleY":"1.5"}},{"type":"element","name":"circle","attributes":{"x":"200","y":"200","radius":"50","fillColor":"white","rotation":"0","scaleX":"1","scaleY":"1"}},{"type":"element","name":"circle","attributes":{"x":"500","y":"200","radius":"50","fillColor":"white","rotation":"0","scaleX":"1","scaleY":"1"}}]}]}';
-
-    const importedJSONwithAllShapes =
-      '{"elements":[{"type":"element","name":"shapes","elements":[{"type":"element","name":"rect","attributes":{"x":"400","y":"400","width":"50","height":"50","fillColor":"red","rotation":"0","scaleX":"1.5","scaleY":"1.5"}},{"type":"element","name":"circle","attributes":{"x":"200","y":"200","radius":"50","fillColor":"white","rotation":"0","scaleX":"1","scaleY":"1"}},{"type":"element","name":"circle","attributes":{"x":"500","y":"200","radius":"50","fillColor":"white","rotation":"0","scaleX":"1","scaleY":"1"}},{"type":"element","name":"triangle","attributes":{"p1x":"100","p1y":"100","p2x":"200","p2y":"200","p3x":"100","p3y":"200","fillColor":"white","rotation":"0","scaleX":"1","scaleY":"1"}},{"type":"element","name":"polyg","attributes":{"p1x":"400","p1y":"400","p2x":"500","p2y":"500","p3x":"400","p3y":"500","p4x":"300","p4y":"400","numCoords":"4","fillColor":"white","rotation":"0","scaleX":"1","scaleY":"1"}}]}]}';
+    const importedJSONFile = this.fileContent;
 
     //Convert Json to Xml
     const convert = require('xml-js');
     const options = { ignoreComment: true, compact: false };
-    const result = convert.json2xml(importedJSONwithAllShapes, options);
+    const result = convert.json2xml(importedJSONFile, options);
 
     const xmlReader = require('xml-reader');
     const ast = xmlReader.parseSync(result);

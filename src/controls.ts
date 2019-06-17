@@ -16,6 +16,8 @@ export class Controls {
   private readonly exportXMLBtn: HTMLElement;
   private readonly exportJSONBtn: HTMLElement;
   private fileUploadForm: HTMLElement;
+  private importAction = '';
+
   constructor(
     private simpleDrawDocument: SimpleDrawDocument,
     private render: Render
@@ -63,8 +65,9 @@ export class Controls {
     reader.onload = e => {
       // tslint:disable-next-line:ban-ts-ignore
       // @ts-ignore
-      const fileContent = e.target.result;
-      console.log('File content: ' + fileContent);
+      const fileString = e.target.result;
+      //Import File
+      this.simpleDrawDocument.import(this.importAction, fileString);
     };
 
     reader.readAsText(file);
@@ -88,6 +91,8 @@ export class Controls {
     });
 
     this.fileUploadForm.onchange = e => this.fileOnChange(e);
+
+    //this.fileUploadFormJSON.onchange = e => this.fileOnChange(e, 'JSON');
 
     // tslint:disable-next-line:ban-ts-ignore
     // @ts-ignore
@@ -118,32 +123,26 @@ export class Controls {
     this.importXMLBtn.onclick = () => {
       // tslint:disable-next-line:ban-ts-ignore
       // @ts-ignore
-      //this.fileUploadForm.click();
-      console.log('Going to import XML');
+      this.importAction = 'XML';
       this.fileUploadForm.click();
-      this.simpleDrawDocument.import('XML');
     };
 
     this.importJSONBtn.onclick = () => {
       // tslint:disable-next-line:ban-ts-ignore
       // @ts-ignore
-      //this.fileUploadForm.click();
-      console.log('Going to import JSON');
+      this.importAction = 'JSON';
       this.fileUploadForm.click();
-      this.simpleDrawDocument.import('JSON');
     };
 
     // tslint:disable-next-line:ban-ts-ignore
     // @ts-ignore
     this.exportXMLBtn.onclick = () => {
-      console.log('Going to Export XML');
       this.simpleDrawDocument.export('XML');
     };
 
     // tslint:disable-next-line:ban-ts-ignore
     // @ts-ignore
     this.exportJSONBtn.onclick = () => {
-      console.log('Going to Export JSON');
       this.simpleDrawDocument.export('JSON');
     };
   }
