@@ -116,6 +116,8 @@ The **Interpreter pattern** tells us how to solve this kind of problem:
 
 In SimpleDraw, we want users to be able to pick between different rendering modes during runtime. This feature should not affect the view of other users in the session and must be controlled by pressing buttons on the top bar of the screen. We planned to be able to render the document in two formats: SVG and HTMLCanvas and each of these modes should have different 'sub-modes' to change between. In our system, we enable the users to change between normal rendering (rendering of the colors as they are originally) or inverted color rendering, where we render all the colors of the objects invertedly (black becomes white, etc.).
 
+![](https://i.gyazo.com/a5712466595ae994ef78cacf5ac18919.gif)
+
 #### Strategy Pattern
 
 ##### Problem in Context
@@ -271,6 +273,10 @@ As the `drawObjects()` method is relatively large (and will only get larger with
 
 In SimpleDraw, we want users to be able to do a multitude of actions, such as creating various types of shapes and operate over them with algorithms such as translation, scale and rotation. In addition of performing such actions, users should be able to undo and redo these actions in the order they were performed. How should we design the program to perform these actions successfully? Our solution is that, by applying the **Command** pattern and it's respective characteristic functions (`do()` and `undo()`), we can be able to create a structure that supports the concept of performing actions in an easily scalable and maintainable format.
 
+![](https://i.gyazo.com/7a9fe196f04cc9b55bd9c86d19f5afc7.gif)
+
+![](https://i.gyazo.com/c3104adbcd5461b7a5074e6e7e370a27.gif)
+
 #### Command Pattern
 
 ##### Problem in Context
@@ -343,6 +349,8 @@ By using the **Command** pattern, features such as the multiuser take a hit on i
 
 We want our users to be able to share a SimpleDraw session with their friends and that everyone in the session is updated real-time with everyone's changes to the document. Changes that are made by one user cannot be undone/redone by another user, as the do/undo action stacks are user-bound, to prevent user frustration and work flow during the system's usage.
 In order to share sessions and to enable communication between every browser in the session, we adopted the usage of a **publish-subscribe** architecture, which uses a publicly available broker that manages the receiving and sending of the session messages to subscriber browsers. These messages are then parsed client-side and then the according action is reproduced onto everyone's screen.
+
+![](https://i.gyazo.com/c12fb18532bef6f64e232e4cd43470b1.gif)
 
 #### Factory Pattern
 
