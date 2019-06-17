@@ -1,5 +1,7 @@
 import { SimpleDrawDocument } from './document';
 import { SVGRender } from './render/svg-render';
+import { SVGInvertedRender } from './render/svg-inverted-render';
+import { CanvasInvertedRender } from 'render/canvas-inverted-render';
 import { CanvasRender } from 'render/canvas-render';
 import { connect } from 'mqtt';
 import { CreateRectangleActionWrapper } from 'messages/wrappers/create-rectangle-action-wrapper';
@@ -23,7 +25,12 @@ const client = connect(
 
 const canvas = document.getElementById('canvas') as HTMLElement;
 export const defaultRender = new SVGRender('svg', canvas);
+const svgInvertedRender = new SVGInvertedRender('svg-inverted', canvas);
 const canvasRender = new CanvasRender('canvas', canvas);
+const canvasInvertedRender = new CanvasInvertedRender(
+  'canvas-inverted',
+  canvas
+);
 export const simpleDrawDocument = new SimpleDrawDocument(
   docID,
   client,
@@ -32,6 +39,8 @@ export const simpleDrawDocument = new SimpleDrawDocument(
 const controls = new Controls(simpleDrawDocument, defaultRender);
 
 simpleDrawDocument.registerRender(canvasRender);
+simpleDrawDocument.registerRender(canvasInvertedRender);
+simpleDrawDocument.registerRender(svgInvertedRender);
 
 function isJson(item: string) {
   item = typeof item !== 'string' ? JSON.stringify(item) : item;
