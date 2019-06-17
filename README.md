@@ -112,6 +112,161 @@ The **Interpreter pattern** tells us how to solve this kind of problem:
 
 ![Pattern Diagram](https://www.plantuml.com/plantuml/png/ZP912i8m44NtESM0cuhs1YuKwqvGgXSOwr0YILkIgGhgtQrjfJPDmMp2_7dv-HEoj8o6Iwq4IrO4yMQ_XRL2Qo6Ic1hKGk39ii648QdrLLjkxeM1Xu1gXGUf2qMHmLkK9wMcZC4Ef0QDAJkJ0LDljJJfEVuMmL--S-XvJclJMUKYinJeYgf4fg2jPLQK_4M8cvE1O_0IefdrSurdtWxuY0xGDNUdosWl9frVQRHz9ACzpPwqU8RX8A47SJDw42UfXnZczK1kQY6MrOjMl-iD)
 
+### SVG and HTMLCanvas rendering with different modes
+
+In SimpleDraw, we want users to be able to pick between different rendering modes during runtime. This feature should not affect the view of other users in the session and must be controlled by pressing buttons on the top bar of the screen. We planned to be able to render the document in two formats: SVG and HTMLCanvas and each of these modes should have different 'sub-modes' to change between. In our system, we enable the users to change between normal rendering (rendering of the colors as they are originally) or inverted color rendering, where we render all the colors of the objects invertedly (black becomes white, etc.).
+
+#### Strategy Pattern
+
+##### Problem in Context
+
+The available rendering modes should be able to render the same document in the same way, despite the different APIs used. The way a rectangle is created in SVG differs from the way a rectangle is created in HTMLCanvas and with the increase of the number of rendering APIs we support, maintaining logic to render a rectangle in multiple different APIs gets harder and harder if the code is not structured properly. This problem only gets bigger if we introduce more objects to draw on top of it, turning otherwise simple code into a huge pile of unreadable and unmaintainable code.
+So, the solution here is to create classes that do pretty much the same, but in different ways and interacting with different APIs.
+
+##### Pattern Description
+
+According to refactoring.guru, the **Strategy pattern** suggests that you take a class that does something specific in a lot of different ways and extract all of these algorithms into separate classes called strategies.
+The original class, called context, must have a field for storing a reference to one of the strategies. The context delegates the work to a linked strategy object instead of executing it on its own.
+The context isn’t responsible for selecting an appropriate algorithm for the job. Instead, the client passes the desired strategy to the context. In fact, the context doesn’t know much about strategies. It works with all strategies through the same generic interface, which only exposes a single method for triggering the algorithm encapsulated within the selected strategy.
+
+##### Implementation Details
+
+To apply the **Strategy Pattern**, the SimpleDrawDocument class keeps information about the available 'strategies' (render modes) it can change between and then, by using the buttons present on top of the screen, the user is able to select which strategy the document is using to render itself currently.
+
+Rendering strategies being registered on the document.
+```typescript
+const defaultRender = new SVGRender('svg', canvas);
+const svgInvertedRender = new SVGInvertedRender('svg-inverted', canvas);
+const canvasRender = new CanvasRender('canvas', canvas);
+const canvasInvertedRender = new CanvasInvertedRender(
+  'canvas-inverted',
+  canvas
+);
+export const simpleDrawDocument = new SimpleDrawDocument(
+  docID,
+  client,
+  defaultRender
+);
+const controls = new Controls(simpleDrawDocument, defaultRender);
+
+simpleDrawDocument.registerRender(canvasRender);
+simpleDrawDocument.registerRender(canvasInvertedRender);
+simpleDrawDocument.registerRender(svgInvertedRender);
+```
+
+Strategy changing 'on the fly' by click-listeners on the buttons
+```typescript
+this.svgBtn.onclick = () => {
+  this.simpleDrawDocument.changeRender('svg');
+};
+
+this.svgInvertedBtn.onclick = () => {
+  this.simpleDrawDocument.changeRender('svg-inverted');
+};
+
+this.canvasBtn.onclick = () => {
+  this.simpleDrawDocument.changeRender('canvas');
+};
+
+this.canvasInvertedBtn.onclick = () => {
+  this.simpleDrawDocument.changeRender('canvas-inverted');
+};
+```
+
+##### Consequences
+
+By using the **Strategy Pattern**, we are able to swap rendering algorithms on the spot, at runtime. The isolation between the implementation of the algorithm and the document code works great and proves to be greatly scalable, because more different rendering algorithms can be added to the system without interfering with previously existent ones.
+One counterpart that can be made is that, with only having few strategies to choose from, the addition of more classes to the mix can bloat the code, but we believe that the choosing of this pattern helps the code in the long run, without overcomplicating it, which leads to a greater maintainability.
+
+#### Template Method
+
+##### Problem in Context
+
+The implementation of different rendering modes (normal and inverted colors, for example) in each rendering algorithm used, means that more strategies need to be implemented and more `draw()` methods need to be created. But our rendering modes only change the rendering of colors the shapes contain, why should this strategy implement a `draw()` method, resulting in duplicated 'unused' code and be aware on how to draw the objects it intends, when it only wants to change the colors (a portion of the drawing algorithm)? Wouldn't it be easier if the drawing algorithm was divided into parts and each of these alternative strategies only override the necessary methods?
+
+##### Pattern Description
+
+According to refactoring.guru, the **Template Method** pattern suggests that you break down an algorithm into a series of steps, turn these steps into methods, and put a series of calls to these methods inside a single “template method.” The steps may either be abstract, or have some default implementation. To use the algorithm, the client is supposed to provide its own subclass, implement all abstract steps, and override some of the optional ones if needed (but not the template method itself).
+
+##### Implementation Details
+
+Lets pick the example of HTMLCanvas rendering. In our CanvasRender class, a `drawObjects()` method is responsible of rendering the array of objects in the document, creating the HTMLCanvas elements accordingly.
+
+```typescript
+drawObjects(...objs: Shape[]): void {
+	for (const shape of objs) {
+	  this.ctx.save();
+	  if (shape instanceof Circle) {
+		this.ctx.beginPath();
+		this.ctx.ellipse(
+		  shape.coordinates[0].x,
+		  shape.coordinates[0].y,
+		  shape.radius * shape.scaleX,
+		  shape.radius * shape.scaleY,
+		  shape.rotation,
+		  0,
+		  2 * Math.PI
+		);
+		this.ctx.closePath();
+
+	  } else if (shape instanceof Rectangle) {
+		this.ctx.rect(
+		  shape.coordinates[0].x,
+		  shape.coordinates[0].y,
+		  shape.width * shape.scaleX,
+		  shape.height * shape.scaleY
+		);
+	  } else if (shape instanceof Triangle || shape instanceof Polygon) {
+		this.ctx.beginPath();
+		this.ctx.moveTo(shape.coordinates[0].x, shape.coordinates[0].y);
+
+		shape.coordinates.forEach((element, index) => {
+		  if (index > 0) {
+			let x = 0;
+			let y = 0;
+
+			if (shape.scaleX > 1) {
+			  x = element.x * shape.scaleX - shape.coordinates[0].x;
+			} else if (shape.scaleX === 1) {
+			  x = element.x;
+			} else {
+			  x = (element.x + shape.coordinates[0].x) * shape.scaleX;
+			}
+
+			if (shape.scaleY > 1) {
+			  y = element.y * shape.scaleY - shape.coordinates[0].y;
+			} else if (shape.scaleY === 1) {
+			  y = element.y;
+			} else {
+			  y = (element.y + shape.coordinates[0].y) * shape.scaleY;
+			}
+
+			this.ctx.lineTo(x, y);
+		  }
+		});
+		this.ctx.closePath();
+	  }
+	  this.colorObject(shape);
+	  this.ctx.restore();
+	}
+}
+```
+
+This CanvasRender strategy renders the 'normal' colors of the object inside the `colorObject(s: Shape)` method above. What we did, in order to prevent unnecessary duplicated code in the related strategy CanvasInvertedRender was for this class to override the `colorObject(s: Shape)` method, making the code much more readable and easy to maintainability, as the logic for 'drawing' the shapes is maintained between strategies.
+
+```typescript
+colorObject(s: Shape): void {
+	this.ctx.fillStyle = this.calculateInvertedColor(s.fillColor);
+	this.ctx.strokeStyle = this.calculateInvertedColor(s.strokeColor);
+	this.ctx.fill();
+	this.ctx.stroke();
+}
+```
+
+##### Consequences
+
+As the `drawObjects()` method is relatively large (and will only get larger with the introduction of more shapes), we are able to put the drawing methods inside the main classes (which render 'normally') SVGRender and CanvasRender, preventing duplicated code and the shape drawing logic being in classes that have nothing to do with it. This, however, comes with a tradeoff, as the code gets bigger and the more different rendering modes are implemented, the `drawObjects()` method needs to be fractured in more steps, making it harder to maintain.
+
 ### Undo/Redo Actions
 
 In SimpleDraw, we want users to be able to do a multitude of actions, such as creating various types of shapes and operate over them with algorithms such as translation, scale and rotation. In addition of performing such actions, users should be able to undo and redo these actions in the order they were performed. How should we design the program to perform these actions successfully? Our solution is that, by applying the **Command** pattern and it's respective characteristic functions (`do()` and `undo()`), we can be able to create a structure that supports the concept of performing actions in an easily scalable and maintainable format.

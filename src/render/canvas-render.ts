@@ -58,7 +58,6 @@ export class CanvasRender extends Render {
           2 * Math.PI
         );
         this.ctx.closePath();
-
       } else if (shape instanceof Rectangle) {
         this.ctx.rect(
           shape.coordinates[0].x,

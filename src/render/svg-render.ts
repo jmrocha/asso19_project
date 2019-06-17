@@ -40,12 +40,9 @@ export class SVGRender extends Render {
   }
 
   colorObject(e: SVGElement, s: Shape): void {
-    e.setAttribute (
+    e.setAttribute(
       'style',
-      'stroke: ' +
-        s.strokeColor +
-        '; fill: ' +
-        s.fillColor
+      'stroke: ' + s.strokeColor + '; fill: ' + s.fillColor
     );
   }
 
@@ -53,34 +50,21 @@ export class SVGRender extends Render {
     for (const shape of objs) {
       let e: SVGElement;
       if (shape instanceof Rectangle) {
-
-        e = document.createElementNS(
-          'http://www.w3.org/2000/svg',
-          'rect'
-        );
+        e = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         e.setAttribute('id', `${shape.getId()}`);
         e.setAttribute('x', shape.coordinates[0].x.toString());
         e.setAttribute('y', shape.coordinates[0].y.toString());
         e.setAttribute('width', (shape.width * shape.scaleX).toString());
         e.setAttribute('height', (shape.height * shape.scaleY).toString());
-
       } else if (shape instanceof Circle) {
-
-        e = document.createElementNS(
-          'http://www.w3.org/2000/svg',
-          'ellipse'
-        );
+        e = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
         e.setAttribute('id', `${shape.getId()}`);
         e.setAttribute('cx', shape.coordinates[0].x.toString());
         e.setAttribute('cy', shape.coordinates[0].y.toString());
         e.setAttribute('rx', (shape.radius * shape.scaleX).toString());
         e.setAttribute('ry', (shape.radius * shape.scaleY).toString());
-
-      } else /*if (shape instanceof Triangle || shape instanceof Polygon)*/ {
-        e = document.createElementNS(
-          'http://www.w3.org/2000/svg',
-          'polygon'
-        );
+      } /*if (shape instanceof Triangle || shape instanceof Polygon)*/ else {
+        e = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
         e.setAttribute('id', `${shape.getId()}`);
 
         let s = '';

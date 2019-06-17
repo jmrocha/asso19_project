@@ -27,7 +27,7 @@ export class SVGInvertedRender extends SVGRender {
   }
 
   colorObject(e: SVGElement, s: Shape): void {
-    e.setAttribute (
+    e.setAttribute(
       'style',
       'stroke: ' +
         this.calculateInvertedColor(s.strokeColor) +
