@@ -11,7 +11,8 @@ export class Controls {
   private readonly redoBtn: HTMLElement;
   private readonly svgBtn: HTMLElement;
   private readonly canvasBtn: HTMLElement;
-  private readonly importBtn: HTMLElement;
+  private readonly importXMLBtn: HTMLElement;
+  private readonly importJSONBtn: HTMLElement;
   private readonly exportXMLBtn: HTMLElement;
   private readonly exportJSONBtn: HTMLElement;
   private fileUploadForm: HTMLElement;
@@ -27,7 +28,12 @@ export class Controls {
     this.redoBtn = document.getElementById('redo-btn') as HTMLElement;
     this.svgBtn = document.getElementById('svg-btn') as HTMLElement;
     this.canvasBtn = document.getElementById('canvas-btn') as HTMLElement;
-    this.importBtn = document.getElementById('import-btn') as HTMLElement;
+    this.importXMLBtn = document.getElementById(
+      'import-xml-btn'
+    ) as HTMLElement;
+    this.importJSONBtn = document.getElementById(
+      'import-json-btn'
+    ) as HTMLElement;
     this.exportXMLBtn = document.getElementById(
       'export-xml-btn'
     ) as HTMLElement;
@@ -40,7 +46,8 @@ export class Controls {
     console.assert(this.redoBtn);
     console.assert(this.svgBtn);
     console.assert(this.canvasBtn);
-    console.assert(this.importBtn);
+    console.assert(this.importXMLBtn);
+    console.assert(this.importJSONBtn);
     console.assert(this.exportXMLBtn);
     console.assert(this.exportJSONBtn);
 
@@ -108,18 +115,34 @@ export class Controls {
 
     // tslint:disable-next-line:ban-ts-ignore
     // @ts-ignore
-    this.importBtn.onclick = () => {
+    this.importXMLBtn.onclick = () => {
       // tslint:disable-next-line:ban-ts-ignore
       // @ts-ignore
-      this.fileUploadForm.click();
+      //this.fileUploadForm.click();
+      console.log('Going to import XML');
+      this.simpleDrawDocument.import('XML');
+    };
+
+    this.importJSONBtn.onclick = () => {
+      // tslint:disable-next-line:ban-ts-ignore
+      // @ts-ignore
+      //this.fileUploadForm.click();
+      console.log('Going to import JSON');
+      this.simpleDrawDocument.import('JSON');
     };
 
     // tslint:disable-next-line:ban-ts-ignore
     // @ts-ignore
-    this.exportXMLBtn.onclick = () => {};
+    this.exportXMLBtn.onclick = () => {
+      console.log('Going to Export XML');
+      this.simpleDrawDocument.export('XML');
+    };
 
     // tslint:disable-next-line:ban-ts-ignore
     // @ts-ignore
-    this.exportJSONBtn.onclick = () => {};
+    this.exportJSONBtn.onclick = () => {
+      console.log('Going to Export JSON');
+      this.simpleDrawDocument.export('JSON');
+    };
   }
 }

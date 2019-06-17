@@ -3,7 +3,6 @@ import { Circle } from 'shapes/circle';
 import { Polygon } from 'shapes/polygon';
 import { Triangle } from 'shapes/triangle';
 import { Shape } from 'shapes/shape';
-import { Tools } from 'utilities/tools';
 import { SimpleDrawDocument } from 'document';
 import { SVGRender } from 'render/svg-render';
 import { Coordinate } from 'utilities/coordinate';
