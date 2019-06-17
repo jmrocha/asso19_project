@@ -8,12 +8,12 @@ import { Polygon } from 'shapes/polygon';
 export class CanvasRender extends Render {
   // tslint:disable-next-line:ban-ts-ignore
   // @ts-ignore
-  private ctx: CanvasRenderingContext2D;
+  protected ctx: CanvasRenderingContext2D;
   // tslint:disable-next-line:ban-ts-ignore
   // @ts-ignore
-  private canvas: HTMLCanvasElement = null;
+  protected canvas: HTMLCanvasElement = null;
 
-  constructor(name: string, private rootElem: HTMLElement) {
+  constructor(name: string, protected rootElem: HTMLElement) {
     super(name);
   }
 
@@ -35,6 +35,13 @@ export class CanvasRender extends Render {
   }
 
   remove(obj: Shape): void {}
+
+  colorObject(s: Shape): void {
+    this.ctx.fillStyle = s.fillColor;
+    this.ctx.strokeStyle = s.strokeColor;
+    this.ctx.fill();
+    this.ctx.stroke();
+  }
 
   drawObjects(...objs: Shape[]): void {
     for (const shape of objs) {
@@ -89,11 +96,7 @@ export class CanvasRender extends Render {
         });
         this.ctx.closePath();
       }
-      
-      this.ctx.fillStyle = shape.fillColor;
-      this.ctx.strokeStyle = shape.strokeColor;
-      this.ctx.fill();
-      this.ctx.stroke();
+      this.colorObject(shape);
       this.ctx.restore();
     }
   }

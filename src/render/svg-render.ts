@@ -8,10 +8,10 @@ import { Polygon } from 'shapes/polygon';
 export class SVGRender extends Render {
   // tslint:disable-next-line:ban-ts-ignore
   // @ts-ignore
-  private canvas: SVGElement = null;
-  private shapes: Map<number, Shape> = new Map<number, Shape>();
+  protected canvas: SVGElement = null;
+  protected shapes: Map<number, Shape> = new Map<number, Shape>();
 
-  constructor(name: string, private rootElem: HTMLElement) {
+  constructor(name: string, protected rootElem: HTMLElement) {
     super(name);
   }
 
@@ -39,41 +39,34 @@ export class SVGRender extends Render {
     }
   }
 
+  colorObject(e: SVGElement, s: Shape): void {
+    e.setAttribute (
+      'style',
+      'stroke: ' +
+        s.strokeColor +
+        '; fill: ' +
+        s.fillColor
+    );
+  }
+
   drawObjects(...objs: Shape[]): void {
     for (const shape of objs) {
+      let e: SVGElement;
       if (shape instanceof Rectangle) {
-        const e = document.createElementNS(
+
+        e = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'rect'
         );
         e.setAttribute('id', `${shape.getId()}`);
-        e.setAttribute(
-          'style',
-          'stroke: ' + shape.strokeColor + '; fill: ' + shape.fillColor
-        );
         e.setAttribute('x', shape.coordinates[0].x.toString());
         e.setAttribute('y', shape.coordinates[0].y.toString());
         e.setAttribute('width', (shape.width * shape.scaleX).toString());
         e.setAttribute('height', (shape.height * shape.scaleY).toString());
 
-        //transformation (REPEATED CODE)
-        let transformations = '';
-        if (shape.rotation !== 0) {
-          transformations +=
-            'rotate(' +
-            shape.rotation +
-            ',' +
-            shape.coordinates[0].x +
-            ',' +
-            shape.coordinates[0].y +
-            ') ';
-        }
-        e.setAttribute('transform', transformations);
-        //end transformations
-
-        this.canvas.appendChild(e);
       } else if (shape instanceof Circle) {
-        const e = document.createElementNS(
+
+        e = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'ellipse'
         );
@@ -82,30 +75,13 @@ export class SVGRender extends Render {
         e.setAttribute('cy', shape.coordinates[0].y.toString());
         e.setAttribute('rx', (shape.radius * shape.scaleX).toString());
         e.setAttribute('ry', (shape.radius * shape.scaleY).toString());
-        e.setAttribute('stroke', shape.strokeColor);
-        e.setAttribute('fill', shape.fillColor);
 
-        //transformation (REPEATED CODE)
-        let transformations = '';
-        if (shape.rotation !== 0) {
-          transformations +=
-            'rotate(' +
-            shape.rotation +
-            ',' +
-            shape.coordinates[0].x +
-            ',' +
-            shape.coordinates[0].y +
-            ') ';
-        }
-        e.setAttribute('transform', transformations);
-        //end transformations
-
-        this.canvas.appendChild(e);
-      } else if (shape instanceof Triangle || shape instanceof Polygon) {
-        const e = document.createElementNS(
+      } else /*if (shape instanceof Triangle || shape instanceof Polygon)*/ {
+        e = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'polygon'
         );
+        e.setAttribute('id', `${shape.getId()}`);
 
         let s = '';
         shape.coordinates.forEach((element, index) => {
@@ -130,30 +106,25 @@ export class SVGRender extends Render {
           }
         });
 
-        e.setAttribute('id', `${shape.getId()}`);
         e.setAttribute('points', s);
-        e.setAttribute(
-          'style',
-          'stroke: ' + shape.strokeColor + '; fill: ' + shape.fillColor
-        );
-
-        //transformation (REPEATED CODE)
-        let transformations = '';
-        if (shape.rotation !== 0) {
-          transformations +=
-            'rotate(' +
-            shape.rotation +
-            ',' +
-            shape.coordinates[0].x +
-            ',' +
-            shape.coordinates[0].y +
-            ') ';
-        }
-        e.setAttribute('transform', transformations);
-        //end transformations
-
-        this.canvas.appendChild(e);
       }
+
+      this.colorObject(e, shape);
+
+      let transformations = '';
+      if (shape.rotation !== 0) {
+        transformations +=
+          'rotate(' +
+          shape.rotation +
+          ',' +
+          shape.coordinates[0].x +
+          ',' +
+          shape.coordinates[0].y +
+          ') ';
+      }
+      e.setAttribute('transform', transformations);
+
+      this.canvas.appendChild(e);
     }
   }
 }
