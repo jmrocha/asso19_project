@@ -24,14 +24,18 @@ npm run dev
 ```
 
 ## Functionalities
-- SimpleDraw is based on the notion of documents;
-- Documents are rendered either in SVG or HTMLCanvas;
-- Multiple views of the same model;
-- Two interaction modes: point-n-click and REPLs;
-- Support persistence in multiple formats (TXT, XML, BIN);
-- Extendible with different objects (triangles, arrows, ...);
-- Extendible with new tools (rotate, translate, grid, ...);
-- Support (un)limited Undo / Redo of all operations;
+- [x] SimpleDraw is based on the notion of documents;
+- [x] Documents are rendered either in SVG or HTMLCanvas;
+- [x] Multiple views of the same model;
+- [x] Two interaction modes: point-n-click and REPLs;
+- [x] Support persistence in multiple formats (XML and JSON);
+- [x] Extendible with different objects (triangles, arrows, ...);
+- [x] Extendible with new tools (rotate, translate, grid, ...);
+- [x] Support (un)limited Undo / Redo of all operations;
+- [ ] Management of multiple documents;
+- [ ] Support of new tools with plugins;
+- [ ] Interactivity to manipulate objects created;
+- [ ] Support for group and layers;
 
 ## Authors
 
@@ -39,19 +43,11 @@ npm run dev
 - João Rocha;
 - Sérgio Salgado.
 
-## Logical View
-
-### Application Class Diagram
-
-![Application Class Diagram](https://www.plantuml.com/plantuml/png/VLHRJiCm4FptANA1z0G8jKeH4g8WDQNYT-iknLBYHFQMXyJXCOxjhfFGJy_ClYTPMW93vxOHGcb2ymOIYotg8neX6x2sgFVtsRi2_G4sG56Zshx1jO7FTIVFBMeAn0vDgpHasUjtw96zLv9KfsEgoY0GLih81WF3YIrA0drA71mi6P1KS96la0Nl36ZRE2f3N_Insu26avlaqiyV2eTHzLNVCybUMKKT3xhxwZj3jUk5yFGTWbutZxFuG_tyD2A4xxaeozkKF5SKDp-BnLLkMcrEDLVR3UShpvmnKkcG4GW6YC_9ED4rGs9_SkuS1ejfMS_ow_mZYTQPdDtDMfPpNhgg79ihATpUfixYxDXVhFSq2_DKChjlRLZ3WAGMmcv4M9UlSlaKEPfza8ED1fmbP_2aWbYwKFS7-0K0)
-
-### Architecture Style
-![Architecture Style](https://www.plantuml.com/plantuml/png/SoWkIImgAStDuUBYKW22jAB4t5G59UUSpDIy4YM5Qh0W24I7UiQ2ERKe2eDJYyfIYr0KXgScAK24uHguGBeLT7NjK6GLh1GyGa82WD8EgNafG3S00000)
-
 ## Decision Points
 
-### REPL
-We want to be able to execute commands such as:
+### Read Eval Print Loop (REPL)
+Users should be able to interact with our app through commands, like in a shell.
+An example of this commands is:
 ```
 draw rect 10 10 10 10   // draws a rectangle at point (10, 10) with width 10 and height 10
 draw circle 10 10 10    // draws a square at point (10, 10) with radius 10
@@ -73,7 +69,7 @@ use 2                     // use the document with id 2
 render SVG                // change render to SVG
 help                      // shows possible commands
 ```
-And to support concatenation of operations such as:
+Including the concatenation of operations:
 ```
 draw rect 10 10 10 10 and draw circle 10 10 10 and export json
 ```
@@ -108,9 +104,79 @@ int -> [0-9]+
 float -> [0-9]+\.[0-9]+
 ```
 
-The **Interpreter pattern** tells us how to solve this kind of problem:
+#### Interpreter Pattern
+##### Problem in Context
+Having the grammar defined, the next step is to implement it, and this implies
+parsing, validating and interpreting several commands. The problem lies in the
+way we divide the logic to perform this steps. An easy solution would be to
+create a single class that has all the responsibility of interpreting the language,
+but the code would quickly become 'spaghetti' code... Adding or fixing a rule in
+the future would be an hard task because we'd need to swim in an excessive number
+of lines of code.
 
-![Pattern Diagram](https://www.plantuml.com/plantuml/png/ZP912i8m44NtESM0cuhs1YuKwqvGgXSOwr0YILkIgGhgtQrjfJPDmMp2_7dv-HEoj8o6Iwq4IrO4yMQ_XRL2Qo6Ic1hKGk39ii648QdrLLjkxeM1Xu1gXGUf2qMHmLkK9wMcZC4Ef0QDAJkJ0LDljJJfEVuMmL--S-XvJclJMUKYinJeYgf4fg2jPLQK_4M8cvE1O_0IefdrSurdtWxuY0xGDNUdosWl9frVQRHz9ACzpPwqU8RX8A47SJDw42UfXnZczK1kQY6MrOjMl-iD)
+##### Pattern Description
+The Interpreter pattern suggests modeling the language domain with a recursive grammar,
+where each production in the grammar is either a 'composite' (a production that
+produces non-terminal symbols), or a terminal symbol. The Interpreter relies on the recursive
+traversal of the Composite pattern to interpret the commands it is asked to process.
+
+##### Implementation Details
+The abstract class `AbstractExpr` represents any expression to be interpreted, and the method `evaluate(input)` will be implemented by the its derived classes, that will delegate the work accordingly to the current rule being processed.
+```typescript
+// The base class for all expressions
+export abstract class AbstractExpr {
+  protected constructor(
+    protected simpleDrawDocument: SimpleDrawDocument,
+    protected render: Render
+  ) {}
+
+  // each rule will know how to process the corresponding expression
+  abstract evaluate(input: string): string;
+}
+
+// A class that knows how to interpret a 'draw' production
+export class DrawAbstractExpr extends AbstractExpr {
+  constructor(simpleDrawDocument: SimpleDrawDocument, render: Render) {
+    super(simpleDrawDocument, render);
+  }
+
+  evaluate(input: string): string {
+    const res = new ObjAbstractExpr(
+      this.simpleDrawDocument,
+      this.render
+    ).evaluate(input);
+    this.simpleDrawDocument.draw();
+    return res;
+  }
+}
+
+// A class that actually knows how to draw a rectangle
+export class RectObjAbstractExpr extends AbstractExpr {
+  constructor(simpleDrawDocument: SimpleDrawDocument, render: Render) {
+    super(simpleDrawDocument, render);
+  }
+
+  evaluate(input: string): string {
+    const exprs = input.split('rect')[1].split(' ');
+
+    let x, y, width, height;
+
+    x = Number(exprs[1]);
+    y = Number(exprs[2]);
+    width = Number(exprs[3]);
+    height = Number(exprs[4]);
+
+    const action = this.simpleDrawDocument.createRectangle(x, y, width, height);
+
+    return `Created rectangle with id ${action.getId()}`;
+  }
+}
+```
+##### Consequences
+- The code becomes more complex;
+- Having to much rules, implies having the same amount of classes;
+- Extending, maintaining and testing becomes easier because the logic for each
+rule is encapsulated.
 
 ### SVG and HTMLCanvas rendering with different modes
 
@@ -432,7 +498,7 @@ On the other side, the addition of these new actions means the creation of more 
 
 ##### Problem in Context
 
-For this feature, we want the application to be able to support persistence of the data in more than one format. We also want the user to be able to import data to the application, which translates into objects to be drawn. 
+For this feature, we want the application to be able to support persistence of the data in more than one format. We also want the user to be able to import data to the application, which translates into objects to be drawn.
 Therefore, the application should be capable of exporting the objects created by the user to a file, which can be an XML file or a JSON file, and also capable of importing an XML or JSON file in order to load data to the program.
 
 In order to solve this problem, the program must implement two algorithms, one for each of the types of file to be handled, both for the exporting and for the importing. Then, when the user requests the export or import feature, the correct algorithm must be selected to be executed. This problem was handled with the use of the **Strategy Pattern**.
@@ -504,7 +570,7 @@ So, for the different shapes of the program (rectangle, circle, triangle, polygo
 
 ##### Implementation Details
 
-When it comes to implementation, at first, a simple class was created, *Visitor*, which can be seen bellow. 
+When it comes to implementation, at first, a simple class was created, *Visitor*, which can be seen bellow.
 
 ```typescript
 export interface Visitor {
@@ -542,7 +608,7 @@ The **Command pattern** helps us solving this problem, as we can encapsulate eve
 
 ##### Problem in Context
 
-For this feature, we want the application to be able to support persistence of the data in more than one format. We also want the user to be able to import data to the application, which translates into objects to be drawn. 
+For this feature, we want the application to be able to support persistence of the data in more than one format. We also want the user to be able to import data to the application, which translates into objects to be drawn.
 Therefore, the application should be capable of exporting the objects created by the user to a file, which can be an XML file or a JSON file, and also capable of importing an XML or JSON file in order to load data to the program.
 
 In order to solve this problem, the program must implement two algorithms, one for each of the types of file to be handled, both for the exporting and for the importing. Then, when the user requests the export or import feature, the correct algorithm must be selected to be executed. This problem was handled with the use of the **Strategy Pattern**.
@@ -614,7 +680,7 @@ So, for the different shapes of the program (rectangle, circle, triangle, polygo
 
 ##### Implementation Details
 
-When it comes to implementation, at first, a simple class was created, *Visitor*, which can be seen bellow. 
+When it comes to implementation, at first, a simple class was created, *Visitor*, which can be seen bellow.
 
 ```typescript
 export interface Visitor {
