@@ -64,7 +64,7 @@ export class Controls {
       // tslint:disable-next-line:ban-ts-ignore
       // @ts-ignore
       const fileContent = e.target.result;
-      console.log(fileContent);
+      console.log('File content: ' + fileContent);
     };
 
     reader.readAsText(file);
@@ -120,6 +120,7 @@ export class Controls {
       // @ts-ignore
       //this.fileUploadForm.click();
       console.log('Going to import XML');
+      this.fileUploadForm.click();
       this.simpleDrawDocument.import('XML');
     };
 
@@ -128,6 +129,7 @@ export class Controls {
       // @ts-ignore
       //this.fileUploadForm.click();
       console.log('Going to import JSON');
+      this.fileUploadForm.click();
       this.simpleDrawDocument.import('JSON');
     };
 
