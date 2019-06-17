@@ -7,15 +7,17 @@ import { SimpleDrawDocument } from 'document';
 import { SVGRender } from 'render/svg-render';
 import { Coordinate } from 'utilities/coordinate';
 import { connect } from 'mqtt';
+import { DrawAbstractExpr } from 'repl/draw-abstract-expr';
+import { defaultRender } from 'index';
 
 //Strategy Pattern
 
 export interface Strategy {
-  execute(objects: Shape[]): void;
+  execute(objects: Shape[], currentDocument: SimpleDrawDocument): void;
 }
 
 export class ConcreteStrategyXMLExp implements Strategy {
-  execute(objects: Shape[]): void {
+  execute(objects: Shape[], currentDocument: SimpleDrawDocument): void {
     const xmlDoc: XMLDocument = document.implementation.createDocument(
       '',
       '',
@@ -44,7 +46,7 @@ export class ConcreteStrategyXMLExp implements Strategy {
 }
 
 export class ConcreteStrategyJSONExp implements Strategy {
-  execute(objects: Shape[]): void {
+  execute(objects: Shape[], currentDocument: SimpleDrawDocument): void {
     const xmlDoc: XMLDocument = document.implementation.createDocument(
       '',
       '',
@@ -80,7 +82,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
 
   private fileContent: string;
 
-  execute(objects: Shape[]): void {
+  execute(objects: Shape[], currentDocument: SimpleDrawDocument): void {
     const importedXMLFile = this.fileContent;
 
     const xmlReader = require('xml-reader');
@@ -93,24 +95,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
       .children()
       .size();
 
-    // todo: use exported values
-    const client = connect(
-      'wss://iot.eclipse.org:443/ws',
-      {
-        clientId: '0',
-        clean: false,
-      }
-    );
-
-    const canvas = document.getElementById('canvas') as HTMLElement;
-    const defaultRender = new SVGRender('svg', canvas);
-
-    // todo: use exported values
-    const newDoc = new SimpleDrawDocument(
-      0,
-      client,
-      new SVGRender('svg', canvas)
-    );
+    const newShapes = new Array<Shape>();
 
     for (let i = 0; i < numChildren; i++) {
       const eachShape = xmlQuery(ast)
@@ -140,7 +125,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
           newRect.scaleX = scaleX;
           newRect.scaleY = scaleY;
 
-          newDoc.add(newRect);
+          newShapes.push(newRect);
           break;
         }
         case 'circle': {
@@ -154,7 +139,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
           newCircle.scaleX = scaleX;
           newCircle.scaleY = scaleY;
 
-          newDoc.add(newCircle);
+          newShapes.push(newCircle);
           break;
         }
         case 'polyg': {
@@ -181,7 +166,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
           newPolyg.scaleX = scaleX;
           newPolyg.scaleY = scaleY;
 
-          newDoc.add(newPolyg);
+          newShapes.push(newPolyg);
           break;
         }
         case 'triangle': {
@@ -204,7 +189,7 @@ export class ConcreteStrategyXMLImp implements Strategy {
           newTriangle.scaleX = scaleX;
           newTriangle.scaleY = scaleY;
 
-          newDoc.add(newTriangle);
+          newShapes.push(newTriangle);
           break;
         }
         default: {
@@ -213,7 +198,8 @@ export class ConcreteStrategyXMLImp implements Strategy {
       }
     }
 
-    newDoc.draw();
+    currentDocument.objects = newShapes;
+    currentDocument.draw();
   }
 }
 
@@ -224,7 +210,7 @@ export class ConcreteStrategyJSONImp implements Strategy {
 
   private fileContent: string;
 
-  execute(objects: Shape[]): void {
+  execute(objects: Shape[], currentDocument: SimpleDrawDocument): void {
     const importedJSONFile = this.fileContent;
 
     //Convert Json to Xml
@@ -242,20 +228,7 @@ export class ConcreteStrategyJSONImp implements Strategy {
       .children()
       .size();
 
-    // todo: use exported values
-    const client = connect(
-      'wss://iot.eclipse.org:443/ws',
-      {
-        clientId: '0',
-        clean: false,
-      }
-    );
-
-    const canvas = document.getElementById('canvas') as HTMLElement;
-    const defaultRender = new SVGRender('svg', canvas);
-
-    // todo: use exported values
-    const newDoc = new SimpleDrawDocument(0, client, defaultRender);
+    const newShapes = new Array<Shape>();
 
     for (let i = 0; i < numChildren; i++) {
       const eachShape = xmlQuery(ast)
@@ -279,14 +252,13 @@ export class ConcreteStrategyJSONImp implements Strategy {
           const height = eachShapeAttributes['height'];
           const width = eachShapeAttributes['width'];
 
-          // todo: use export id value
           const newRect = new Rectangle(id, coordX, coordY, width, height);
           newRect.fillColor = fillColor;
           newRect.rotation = rotation;
           newRect.scaleX = scaleX;
           newRect.scaleY = scaleY;
 
-          newDoc.add(newRect);
+          newShapes.push(newRect);
           break;
         }
         case 'circle': {
@@ -294,14 +266,13 @@ export class ConcreteStrategyJSONImp implements Strategy {
           const coordY = eachShapeAttributes['y'];
           const radius = eachShapeAttributes['radius'];
 
-          // todo: use export id value
           const newCircle = new Circle(id, coordX, coordY, radius);
           newCircle.fillColor = fillColor;
           newCircle.rotation = rotation;
           newCircle.scaleX = scaleX;
           newCircle.scaleY = scaleY;
 
-          newDoc.add(newCircle);
+          newShapes.push(newCircle);
           break;
         }
         case 'polyg': {
@@ -322,14 +293,13 @@ export class ConcreteStrategyJSONImp implements Strategy {
             coordsArray.push(coord);
           }
 
-          // todo: use export id value
           const newPolyg = new Polygon(id, ...coordsArray);
           newPolyg.fillColor = fillColor;
           newPolyg.rotation = rotation;
           newPolyg.scaleX = scaleX;
           newPolyg.scaleY = scaleY;
 
-          newDoc.add(newPolyg);
+          newShapes.push(newPolyg);
           break;
         }
         case 'triangle': {
@@ -339,8 +309,6 @@ export class ConcreteStrategyJSONImp implements Strategy {
           const p2y = eachShapeAttributes['p2y'];
           const p3x = eachShapeAttributes['p3x'];
           const p3y = eachShapeAttributes['p3y'];
-
-          // todo: use export id value
 
           const newTriangle = new Triangle(
             id,
@@ -354,7 +322,7 @@ export class ConcreteStrategyJSONImp implements Strategy {
           newTriangle.scaleX = scaleX;
           newTriangle.scaleY = scaleY;
 
-          newDoc.add(newTriangle);
+          newShapes.push(newTriangle);
           break;
         }
         default: {
@@ -363,7 +331,8 @@ export class ConcreteStrategyJSONImp implements Strategy {
       }
     }
 
-    newDoc.draw();
+    currentDocument.objects = newShapes;
+    currentDocument.draw();
   }
 }
 
@@ -374,8 +343,8 @@ export class Context {
     this.strategy = strategy;
   }
 
-  executeStrategy(objects: Shape[]) {
-    return this.strategy.execute(objects);
+  executeStrategy(objects: Shape[], currentDocument: SimpleDrawDocument) {
+    return this.strategy.execute(objects, currentDocument);
   }
 }
 

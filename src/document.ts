@@ -163,7 +163,7 @@ export class SimpleDrawDocument {
       context.setStrategy(new ConcreteStrategyJSONExp());
     }
 
-    const result = context.executeStrategy(this.objects);
+    const result = context.executeStrategy(this.objects, this);
   }
 
   import(action: string, content: string) {
@@ -176,7 +176,7 @@ export class SimpleDrawDocument {
       context.setStrategy(new ConcreteStrategyJSONImp(content));
     }
 
-    const result = context.executeStrategy(this.objects);
+    const result = context.executeStrategy(this.objects, this);
   }
 
   getShapeById(id: number): Shape {
