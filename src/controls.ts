@@ -47,6 +47,22 @@ export class Controls {
     this.bindEvents();
   }
 
+  fileOnChange(event: Event) {
+    // tslint:disable-next-line:ban-ts-ignore
+    // @ts-ignore
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = e => {
+      // tslint:disable-next-line:ban-ts-ignore
+      // @ts-ignore
+      const fileContent = e.target.result;
+      console.log(fileContent);
+    };
+
+    reader.readAsText(file);
+  }
+
   bindEvents() {
     this.terminalElem.addEventListener('keydown', event => {
       if (event.code === 'Enter') {
@@ -63,6 +79,8 @@ export class Controls {
         }
       }
     });
+
+    this.fileUploadForm.onchange = e => this.fileOnChange(e);
 
     // tslint:disable-next-line:ban-ts-ignore
     // @ts-ignore
