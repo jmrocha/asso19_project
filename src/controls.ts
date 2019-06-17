@@ -2,6 +2,7 @@ import { ExprAbstractExpr } from './repl/expr-abstract-expr';
 import { SimpleDrawDocument } from './document';
 import { Render } from './render/render';
 import { Terminal } from './terminal';
+import { SVGRender } from './render/svg-render';
 
 export class Controls {
   private terminal: Terminal;
@@ -15,6 +16,8 @@ export class Controls {
   private readonly importJSONBtn: HTMLElement;
   private readonly exportXMLBtn: HTMLElement;
   private readonly exportJSONBtn: HTMLElement;
+  private readonly normalViewBtn: HTMLElement;
+  private readonly invertedViewBtn: HTMLElement;
   private fileUploadForm: HTMLElement;
   private importAction = '';
 
@@ -41,6 +44,12 @@ export class Controls {
     ) as HTMLElement;
     this.exportJSONBtn = document.getElementById(
       'export-json-btn'
+    ) as HTMLElement;
+    this.normalViewBtn = document.getElementById(
+      'normal-view-btn'
+    ) as HTMLElement;
+    this.invertedViewBtn = document.getElementById(
+      'inverted-view-btn'
     ) as HTMLElement;
     this.fileUploadForm = document.getElementById('file-upload') as HTMLElement;
 
@@ -142,8 +151,25 @@ export class Controls {
 
     // tslint:disable-next-line:ban-ts-ignore
     // @ts-ignore
+
     this.exportJSONBtn.onclick = () => {
       this.simpleDrawDocument.export('JSON');
+    };
+
+    this.normalViewBtn.onclick = () => {
+      if (this.simpleDrawDocument.currentRender instanceof SVGRender) {
+        this.simpleDrawDocument.changeRender('svg');
+      } else {
+        this.simpleDrawDocument.changeRender('canvas');
+      }
+    };
+
+    this.invertedViewBtn.onclick = () => {
+      if (this.simpleDrawDocument.currentRender instanceof SVGRender) {
+        this.simpleDrawDocument.changeRender('svg-inverted');
+      } else {
+        this.simpleDrawDocument.changeRender('canvas-inverted');
+      }
     };
   }
 }

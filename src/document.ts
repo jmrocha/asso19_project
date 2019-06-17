@@ -104,8 +104,17 @@ export class SimpleDrawDocument {
   }
 
   add(r: Shape): void {
-    this.objects.push(r);
-    this.objId++;
+    let found = false;
+    for (let i = 0; i < this.objects.length; i++) {
+      if (this.objects[i].getId() === r.getId()) {
+        found = true;
+      }
+    }
+
+    if (!found) {
+      this.objects.push(r);
+      this.objId++;
+    }
   }
 
   do<T>(a: Action<T>): T {

@@ -7,8 +7,6 @@ import { SimpleDrawDocument } from 'document';
 import { SVGRender } from 'render/svg-render';
 import { Coordinate } from 'utilities/coordinate';
 import { connect } from 'mqtt';
-import { DrawAbstractExpr } from 'repl/draw-abstract-expr';
-import { defaultRender } from 'index';
 
 //Strategy Pattern
 
@@ -97,6 +95,15 @@ export class ConcreteStrategyXMLImp implements Strategy {
 
     const newShapes = new Array<Shape>();
 
+    // todo: use exported values
+    const client = connect(
+      'wss://iot.eclipse.org:443/ws',
+      {
+        clientId: '0',
+        clean: false,
+      }
+    );
+    
     for (let i = 0; i < numChildren; i++) {
       const eachShape = xmlQuery(ast)
         .find('shapes')
