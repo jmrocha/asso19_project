@@ -2,6 +2,7 @@ import { ExprAbstractExpr } from './repl/expr-abstract-expr';
 import { SimpleDrawDocument } from './document';
 import { Render } from './render/render';
 import { Terminal } from './terminal';
+import {SVGRender} from "./render/svg-render";
 
 export class Controls {
   private terminal: Terminal;
@@ -10,12 +11,12 @@ export class Controls {
   private readonly undoBtn: HTMLElement;
   private readonly redoBtn: HTMLElement;
   private readonly svgBtn: HTMLElement;
-  private readonly svgInvertedBtn: HTMLElement;
   private readonly canvasBtn: HTMLElement;
-  private readonly canvasInvertedBtn: HTMLElement;
   private readonly importBtn: HTMLElement;
   private readonly exportXMLBtn: HTMLElement;
   private readonly exportJSONBtn: HTMLElement;
+  private readonly normalViewBtn: HTMLElement;
+  private readonly invertedViewBtn: HTMLElement;
   private fileUploadForm: HTMLElement;
   constructor(
     private simpleDrawDocument: SimpleDrawDocument,
@@ -28,13 +29,7 @@ export class Controls {
     this.undoBtn = document.getElementById('undo-btn') as HTMLElement;
     this.redoBtn = document.getElementById('redo-btn') as HTMLElement;
     this.svgBtn = document.getElementById('svg-btn') as HTMLElement;
-    this.svgInvertedBtn = document.getElementById(
-      'svg-inverted-btn'
-    ) as HTMLElement;
     this.canvasBtn = document.getElementById('canvas-btn') as HTMLElement;
-    this.canvasInvertedBtn = document.getElementById(
-      'canvas-inverted-btn'
-    ) as HTMLElement;
     this.importBtn = document.getElementById('import-btn') as HTMLElement;
     this.exportXMLBtn = document.getElementById(
       'export-xml-btn'
@@ -42,14 +37,18 @@ export class Controls {
     this.exportJSONBtn = document.getElementById(
       'export-json-btn'
     ) as HTMLElement;
+    this.normalViewBtn = document.getElementById(
+      'normal-view-btn'
+    ) as HTMLElement;
+    this.invertedViewBtn = document.getElementById(
+      'inverted-view-btn'
+    ) as HTMLElement;
     this.fileUploadForm = document.getElementById('file-upload') as HTMLElement;
 
     console.assert(this.undoBtn);
     console.assert(this.redoBtn);
     console.assert(this.svgBtn);
-    console.assert(this.svgInvertedBtn);
     console.assert(this.canvasBtn);
-    console.assert(this.canvasInvertedBtn);
     console.assert(this.importBtn);
     console.assert(this.exportXMLBtn);
     console.assert(this.exportJSONBtn);
@@ -94,20 +93,8 @@ export class Controls {
 
     // tslint:disable-next-line:ban-ts-ignore
     // @ts-ignore
-    this.svgInvertedBtn.onclick = () => {
-      this.simpleDrawDocument.changeRender('svg-inverted');
-    };
-
-    // tslint:disable-next-line:ban-ts-ignore
-    // @ts-ignore
     this.canvasBtn.onclick = () => {
       this.simpleDrawDocument.changeRender('canvas');
-    };
-
-    // tslint:disable-next-line:ban-ts-ignore
-    // @ts-ignore
-    this.canvasInvertedBtn.onclick = () => {
-      this.simpleDrawDocument.changeRender('canvas-inverted');
     };
 
     // tslint:disable-next-line:ban-ts-ignore
@@ -125,5 +112,21 @@ export class Controls {
     // tslint:disable-next-line:ban-ts-ignore
     // @ts-ignore
     this.exportJSONBtn.onclick = () => {};
+
+    this.normalViewBtn.onclick = () => {
+      if (this.simpleDrawDocument.currentRender instanceof SVGRender) {
+        this.simpleDrawDocument.changeRender('svg');
+      } else {
+        this.simpleDrawDocument.changeRender('canvas');
+      }
+    };
+
+    this.invertedViewBtn.onclick = () => {
+      if (this.simpleDrawDocument.currentRender instanceof SVGRender) {
+        this.simpleDrawDocument.changeRender('svg-inverted');
+      } else {
+        this.simpleDrawDocument.changeRender('canvas-inverted');
+      }
+    };
   }
 }
